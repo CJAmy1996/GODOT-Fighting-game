@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://kev5mqi22vpk"
+
+[deps]
+
+files=["res://Docs/CharacterTemplateChecklist.Designer Task.translation", "res://Docs/CharacterTemplateChecklist.File Or Asset To Touch.translation", "res://Docs/CharacterTemplateChecklist.Safe For Designer.translation", "res://Docs/CharacterTemplateChecklist.When To Ask Programmer.translation", "res://Docs/CharacterTemplateChecklist.Notes.translation"]
+
+source_file="res://Docs/CharacterTemplateChecklist.csv"
+dest_files=["res://Docs/CharacterTemplateChecklist.Designer Task.translation", "res://Docs/CharacterTemplateChecklist.File Or Asset To Touch.translation", "res://Docs/CharacterTemplateChecklist.Safe For Designer.translation", "res://Docs/CharacterTemplateChecklist.When To Ask Programmer.translation", "res://Docs/CharacterTemplateChecklist.Notes.translation"]
+
+[params]
+
+compress=true
+delimiter=0

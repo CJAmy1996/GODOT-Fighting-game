@@ -1,0 +1,31 @@
+# Godot editor/import cache
+.godot/
+.import/
+imported/
+*.translation
+
+# Godot export/build output
+export.cfg
+export_presets.cfg
+*.pck
+*.zip
+*.exe
+*.app
+
+# C# / .NET build output
+bin/
+obj/
+*.user
+*.suo
+*.csproj.user
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vs/
+.vscode/

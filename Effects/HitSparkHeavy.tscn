@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Demo/HitSparkPlaceholder.cs" id="1_spark"]
+
+[node name="HitSparkHeavy" type="Node2D"]
+script = ExtResource("1_spark")
+Heavy = true
+LifetimeFrames = 12

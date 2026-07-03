@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cfgco0b6uqyaq"
+
+[deps]
+
+files=["res://Docs/DesignerTuningReference.File.translation", "res://Docs/DesignerTuningReference.Property.translation", "res://Docs/DesignerTuningReference.Default.translation", "res://Docs/DesignerTuningReference.Designer Use.translation", "res://Docs/DesignerTuningReference.Notes.translation"]
+
+source_file="res://Docs/DesignerTuningReference.csv"
+dest_files=["res://Docs/DesignerTuningReference.File.translation", "res://Docs/DesignerTuningReference.Property.translation", "res://Docs/DesignerTuningReference.Default.translation", "res://Docs/DesignerTuningReference.Designer Use.translation", "res://Docs/DesignerTuningReference.Notes.translation"]
+
+[params]
+
+compress=true
+delimiter=0
