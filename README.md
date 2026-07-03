@@ -1,4 +1,4 @@
-.# Modular Godot C# Fighter Movement Framework
+# Modular Godot C# Fighter Movement Framework
 
 This is a Godot 4 C# starting point for a fast, responsive 2D fighter whose characters can have radically different movement without modifying shared controller code.
 
