@@ -91,12 +91,12 @@ public partial class NormalMoveData : Resource
 		return moveName == ruleName;
 	}
 
-	public bool AllowsChainTo(string nextAttackName)
+	public bool AllowsChainTo(string nextAttackName, bool nextStartedCrouching, bool nextStartedAirborne)
 	{
 		if (AllowedChainTargets != null && AllowedChainTargets.Length > 0)
 		{
 			foreach (string target in AllowedChainTargets)
-				if (MatchesAttackToken(target, nextAttackName)) return true;
+				if (MatchesAttackToken(target, nextAttackName, nextStartedCrouching, nextStartedAirborne)) return true;
 			return false;
 		}
 
@@ -106,9 +106,30 @@ public partial class NormalMoveData : Resource
 			(next.StartsWith("SPECIAL") && CanChainToSpecial);
 	}
 
-	internal static bool MatchesAttackToken(string token, string attackName)
+	internal static bool MatchesAttackToken(string token, string attackName) =>
+		MatchesAttackToken(token, attackName, false, false);
+
+	internal static bool MatchesAttackToken(string token, string attackName, bool startedCrouching, bool startedAirborne)
 	{
 		string ruleName = token?.Trim().ToUpperInvariant() ?? "";
+		if (ruleName.StartsWith("STANDING "))
+		{
+			if (startedAirborne || startedCrouching) return false;
+			ruleName = ruleName["STANDING ".Length..];
+		}
+		else if (ruleName.StartsWith("CROUCHING ") || ruleName.StartsWith("CROUCH "))
+		{
+			string prefix = ruleName.StartsWith("CROUCHING ") ? "CROUCHING " : "CROUCH ";
+			if (startedAirborne || !startedCrouching) return false;
+			ruleName = ruleName[prefix.Length..];
+		}
+		else if (ruleName.StartsWith("AIRBORNE ") || ruleName.StartsWith("AIR "))
+		{
+			string prefix = ruleName.StartsWith("AIRBORNE ") ? "AIRBORNE " : "AIR ";
+			if (!startedAirborne) return false;
+			ruleName = ruleName[prefix.Length..];
+		}
+
 		string moveName = attackName.ToUpperInvariant();
 		if (ruleName == "" || ruleName == "ANY") return true;
 		if (ruleName == "LIGHT" || ruleName == "HEAVY" || ruleName == "SPECIAL") return moveName.StartsWith(ruleName);

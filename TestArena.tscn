@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://dd14cvfwh6wm0"]
+[gd_scene load_steps=9 format=3 uid="uid://dd14cvfwh6wm0"]
 
 [ext_resource type="Script" uid="uid://bjcen2m8a7qky" path="res://Scripts/Demo/ArenaBackdrop.cs" id="1_backdrop"]
 [ext_resource type="Script" uid="uid://dphsgsf4u0aad" path="res://Scripts/Demo/StickFigureFighter.cs" id="2_fighter"]
 [ext_resource type="Script" uid="uid://d4a3txbd6s580" path="res://Scripts/Demo/StageCamera.cs" id="3_camera"]
 [ext_resource type="Script" uid="uid://chkclim11sa0m" path="res://Scripts/Demo/VersusStageRules.cs" id="4_rules"]
+[ext_resource type="Script" uid="uid://dttwy7si3rte5" path="res://Scripts/Tests/MotionInputBufferTests.cs" id="5_motion_tests"]
 
 [sub_resource type="RectangleShape2D" id="RectangleFloor"]
 size = Vector2(3360, 70)
@@ -71,6 +72,9 @@ FighterOnePath = NodePath("../Fighter")
 FighterTwoPath = NodePath("../Opponent")
 StageWidth = 3360.0
 
+[node name="MotionInputBufferTests" type="Node" parent="."]
+script = ExtResource("5_motion_tests")
+
 [node name="HUD" type="CanvasLayer" parent="."]
 
 [node name="Title" type="Label" parent="HUD"]
@@ -86,4 +90,4 @@ offset_top = 68.0
 theme_override_colors/font_color = Color(0.78, 0.84, 0.95, 1)
 theme_override_font_sizes/font_size = 17
 text = "A / D: move     Forward, Forward: run     W: neutral / forward / back jump
-Super jump: tap S, then W within 4 frames. Air dash/back air dash still available."
+Super jump: tap S, then W within 4 frames. QCF + U/I: projectile. QCF + O: EWGF."

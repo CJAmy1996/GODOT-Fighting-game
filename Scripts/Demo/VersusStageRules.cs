@@ -47,6 +47,7 @@ public partial class VersusStageRules : Node
 		if (_fighterTwo.JustLanded) ResolveLandingOverlap(_fighterTwo, _fighterOne, leftEdge, rightEdge);
 		ResolvePushboxes();
 		ResolveBasicAttackHits();
+		ResolveProjectileHits();
 		ClampFightersToCameraCorners(leftEdge, rightEdge);
 	}
 
@@ -219,6 +220,26 @@ public partial class VersusStageRules : Node
 		float shake = Mathf.Max(firstShake, secondShake);
 		int shakeFrames = Mathf.Max(firstHitstop, secondHitstop);
 		if (shake > 0f) _fightCamera?.Shake(shake, shakeFrames);
+	}
+
+	private void ResolveProjectileHits()
+	{
+		foreach (Node node in GetTree().GetNodesInGroup(BasicProjectile.ProjectileGroup))
+		{
+			if (node is not BasicProjectile projectile || projectile.HasHit || projectile.OwnerFighter == null) continue;
+			FighterController defender = projectile.OwnerFighter == _fighterOne
+				? _fighterTwo
+				: projectile.OwnerFighter == _fighterTwo ? _fighterOne : null;
+			if (defender == null) continue;
+
+			if (!projectile.OwnerFighter.TryApplyProjectileHit(defender, projectile.WorldHitbox, projectile.HitstunFrames, projectile.Pushback,
+				projectile.HitstopFrames, projectile.ShakeStrength, out int hitstop, out float shake, out _, out Vector2 hitPoint, out bool heavySpark)) continue;
+
+			if (hitstop > 0) defender.RequestHitstop(hitstop);
+			if (shake > 0f) _fightCamera?.Shake(shake, hitstop);
+			_hitSparkLayer?.Spawn(hitPoint, heavySpark);
+			projectile.MarkHit();
+		}
 	}
 
 	private void ApplyCornerPushbackTransfer(FighterController attacker, FighterController defender, float hitPushback)

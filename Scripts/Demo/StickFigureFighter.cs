@@ -207,6 +207,16 @@ public partial class StickFigureFighter : FighterController
 			AirAcceleration = 2600f, AirDeceleration = 1700f, AllowAirControl = false,
 			CoyoteFrames = 3, InputBufferFrames = 3
 		},
+		CancelRules = new CancelRule[]
+		{
+			new()
+			{
+				FromMove = "ANY_NORMAL",
+				Kind = CancelKind.Special,
+				RequiresContact = true,
+				StartFrame = 0
+			}
+		},
 		NormalMoves = CreateBaselineNormalMoveSet(),
 		Abilities = new MovementAbility[]
 		{
@@ -277,11 +287,47 @@ public partial class StickFigureFighter : FighterController
 			},
 			new()
 			{
-				AttackName = "LIGHT",
-				Stance = NormalMoveStance.Any,
-				AllowedChainTargets = new[] { "LIGHT", "HEAVY", "ELECTRIC WIND GOD FIST" },
+				AttackName = "LIGHT PUNCH",
+				Stance = NormalMoveStance.Standing,
+				AllowedChainTargets = new[] { "STANDING LIGHT KICK", "STANDING HEAVY", "CROUCHING LIGHT", "CROUCHING HEAVY" },
 				ChainRequiresContact = true,
-				ChainEarliestActiveFramesLeft = 2
+				ChainEarliestActiveFramesLeft = 3
+			},
+			new()
+			{
+				AttackName = "LIGHT KICK",
+				Stance = NormalMoveStance.Standing,
+				AllowedChainTargets = new[] { "STANDING LIGHT PUNCH", "STANDING HEAVY", "CROUCHING LIGHT", "CROUCHING HEAVY" },
+				ChainRequiresContact = true,
+				ChainEarliestActiveFramesLeft = 3
+			},
+			new()
+			{
+				AttackName = "LIGHT",
+				Stance = NormalMoveStance.Crouching,
+				AllowedChainTargets = new[] { "CROUCHING LIGHT", "CROUCHING HEAVY" },
+				ChainRequiresContact = true,
+				ChainEarliestActiveFramesLeft = 3
+			},
+			new()
+			{
+				AttackName = "HEAVY PUNCH",
+				Stance = NormalMoveStance.Standing,
+				AllowedChainTargets = new[] { "CROUCHING HEAVY PUNCH", "CROUCHING HEAVY KICK" },
+				ChainRequiresContact = true
+			},
+			new()
+			{
+				AttackName = "HEAVY KICK",
+				Stance = NormalMoveStance.Standing,
+				AllowedChainTargets = new[] { "CROUCHING HEAVY PUNCH", "CROUCHING HEAVY KICK" },
+				ChainRequiresContact = true
+			},
+			new()
+			{
+				AttackName = "HEAVY",
+				Stance = NormalMoveStance.Crouching,
+				ChainRequiresContact = true
 			}
 		}
 	};

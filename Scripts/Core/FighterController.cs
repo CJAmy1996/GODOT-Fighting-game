@@ -45,7 +45,7 @@ public partial class FighterController : CharacterBody2D
 	[Export] public int LightPunchActiveFrames { get; set; } = 3;
 	[Export] public int LightKickActiveFrames { get; set; } = 4;
 	[Export] public int LightAttackRecoveryFrames { get; set; } = 8;
-	[Export] public int LightChainEarliestActiveFramesLeft { get; set; } = 2;
+	[Export] public int LightChainEarliestActiveFramesLeft { get; set; } = 3;
 	[Export] public int HeavyPunchActiveFrames { get; set; } = 4;
 	[Export] public int HeavyKickActiveFrames { get; set; } = 5;
 	[Export] public int HeavyAttackRecoveryFrames { get; set; } = 18;
@@ -105,6 +105,10 @@ public partial class FighterController : CharacterBody2D
 	[Export] public Rect2 Special1HitboxLocal { get; set; } = new(20f, -70f, 76f, 52f);
 	[Export] public Rect2 Special2HitboxLocal { get; set; } = new(18f, -50f, 88f, 42f);
 	[Export] public Rect2 ElectricWindGodFistHitboxLocal { get; set; } = new(24f, -66f, 72f, 46f);
+	[ExportGroup("Projectile Specials")]
+	[Export] public float LightProjectileSpeed { get; set; } = 720f;
+	[Export] public float HeavyProjectileSpeed { get; set; } = 1040f;
+	[Export] public Vector2 ProjectileSpawnOffset { get; set; } = new(70f, -42f);
 	[ExportGroup("Visual Smoothing")]
 	[Export] public float VisualCorrectionSlideSpeed { get; set; } = 900f;
 	[Export] public float MaxVisualCorrectionOffset { get; set; } = 80f;
@@ -118,11 +122,12 @@ public partial class FighterController : CharacterBody2D
 	public int CoyoteFramesLeft { get; private set; }
 	public int JumpBufferFramesLeft { get; private set; }
 	public int DashBufferFramesLeft { get; private set; }
+	public int AttackBufferFramesLeft { get; private set; }
 	public float BufferedJumpHorizontal { get; private set; }
 	public int BufferedJumpFacing { get; private set; } = 1;
 	public float JumpInputHorizontal => CurrentInput.JumpPressed ? CurrentInput.Horizontal : BufferedJumpHorizontal;
 	public int JumpInputFacing => CurrentInput.JumpPressed ? Facing : BufferedJumpFacing;
-	public int DashInputDirection => _dashCommandDirection != 0 ? _dashCommandDirection : Facing;
+	public int DashInputDirection => _motionInputBuffer.DashCommandDirection != 0 ? _motionInputBuffer.DashCommandDirection : Facing;
 	public MovementAbility ActiveAbility { get; private set; }
 	/// <summary>Pushbox in world space. It follows this fighter's origin exactly.</summary>
 	public Rect2 ActivePushboxLocal => !IsOnFloor() && SuppressesGroundedPushWhileAirborne ? AirbornePushboxLocal : PushboxLocal;
@@ -175,24 +180,23 @@ public partial class FighterController : CharacterBody2D
 	public bool CurrentAttackCanHitGroundedKnockdown => _currentAttackCanHitGroundedKnockdown;
 	public Vector2 VisualCorrectionOffset { get; private set; }
 	public readonly Dictionary<string, AbilityRuntime> Runtime = new();
+	private readonly MotionInputBuffer _motionInputBuffer = new();
 	private readonly Dictionary<string, int> _airJumpUses = new();
 	private readonly Dictionary<string, int> _normalUsesThisChain = new();
 	private bool _groundedLastFrame;
-	private int _framesSinceDown = int.MaxValue;
-	private int _downToUpFrames = int.MaxValue;
-	private int _superJumpCommandFramesLeft;
-	private int _framesSinceLeftTap = int.MaxValue;
-	private int _framesSinceRightTap = int.MaxValue;
-	private int _dashCommandFramesLeft;
-	private int _dashCommandDirection;
-	private int _qcfForwardCommandFramesLeft;
-	private int _backDashInputLockoutFrames;
 	private int _pendingLandingLagFrames;
+	private int _lightPunchBufferFramesLeft;
+	private int _lightKickBufferFramesLeft;
+	private int _heavyPunchBufferFramesLeft;
+	private int _heavyKickBufferFramesLeft;
+	private int _special1BufferFramesLeft;
+	private int _special2BufferFramesLeft;
 	private bool _doubleJumpAirDashAvailable;
 	private int _attackStartupFramesLeft;
 	private int _attackActiveFramesLeft;
 	private int _attackRecoveryFramesLeft;
 	private bool _attackHasHit;
+	private bool _projectileSpawnedThisAttack;
 	private bool _currentAttackStartedAirborne;
 	private bool _currentAttackStartedFromAirDash;
 	private bool _currentAttackStartedFromRun;
@@ -219,6 +223,8 @@ public partial class FighterController : CharacterBody2D
 	private const int QuarterCircleForwardWindowFrames = 12;
 	private const int BackDashInputLockoutWindowFrames = 18;
 	private const string ElectricWindGodFistName = "ELECTRIC WIND GOD FIST";
+	private const string LightProjectileName = "LIGHT PROJECTILE";
+	private const string HeavyProjectileName = "HEAVY PROJECTILE";
 
 	private readonly struct NormalMoveRule
 	{
@@ -282,12 +288,12 @@ public partial class FighterController : CharacterBody2D
 				CanHitGroundedKnockdown = data.CanHitGroundedKnockdown
 			};
 
-		public bool AllowsChainTo(string nextAttackName)
+		public bool AllowsChainTo(string nextAttackName, bool nextStartedCrouching, bool nextStartedAirborne)
 		{
 			if (AllowedChainTargets != null && AllowedChainTargets.Length > 0)
 			{
 				foreach (string target in AllowedChainTargets)
-					if (NormalMoveData.MatchesAttackToken(target, nextAttackName)) return true;
+					if (NormalMoveData.MatchesAttackToken(target, nextAttackName, nextStartedCrouching, nextStartedAirborne)) return true;
 				return false;
 			}
 
@@ -310,14 +316,10 @@ public partial class FighterController : CharacterBody2D
 	public override void _Input(InputEvent @event)
 	{
 		if (!ReadLocalInput) return;
-		if (@event.IsActionPressed("move_down")) _framesSinceDown = 0;
+		if (@event.IsActionPressed("move_down")) _motionInputBuffer.PressDown();
 		if (@event.IsActionPressed("move_left")) HandleHorizontalTap(-1);
 		if (@event.IsActionPressed("move_right")) HandleHorizontalTap(1);
-		if (@event.IsActionPressed("jump") && _framesSinceDown < int.MaxValue)
-		{
-			_downToUpFrames = _framesSinceDown;
-			_superJumpCommandFramesLeft = Definition?.Tuning?.InputBufferFrames ?? 3;
-		}
+		if (@event.IsActionPressed("jump")) _motionInputBuffer.PressJump(Definition?.Tuning?.InputBufferFrames ?? 3);
 	}
 
 	public void SetExternalInput(FighterInput input) => CurrentInput = input;
@@ -331,16 +333,14 @@ public partial class FighterController : CharacterBody2D
 		WasGrounded = IsOnFloor();
 		if (HitstopFramesLeft > 0)
 		{
+			UpdateInputBuffer(input, true);
 			HitstopFramesLeft--;
 			return;
 		}
-		if (_framesSinceDown < int.MaxValue) _framesSinceDown++;
-		if (_framesSinceLeftTap < int.MaxValue) _framesSinceLeftTap++;
-		if (_framesSinceRightTap < int.MaxValue) _framesSinceRightTap++;
-		if (_backDashInputLockoutFrames > 0) _backDashInputLockoutFrames--;
+		_motionInputBuffer.Tick();
 		if (WasGrounded && LandingLagFramesLeft > 0) LandingLagFramesLeft--;
 		if (FaceWithMovement && input.Horizontal != 0) Facing = input.Horizontal > 0 ? 1 : -1;
-		UpdateInputBuffer(input);
+		UpdateInputBuffer(input, false);
 
 		if (WasGrounded)
 		{
@@ -371,7 +371,8 @@ public partial class FighterController : CharacterBody2D
 		}
 		else
 		{
-			if (!TryStartLauncherChaseJump() && !TryStartAirLightHitJumpCancel() && !TryStartDoubleJumpStateAirDashCancel())
+			if (!TryStartLauncherChaseJump() && !TryStartAirLightHitJumpCancel() && !TryStartNormalJumpCancel() &&
+				!TryStartNormalAirDashCancel() && !TryCrouchCancelCurrentNormal() && !TryStartDoubleJumpStateAirDashCancel())
 			{
 				CancelGroundMovementForCrouchNormal();
 				TryStartBasicAttack();
@@ -403,9 +404,7 @@ public partial class FighterController : CharacterBody2D
 			ConsumeJumpBuffer();
 		}
 		_groundedLastFrame = WasGrounded;
-		if (_superJumpCommandFramesLeft > 0) _superJumpCommandFramesLeft--;
-		if (_dashCommandFramesLeft > 0) _dashCommandFramesLeft--;
-		if (_qcfForwardCommandFramesLeft > 0) _qcfForwardCommandFramesLeft--;
+		TrySpawnProjectileForCurrentAttack();
 		if (_launcherJumpCancelFramesLeft > 0) _launcherJumpCancelFramesLeft--;
 		if (_airLightJumpCancelFramesLeft > 0) _airLightJumpCancelFramesLeft--;
 	}
@@ -445,18 +444,12 @@ public partial class FighterController : CharacterBody2D
 	public void ConsumeDashCommand()
 	{
 		DashBufferFramesLeft = 0;
-		_dashCommandFramesLeft = 0;
-		_dashCommandDirection = 0;
+		_motionInputBuffer.ConsumeDashCommand();
 	}
-	public void ConsumeQuarterCircleForwardCommand() => _qcfForwardCommandFramesLeft = 0;
+	public void ConsumeQuarterCircleForwardCommand() => _motionInputBuffer.ConsumeQuarterCircleForwardCommand();
 	public bool IsDownThenUpCommand(int windowFrames) =>
-		_superJumpCommandFramesLeft > 0 && _downToUpFrames <= windowFrames;
-	public void ConsumeDownThenUpCommand()
-	{
-		_framesSinceDown = int.MaxValue;
-		_downToUpFrames = int.MaxValue;
-		_superJumpCommandFramesLeft = 0;
-	}
+		_motionInputBuffer.IsDownThenUpCommand(windowFrames);
+	public void ConsumeDownThenUpCommand() => _motionInputBuffer.ConsumeDownThenUpCommand();
 
 	public bool CanUseAirJump(string resourceId, int maximumUses) =>
 		!AirJumpsDisabledThisJump &&
@@ -520,7 +513,7 @@ public partial class FighterController : CharacterBody2D
 		hitPushback = 0f;
 		hitPoint = Vector2.Zero;
 		heavySpark = false;
-		if (!IsAttackActive || _attackHasHit || defender == null || defender == this) return false;
+		if (!IsAttackActive || _attackHasHit || IsProjectileAttackName(CurrentAttackName) || defender == null || defender == this) return false;
 		if (defender.IsGroundedKnockdown && !_currentAttackCanHitGroundedKnockdown) return false;
 		if (!WorldHitbox.Intersects(defender.WorldHurtbox)) return false;
 		_attackHasHit = true;
@@ -568,6 +561,31 @@ public partial class FighterController : CharacterBody2D
 		hitstopFrames = _currentAttackHitstopFrames + GlobalHitstopBonusFrames + (_currentAttackStartedAirborne ? AirAttackHitstopBonusFrames : GroundedAttackHitstopBonusFrames);
 		shakeStrength = _currentAttackShakeStrength;
 		hitPushback = appliedPushback;
+		return true;
+	}
+
+	public bool TryApplyProjectileHit(FighterController defender, Rect2 projectileHitbox, int hitstunFrames, float pushback, int hitstopFrames,
+		float shakeStrength, out int appliedHitstopFrames, out float appliedShakeStrength, out float hitPushback, out Vector2 hitPoint, out bool heavySpark)
+	{
+		appliedHitstopFrames = 0;
+		appliedShakeStrength = 0f;
+		hitPushback = 0f;
+		hitPoint = Vector2.Zero;
+		heavySpark = false;
+		if (defender == null || defender == this) return false;
+		if (defender.IsGroundedKnockdown) return false;
+		if (!projectileHitbox.Intersects(defender.WorldHurtbox)) return false;
+
+		float appliedPushback = Facing * pushback;
+		if (defender.WasGrounded)
+			defender.ApplyHitstun(hitstunFrames, appliedPushback);
+		else
+			defender.ApplyAirPopHitstun(hitstunFrames, appliedPushback, AirHitPopUpSpeed);
+		hitPoint = (projectileHitbox.GetCenter() + defender.WorldHurtbox.GetCenter()) * 0.5f;
+		appliedHitstopFrames = hitstopFrames;
+		appliedShakeStrength = shakeStrength;
+		hitPushback = pushback;
+		heavySpark = true;
 		return true;
 	}
 	public void RequestHitstop(int frames)
@@ -727,12 +745,13 @@ public partial class FighterController : CharacterBody2D
 			StopActiveAbility();
 	}
 
-	private void UpdateInputBuffer(FighterInput input)
+	private void UpdateInputBuffer(FighterInput input, bool freezeBufferDecay)
 	{
 		if (ActiveAbility?.SuspendsInputBufferWhileActive == true)
 		{
 			JumpBufferFramesLeft = 0;
 			DashBufferFramesLeft = 0;
+			ClearAttackInputBuffers();
 		}
 		else
 		{
@@ -741,19 +760,27 @@ public partial class FighterController : CharacterBody2D
 				BufferedJumpHorizontal = input.Horizontal;
 				BufferedJumpFacing = Facing;
 			}
-			JumpBufferFramesLeft = AdvanceBuffer(JumpBufferFramesLeft, input.JumpPressed);
-			DashBufferFramesLeft = AdvanceBuffer(DashBufferFramesLeft, input.DashPressed || _dashCommandFramesLeft > 0);
+			JumpBufferFramesLeft = AdvanceBuffer(JumpBufferFramesLeft, input.JumpPressed, freezeBufferDecay);
+			DashBufferFramesLeft = AdvanceBuffer(DashBufferFramesLeft, input.DashPressed || _motionInputBuffer.HasDashCommand, freezeBufferDecay);
+			_lightPunchBufferFramesLeft = AdvanceBuffer(_lightPunchBufferFramesLeft, input.LightPunchPressed, freezeBufferDecay);
+			_lightKickBufferFramesLeft = AdvanceBuffer(_lightKickBufferFramesLeft, input.LightKickPressed, freezeBufferDecay);
+			_heavyPunchBufferFramesLeft = AdvanceBuffer(_heavyPunchBufferFramesLeft, input.HeavyPunchPressed, freezeBufferDecay);
+			_heavyKickBufferFramesLeft = AdvanceBuffer(_heavyKickBufferFramesLeft, input.HeavyKickPressed, freezeBufferDecay);
+			_special1BufferFramesLeft = AdvanceBuffer(_special1BufferFramesLeft, input.Special1Pressed, freezeBufferDecay);
+			_special2BufferFramesLeft = AdvanceBuffer(_special2BufferFramesLeft, input.Special2Pressed, freezeBufferDecay);
 		}
 		if (LandingLagFramesLeft > 0) JumpBufferFramesLeft = 0;
+		AttackBufferFramesLeft = Mathf.Max(Mathf.Max(Mathf.Max(_lightPunchBufferFramesLeft, _lightKickBufferFramesLeft),
+			Mathf.Max(_heavyPunchBufferFramesLeft, _heavyKickBufferFramesLeft)), Mathf.Max(_special1BufferFramesLeft, _special2BufferFramesLeft));
 		ActionInput = new FighterInput(input.Horizontal, input.Vertical,
 			LandingLagFramesLeft <= 0 && (input.JumpPressed || JumpBufferFramesLeft > 0), input.JumpHeld,
 			input.DashPressed || DashBufferFramesLeft > 0, input.FlightHeld,
-			input.LightPunchPressed, input.LightPunchHeld,
-			input.LightKickPressed, input.LightKickHeld,
-			input.HeavyPunchPressed, input.HeavyPunchHeld,
-			input.HeavyKickPressed, input.HeavyKickHeld,
-			input.Special1Pressed, input.Special1Held,
-			input.Special2Pressed, input.Special2Held);
+			input.LightPunchPressed || _lightPunchBufferFramesLeft > 0, input.LightPunchHeld,
+			input.LightKickPressed || _lightKickBufferFramesLeft > 0, input.LightKickHeld,
+			input.HeavyPunchPressed || _heavyPunchBufferFramesLeft > 0, input.HeavyPunchHeld,
+			input.HeavyKickPressed || _heavyKickBufferFramesLeft > 0, input.HeavyKickHeld,
+			input.Special1Pressed || _special1BufferFramesLeft > 0, input.Special1Held,
+			input.Special2Pressed || _special2BufferFramesLeft > 0, input.Special2Held);
 	}
 
 	private void TryStartBasicAttack()
@@ -811,10 +838,31 @@ public partial class FighterController : CharacterBody2D
 		_attackActiveFramesLeft = 0;
 		_attackRecoveryFramesLeft = 0;
 		_attackHasHit = false;
+		_projectileSpawnedThisAttack = false;
 		_launcherJumpCancelFramesLeft = 0;
-		if (attackName == ElectricWindGodFistName) ConsumeQuarterCircleForwardCommand();
+		if (attackName == ElectricWindGodFistName || IsProjectileAttackName(attackName)) ConsumeQuarterCircleForwardCommand();
 		ConsumeDashBuffer();
+		ClearAttackInputBuffers();
 		ApplyAirAttackMomentum(attackName);
+	}
+
+	private void TrySpawnProjectileForCurrentAttack()
+	{
+		if (_projectileSpawnedThisAttack || !IsProjectileAttackName(CurrentAttackName) || _attackStartupFramesLeft > 0) return;
+		_projectileSpawnedThisAttack = true;
+
+		bool heavy = CurrentAttackName == HeavyProjectileName;
+		var projectile = new BasicProjectile { Name = heavy ? "HeavyProjectile" : "LightProjectile" };
+		Vector2 offset = new(ProjectileSpawnOffset.X * Facing, ProjectileSpawnOffset.Y);
+		projectile.GlobalPosition = GlobalPosition + offset;
+		projectile.Initialize(this, Facing,
+			heavy ? HeavyProjectileSpeed : LightProjectileSpeed,
+			heavy ? HeavyAttackHitstunFrames : LightAttackHitstunFrames,
+			heavy ? HeavyAttackPushback * 0.55f : LightAttackPushback * 0.75f,
+			heavy ? HeavyAttackHitstopFrames : LightAttackHitstopFrames,
+			heavy ? HeavyAttackShakeStrength * 0.65f : LightAttackShakeStrength,
+			heavy);
+		GetParent()?.AddChild(projectile);
 	}
 
 	private bool TryStartLauncherChaseJump()
@@ -871,6 +919,65 @@ public partial class FighterController : CharacterBody2D
 		return true;
 	}
 
+	private bool TryStartNormalJumpCancel()
+	{
+		if (!IsAttacking || !WantsJumpCancel()) return false;
+		if (!CanCancelCurrentMove(CancelKind.Jump, "JUMP")) return false;
+
+		var savedCurrentInput = CurrentInput;
+		var savedActionInput = ActionInput;
+		var forcedJumpInput = WithForcedJumpPressed(savedCurrentInput);
+		CurrentInput = forcedJumpInput;
+		ActionInput = WithForcedJumpPressed(savedActionInput);
+		BufferedJumpHorizontal = CurrentInput.Horizontal;
+		BufferedJumpFacing = Facing;
+
+		MovementAbility candidate = null;
+		foreach (var ability in Definition.Abilities)
+			if (ability is JumpAbility && ability.CanStart(this, GetRuntime(ability)) &&
+				(candidate == null || ability.Priority > candidate.Priority)) candidate = ability;
+		if (candidate == null)
+		{
+			CurrentInput = savedCurrentInput;
+			ActionInput = savedActionInput;
+			return false;
+		}
+
+		ClearAttackState();
+		StopActiveAbility();
+		ConsumeJumpBuffer();
+		StartAbility(candidate);
+		CurrentInput = savedCurrentInput;
+		ActionInput = savedActionInput;
+		return true;
+	}
+
+	private bool TryStartNormalAirDashCancel()
+	{
+		if (!IsAttacking || !ActionInput.DashPressed) return false;
+		if (!CanCancelCurrentMove(CancelKind.AirDash, "AIR DASH")) return false;
+
+		MovementAbility candidate = null;
+		foreach (var ability in Definition.Abilities)
+			if (ability is DashAbility { AirOnly: true } && ability.CanStart(this, GetRuntime(ability)) &&
+				(candidate == null || ability.Priority > candidate.Priority)) candidate = ability;
+		if (candidate == null) return false;
+
+		ClearAttackState();
+		StartAbility(candidate);
+		return true;
+	}
+
+	private bool TryCrouchCancelCurrentNormal()
+	{
+		if (!IsAttacking || !WasGrounded || CurrentInput.Vertical <= 0.5f) return false;
+		if (!CanCancelCurrentMove(CancelKind.Crouch, "CROUCH")) return false;
+
+		ClearAttackState();
+		Velocity = new Vector2(Mathf.MoveToward(Velocity.X, 0f, BasicAttackFriction / 60f), Velocity.Y);
+		return true;
+	}
+
 	private bool TryStartDoubleJumpStateAirDashCancel()
 	{
 		if (!IsInDoubleJumpState || !_doubleJumpAirDashAvailable) return false;
@@ -901,11 +1008,33 @@ public partial class FighterController : CharacterBody2D
 
 	private bool CanChainBasicAttack(string nextAttackName)
 	{
-		NormalMoveRule nextRule = GetNormalMoveRule(nextAttackName, WasGrounded && ActionInput.Vertical > 0.5f, !WasGrounded);
+		bool nextStartedCrouching = WasGrounded && ActionInput.Vertical > 0.5f;
+		bool nextStartedAirborne = !WasGrounded;
+		NormalMoveRule nextRule = GetNormalMoveRule(nextAttackName, nextStartedCrouching, nextStartedAirborne);
 		if (nextRule.MaxUsesPerCombo > 0 && GetNormalUseCount(nextAttackName) >= nextRule.MaxUsesPerCombo) return false;
+		if (IsSpecialAttackName(nextAttackName))
+		{
+			return CanCancelCurrentMove(CancelKind.Special, nextAttackName);
+		}
+
 		if (_currentMoveRule.ChainRequiresContact && !_attackHasHit) return false;
-		if (!IsWithinCurrentMoveCancelWindow()) return false;
-		return _currentMoveRule.AllowsChainTo(nextAttackName);
+		if (!IsWithinCurrentMoveCancelWindow(_currentMoveRule.CancelWindowStartFrame,
+			_currentMoveRule.CancelWindowEndFrame, _currentMoveRule.ChainEarliestActiveFramesLeft)) return false;
+		return _currentMoveRule.AllowsChainTo(nextAttackName, nextStartedCrouching, nextStartedAirborne);
+	}
+
+	private bool CanCancelCurrentMove(CancelKind kind, string targetMove)
+	{
+		if (!IsAttacking || Definition?.CancelRules == null) return false;
+		int totalFrames = _currentAttackStartupFrames + _currentAttackActiveFrames + _currentAttackRecoveryFrames;
+		int remainingFrames = _attackStartupFramesLeft + _attackActiveFramesLeft + _attackRecoveryFramesLeft;
+		int elapsedFrames = totalFrames - remainingFrames;
+		bool currentMoveIsNormal = IsNormalAttackName(CurrentAttackName);
+
+		foreach (CancelRule rule in Definition.CancelRules)
+			if (rule != null && rule.Allows(CurrentAttackName, targetMove, kind, currentMoveIsNormal, _attackHasHit,
+				elapsedFrames, _attackStartupFramesLeft, _attackActiveFramesLeft)) return true;
+		return false;
 	}
 
 	private void RegisterNormalUse(string attackName)
@@ -935,20 +1064,21 @@ public partial class FighterController : CharacterBody2D
 		if (_currentMoveRule.PushbackOverride > 0f) _currentAttackPushback = _currentMoveRule.PushbackOverride;
 	}
 
-	private bool IsWithinCurrentMoveCancelWindow()
+	private bool IsWithinCurrentMoveCancelWindow(int windowStartFrame, int windowEndFrame, int earliestActiveFramesLeft)
 	{
-		if (_currentMoveRule.CancelWindowStartFrame >= 0 || _currentMoveRule.CancelWindowEndFrame >= 0)
+		if (windowStartFrame >= 0 || windowEndFrame >= 0)
 		{
 			int totalFrames = _currentAttackStartupFrames + _currentAttackActiveFrames + _currentAttackRecoveryFrames;
 			int remainingFrames = _attackStartupFramesLeft + _attackActiveFramesLeft + _attackRecoveryFramesLeft;
 			int elapsedFrames = totalFrames - remainingFrames;
-			if (_currentMoveRule.CancelWindowStartFrame >= 0 && elapsedFrames < _currentMoveRule.CancelWindowStartFrame) return false;
-			if (_currentMoveRule.CancelWindowEndFrame >= 0 && elapsedFrames > _currentMoveRule.CancelWindowEndFrame) return false;
+			if (windowStartFrame >= 0 && elapsedFrames < windowStartFrame) return false;
+			// Negative end frames mean the cancel remains available until this move fully ends.
+			if (windowEndFrame >= 0 && elapsedFrames > windowEndFrame) return false;
 			return true;
 		}
 
 		if (_attackStartupFramesLeft > 0) return false;
-		if (_attackActiveFramesLeft > _currentMoveRule.ChainEarliestActiveFramesLeft) return false;
+		if (_attackActiveFramesLeft > earliestActiveFramesLeft) return false;
 		return true;
 	}
 
@@ -1030,6 +1160,7 @@ public partial class FighterController : CharacterBody2D
 		_attackActiveFramesLeft = 0;
 		_attackRecoveryFramesLeft = 0;
 		_attackHasHit = false;
+		_projectileSpawnedThisAttack = false;
 		_currentAttackStartedAirborne = false;
 		_currentAttackStartedFromAirDash = false;
 		_currentAttackStartedFromRun = false;
@@ -1057,21 +1188,34 @@ public partial class FighterController : CharacterBody2D
 
 	private string GetPressedBasicAttackName(FighterInput input)
 	{
+		if (input.LightPunchPressed && _motionInputBuffer.HasQuarterCircleForwardCommand) return LightProjectileName;
+		if (input.HeavyPunchPressed && _motionInputBuffer.HasQuarterCircleForwardCommand) return HeavyProjectileName;
 		if (input.LightPunchPressed) return "LIGHT PUNCH";
 		if (input.LightKickPressed) return "LIGHT KICK";
 		if (input.HeavyPunchPressed) return "HEAVY PUNCH";
 		if (input.HeavyKickPressed) return "HEAVY KICK";
-		if (input.Special1Pressed && _qcfForwardCommandFramesLeft > 0) return ElectricWindGodFistName;
+		if (input.Special1Pressed && _motionInputBuffer.HasQuarterCircleForwardCommand) return ElectricWindGodFistName;
 		if (input.Special1Pressed) return "SPECIAL 1";
 		if (input.Special2Pressed) return "SPECIAL 2";
 		return "";
 	}
+
+	private static bool IsSpecialAttackName(string attackName) =>
+		attackName.StartsWith("SPECIAL") || attackName == ElectricWindGodFistName || IsProjectileAttackName(attackName);
+
+	private static bool IsProjectileAttackName(string attackName) =>
+		attackName == LightProjectileName || attackName == HeavyProjectileName;
+
+	private static bool IsNormalAttackName(string attackName) =>
+		attackName == "LIGHT PUNCH" || attackName == "LIGHT KICK" ||
+		attackName == "HEAVY PUNCH" || attackName == "HEAVY KICK";
 
 	private bool HasPressedBasicAttack(FighterInput input) => GetPressedBasicAttackName(input) != "";
 
 	private int GetBasicAttackRecoveryFrames(string attackName)
 	{
 		if (attackName == ElectricWindGodFistName) return 20;
+		if (IsProjectileAttackName(attackName)) return SpecialAttackRecoveryFrames;
 		if (attackName.StartsWith("LIGHT")) return LightAttackRecoveryFrames;
 		if (attackName.StartsWith("HEAVY")) return HeavyAttackRecoveryFrames;
 		if (attackName.StartsWith("SPECIAL")) return SpecialAttackRecoveryFrames;
@@ -1081,6 +1225,7 @@ public partial class FighterController : CharacterBody2D
 	private int GetBasicAttackActiveFrames(string attackName)
 	{
 		if (attackName == ElectricWindGodFistName) return 4;
+		if (IsProjectileAttackName(attackName)) return 2;
 		if (attackName == "LIGHT PUNCH") return LightPunchActiveFrames;
 		if (attackName == "LIGHT KICK") return LightKickActiveFrames;
 		if (attackName == "HEAVY PUNCH") return HeavyPunchActiveFrames;
@@ -1092,6 +1237,7 @@ public partial class FighterController : CharacterBody2D
 	private int GetBasicAttackStartupFrames(string attackName)
 	{
 		if (attackName == ElectricWindGodFistName) return 5;
+		if (IsProjectileAttackName(attackName)) return BasicAttackStartupFrames;
 		if (attackName.StartsWith("LIGHT")) return LightAttackStartupFrames;
 		return BasicAttackStartupFrames;
 	}
@@ -1099,6 +1245,8 @@ public partial class FighterController : CharacterBody2D
 	private int GetBasicAttackHitstunFrames(string attackName)
 	{
 		if (attackName == ElectricWindGodFistName) return HeavyAttackHitstunFrames;
+		if (attackName == LightProjectileName) return LightAttackHitstunFrames;
+		if (attackName == HeavyProjectileName) return HeavyAttackHitstunFrames;
 		if (attackName.StartsWith("LIGHT")) return LightAttackHitstunFrames;
 		if (attackName.StartsWith("HEAVY")) return HeavyAttackHitstunFrames;
 		if (attackName.StartsWith("SPECIAL")) return SpecialAttackHitstunFrames;
@@ -1108,6 +1256,8 @@ public partial class FighterController : CharacterBody2D
 	private float GetBasicAttackPushback(string attackName)
 	{
 		if (attackName == ElectricWindGodFistName) return 360f;
+		if (attackName == LightProjectileName) return LightAttackPushback;
+		if (attackName == HeavyProjectileName) return HeavyAttackPushback;
 		if (attackName.StartsWith("LIGHT")) return LightAttackPushback;
 		if (attackName.StartsWith("HEAVY")) return HeavyAttackPushback;
 		if (attackName.StartsWith("SPECIAL")) return SpecialAttackPushback;
@@ -1117,6 +1267,8 @@ public partial class FighterController : CharacterBody2D
 	private int GetBasicAttackHitstopFrames(string attackName)
 	{
 		if (attackName == ElectricWindGodFistName) return HeavyAttackHitstopFrames;
+		if (attackName == LightProjectileName) return LightAttackHitstopFrames;
+		if (attackName == HeavyProjectileName) return HeavyAttackHitstopFrames;
 		if (attackName.StartsWith("LIGHT")) return LightAttackHitstopFrames;
 		if (attackName.StartsWith("HEAVY")) return HeavyAttackHitstopFrames;
 		return SpecialAttackHitstopFrames;
@@ -1132,6 +1284,8 @@ public partial class FighterController : CharacterBody2D
 	private float GetBasicAttackShakeStrength(string attackName)
 	{
 		if (attackName == ElectricWindGodFistName) return HeavyAttackShakeStrength;
+		if (attackName == LightProjectileName) return LightAttackShakeStrength;
+		if (attackName == HeavyProjectileName) return HeavyAttackShakeStrength;
 		if (attackName.StartsWith("LIGHT")) return LightAttackShakeStrength;
 		if (attackName.StartsWith("HEAVY")) return HeavyAttackShakeStrength;
 		return SpecialAttackShakeStrength;
@@ -1176,36 +1330,33 @@ public partial class FighterController : CharacterBody2D
 
 	private void HandleHorizontalTap(int direction)
 	{
-		if (direction == Facing && _framesSinceDown <= QuarterCircleForwardWindowFrames)
-			_qcfForwardCommandFramesLeft = QuarterCircleForwardWindowFrames;
-		int framesSinceTap = direction < 0 ? _framesSinceLeftTap : _framesSinceRightTap;
-		if (framesSinceTap <= DoubleTapDashWindowFrames)
-		{
-			bool backDashInput = direction * Facing < 0;
-			if (!backDashInput || _backDashInputLockoutFrames <= 0)
-			{
-				_dashCommandDirection = direction;
-				_dashCommandFramesLeft = Definition?.Tuning?.InputBufferFrames ?? 3;
-				if (backDashInput) _backDashInputLockoutFrames = BackDashInputLockoutWindowFrames;
-			}
-		}
-		if (direction < 0)
-			_framesSinceLeftTap = 0;
-		else
-			_framesSinceRightTap = 0;
+		_motionInputBuffer.PressHorizontalTap(direction, Facing, Definition?.Tuning?.InputBufferFrames ?? 3,
+			DoubleTapDashWindowFrames, QuarterCircleForwardWindowFrames, BackDashInputLockoutWindowFrames);
 	}
 
 	private static bool UsesHeavyHitSpark(string attackName) =>
 		attackName.StartsWith("HEAVY") || attackName.StartsWith("SPECIAL") || attackName == ElectricWindGodFistName;
 
-	private int AdvanceBuffer(int framesLeft, bool pressed)
+	private int AdvanceBuffer(int framesLeft, bool pressed, bool freezeDecay = false)
 	{
 		if (pressed)
 		{
 			// The press frame counts as one of the configured buffer frames.
 			return Definition.Tuning.InputBufferFrames;
 		}
+		if (freezeDecay) return framesLeft;
 		return framesLeft > 0 ? framesLeft - 1 : 0;
+	}
+
+	private void ClearAttackInputBuffers()
+	{
+		_lightPunchBufferFramesLeft = 0;
+		_lightKickBufferFramesLeft = 0;
+		_heavyPunchBufferFramesLeft = 0;
+		_heavyKickBufferFramesLeft = 0;
+		_special1BufferFramesLeft = 0;
+		_special2BufferFramesLeft = 0;
+		AttackBufferFramesLeft = 0;
 	}
 
 	private void ApplyBaseMotion(float delta)
