@@ -25,6 +25,11 @@ public sealed class MotionInputBuffer
 		if (_backDashInputLockoutFrames > 0) _backDashInputLockoutFrames--;
 		if (_downThenUpCommandFramesLeft > 0) _downThenUpCommandFramesLeft--;
 		if (_dashCommandFramesLeft > 0) _dashCommandFramesLeft--;
+		TickQuarterCircleForwardCommand();
+	}
+
+	public void TickQuarterCircleForwardCommand()
+	{
 		if (_qcfForwardCommandFramesLeft > 0) _qcfForwardCommandFramesLeft--;
 	}
 
@@ -38,12 +43,12 @@ public sealed class MotionInputBuffer
 	}
 
 	public void PressHorizontalTap(int direction, int facing, int inputBufferFrames, int doubleTapWindowFrames,
-		int quarterCircleForwardWindowFrames, int backDashInputLockoutWindowFrames)
+		int quarterCircleForwardWindowFrames, int quarterCircleForwardLatchFrames, int backDashInputLockoutWindowFrames)
 	{
 		int normalizedDirection = direction >= 0 ? 1 : -1;
 		int normalizedFacing = facing >= 0 ? 1 : -1;
 		if (normalizedDirection == normalizedFacing && _framesSinceDown <= quarterCircleForwardWindowFrames)
-			_qcfForwardCommandFramesLeft = quarterCircleForwardWindowFrames;
+			_qcfForwardCommandFramesLeft = quarterCircleForwardLatchFrames;
 
 		int framesSinceTap = normalizedDirection < 0 ? _framesSinceLeftTap : _framesSinceRightTap;
 		if (framesSinceTap <= doubleTapWindowFrames)

@@ -34,8 +34,12 @@ public partial class RunAbility : MovementAbility
 		bool crouching = fighter.CurrentInput.Vertical > 0.5f;
 		if (!fighter.WasGrounded || crouching || !holdingRunDirection)
 		{
-			float friction = crouching ? CrouchCancelFriction : StopFriction;
-			fighter.Velocity = new Vector2(Mathf.MoveToward(fighter.Velocity.X, 0f, friction * delta), fighter.Velocity.Y);
+			if (crouching)
+			{
+				fighter.BeginRunCrouchSlide();
+				return false;
+			}
+			if (fighter.WasGrounded && !holdingRunDirection) fighter.BeginRunStopSlide();
 			return false;
 		}
 

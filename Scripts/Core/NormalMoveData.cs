@@ -69,6 +69,9 @@ public partial class NormalMoveData : Resource
 	[Export] public int KnockdownFrames { get; set; }
 	[Export] public bool CanHitGroundedKnockdown { get; set; }
 
+	[ExportGroup("Box Timeline")]
+	[Export] public FighterBoxFrame[] BoxTimeline { get; set; } = Array.Empty<FighterBoxFrame>();
+
 	[ExportGroup("Launcher / Jump Cancel")]
 	[Export] public bool Launches { get; set; }
 	[Export] public float LaunchSpeed { get; set; } = 1820f;

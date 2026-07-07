@@ -289,15 +289,19 @@ public partial class StickFigureFighter : FighterController
 			{
 				AttackName = "LIGHT PUNCH",
 				Stance = NormalMoveStance.Standing,
-				AllowedChainTargets = new[] { "STANDING LIGHT KICK", "STANDING HEAVY", "CROUCHING LIGHT", "CROUCHING HEAVY" },
+				AllowedChainTargets = new[] { "STANDING LIGHT PUNCH", "STANDING LIGHT KICK", "STANDING HEAVY", "CROUCHING LIGHT", "CROUCHING HEAVY" },
 				ChainRequiresContact = true,
-				ChainEarliestActiveFramesLeft = 3
+				ChainEarliestActiveFramesLeft = 3,
+				BoxTimeline = new[]
+				{
+					Box(FighterBoxKind.Hitbox, 4, 6, new Rect2(24f, -58f, 42f, 28f), tag: "jab")
+				}
 			},
 			new()
 			{
 				AttackName = "LIGHT KICK",
 				Stance = NormalMoveStance.Standing,
-				AllowedChainTargets = new[] { "STANDING LIGHT PUNCH", "STANDING HEAVY", "CROUCHING LIGHT", "CROUCHING HEAVY" },
+				AllowedChainTargets = new[] { "STANDING LIGHT PUNCH", "STANDING LIGHT KICK", "STANDING HEAVY", "CROUCHING LIGHT", "CROUCHING HEAVY" },
 				ChainRequiresContact = true,
 				ChainEarliestActiveFramesLeft = 3
 			},
@@ -314,7 +318,11 @@ public partial class StickFigureFighter : FighterController
 				AttackName = "HEAVY PUNCH",
 				Stance = NormalMoveStance.Standing,
 				AllowedChainTargets = new[] { "CROUCHING HEAVY PUNCH", "CROUCHING HEAVY KICK" },
-				ChainRequiresContact = true
+				ChainRequiresContact = true,
+				BoxTimeline = new[]
+				{
+					Box(FighterBoxKind.Hitbox, 4, 7, new Rect2(26f, -66f, 68f, 36f), tag: "heavy-punch", hitstunFrames: 14, pushback: 1240f)
+				}
 			},
 			new()
 			{
@@ -330,6 +338,19 @@ public partial class StickFigureFighter : FighterController
 				ChainRequiresContact = true
 			}
 		}
+	};
+
+	private static FighterBoxFrame Box(FighterBoxKind kind, int startFrame, int endFrame, Rect2 localRect, bool mirrorWithFacing = true,
+		string tag = "", int hitstunFrames = -1, float pushback = -1f) => new()
+	{
+		Kind = kind,
+		StartFrame = startFrame,
+		EndFrame = endFrame,
+		LocalRect = localRect,
+		MirrorWithFacing = mirrorWithFacing,
+		Tag = tag,
+		HitstunFrames = hitstunFrames,
+		Pushback = pushback
 	};
 
 	private void DrawEllipse(Vector2 center, Vector2 radii, Color color)
@@ -365,22 +386,27 @@ public partial class StickFigureFighter : FighterController
 
 	private void DrawCombatDebugBoxes()
 	{
-		DrawRect(PushboxLocal, new Color(1f, 1f, 0f, 0.12f), true);
-		DrawRect(PushboxLocal, new Color(1f, 1f, 0f, 0.85f), false, 2f);
+		foreach (Rect2 pushbox in GetActiveLocalBoxes(FighterBoxKind.Pushbox))
+		{
+			DrawRect(pushbox, new Color(1f, 1f, 0f, 0.12f), true);
+			DrawRect(pushbox, new Color(1f, 1f, 0f, 0.85f), false, 2f);
+		}
 		if (!IsOnFloor() && SuppressesGroundedPushWhileAirborne)
 		{
 			DrawRect(AirbornePushboxLocal, new Color(1f, 0.65f, 0f, 0.16f), true);
 			DrawRect(AirbornePushboxLocal, new Color(1f, 0.65f, 0f, 0.95f), false, 2f);
 		}
-		DrawRect(HurtboxLocal, new Color(0f, 0.8f, 1f, 0.10f), true);
-		DrawRect(HurtboxLocal, new Color(0f, 0.8f, 1f, 0.85f), false, 2f);
+		foreach (Rect2 hurtbox in GetActiveLocalBoxes(FighterBoxKind.Hurtbox))
+		{
+			DrawRect(hurtbox, new Color(0f, 0.8f, 1f, 0.10f), true);
+			DrawRect(hurtbox, new Color(0f, 0.8f, 1f, 0.85f), false, 2f);
+		}
 
-		Rect2 selectedHitbox = CurrentHitboxLocal;
-		Rect2 localHitbox = Facing >= 0
-			? selectedHitbox
-			: new Rect2(new Vector2(-selectedHitbox.Position.X - selectedHitbox.Size.X, selectedHitbox.Position.Y), selectedHitbox.Size);
-		DrawRect(localHitbox, new Color(1f, 0.1f, 0.1f, 0.10f), true);
-		DrawRect(localHitbox, IsAttackActive ? new Color(1f, 0.95f, 0.1f, 0.95f) : new Color(1f, 0.1f, 0.1f, 0.85f), false, 2f);
+		foreach (Rect2 hitbox in GetActiveLocalBoxes(FighterBoxKind.Hitbox))
+		{
+			DrawRect(hitbox, new Color(1f, 0.1f, 0.1f, 0.10f), true);
+			DrawRect(hitbox, IsAttackActive ? new Color(1f, 0.95f, 0.1f, 0.95f) : new Color(1f, 0.1f, 0.1f, 0.85f), false, 2f);
+		}
 
 		DrawRect(PositionBoxLocal, new Color(1f, 1f, 1f, 0.90f), false, 2f);
 		DrawLine(new Vector2(-10f, 0f), new Vector2(10f, 0f), Colors.White, 2f);

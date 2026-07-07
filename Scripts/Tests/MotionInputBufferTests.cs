@@ -10,7 +10,8 @@ public partial class MotionInputBufferTests : Node
 
 	private const int InputBufferFrames = 3;
 	private const int DoubleTapWindowFrames = 12;
-	private const int QuarterCircleForwardWindowFrames = 12;
+	private const int QuarterCircleForwardWindowFrames = 9;
+	private const int QuarterCircleForwardLatchFrames = 9;
 	private const int BackDashInputLockoutWindowFrames = 18;
 
 	public override void _Ready()
@@ -43,7 +44,7 @@ public partial class MotionInputBufferTests : Node
 		buffer.PressDown();
 		Tick(buffer, 6);
 		buffer.PressHorizontalTap(1, 1, InputBufferFrames, DoubleTapWindowFrames,
-			QuarterCircleForwardWindowFrames, BackDashInputLockoutWindowFrames);
+			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
 		Expect(buffer.HasQuarterCircleForwardCommand, "QCF should be stored after down, forward.");
 	}
 
@@ -53,7 +54,7 @@ public partial class MotionInputBufferTests : Node
 		buffer.PressDown();
 		Tick(buffer, 4);
 		buffer.PressHorizontalTap(-1, -1, InputBufferFrames, DoubleTapWindowFrames,
-			QuarterCircleForwardWindowFrames, BackDashInputLockoutWindowFrames);
+			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
 		Expect(buffer.HasQuarterCircleForwardCommand, "QCF should use fighter-facing forward.");
 	}
 
@@ -62,8 +63,8 @@ public partial class MotionInputBufferTests : Node
 		var buffer = new MotionInputBuffer();
 		buffer.PressDown();
 		buffer.PressHorizontalTap(1, 1, InputBufferFrames, DoubleTapWindowFrames,
-			QuarterCircleForwardWindowFrames, BackDashInputLockoutWindowFrames);
-		Tick(buffer, QuarterCircleForwardWindowFrames);
+			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
+		Tick(buffer, QuarterCircleForwardLatchFrames);
 		Expect(!buffer.HasQuarterCircleForwardCommand, "QCF should expire after its motion window.");
 	}
 
@@ -71,10 +72,10 @@ public partial class MotionInputBufferTests : Node
 	{
 		var buffer = new MotionInputBuffer();
 		buffer.PressHorizontalTap(1, 1, InputBufferFrames, DoubleTapWindowFrames,
-			QuarterCircleForwardWindowFrames, BackDashInputLockoutWindowFrames);
+			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
 		Tick(buffer, DoubleTapWindowFrames);
 		buffer.PressHorizontalTap(1, 1, InputBufferFrames, DoubleTapWindowFrames,
-			QuarterCircleForwardWindowFrames, BackDashInputLockoutWindowFrames);
+			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
 		Expect(buffer.HasDashCommand && buffer.DashCommandDirection == 1, "Double-tap forward should store a forward dash.");
 	}
 
@@ -82,10 +83,10 @@ public partial class MotionInputBufferTests : Node
 	{
 		var buffer = new MotionInputBuffer();
 		buffer.PressHorizontalTap(1, 1, InputBufferFrames, DoubleTapWindowFrames,
-			QuarterCircleForwardWindowFrames, BackDashInputLockoutWindowFrames);
+			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
 		Tick(buffer, DoubleTapWindowFrames + 1);
 		buffer.PressHorizontalTap(1, 1, InputBufferFrames, DoubleTapWindowFrames,
-			QuarterCircleForwardWindowFrames, BackDashInputLockoutWindowFrames);
+			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
 		Expect(!buffer.HasDashCommand, "Double-tap should fail outside the dash window.");
 	}
 
