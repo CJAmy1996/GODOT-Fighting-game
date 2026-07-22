@@ -7,7 +7,7 @@ namespace ModularFighter.Movement;
 /// A stateless, shareable ability definition. Make a new subclass for a new archetype;
 /// do not add archetype checks to FighterController.
 /// </summary>
-[GlobalClass]
+[Tool, GlobalClass]
 public abstract partial class MovementAbility : Resource
 {
 	[Export] public string Id { get; set; } = "ability_id";

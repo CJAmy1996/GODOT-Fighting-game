@@ -3,7 +3,7 @@ using Godot;
 namespace ModularFighter.Core;
 
 /// <summary>Reusable super-move feel and hit data for cinematic freezes, rush supers, and projectile supers.</summary>
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class SuperMoveData : Resource
 {
 	[Export] public string AttackName { get; set; } = "";

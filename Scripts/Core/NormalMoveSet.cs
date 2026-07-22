@@ -7,7 +7,7 @@ namespace ModularFighter.Core;
 /// Character-level normal cancel rules. Rule order matters: put specific rules
 /// before broad rules such as LIGHT or ANY.
 /// </summary>
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class NormalMoveSet : Resource
 {
 	[Export] public NormalMoveData[] Rules { get; set; } = Array.Empty<NormalMoveData>();

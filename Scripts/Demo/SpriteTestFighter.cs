@@ -202,6 +202,8 @@ public partial class SpriteTestFighter : FighterController
 		StringName nextAnimation;
 		if (IsAttacking && CurrentAttackName == "SUPER FIREBALL")
 			nextAnimation = "super_fireball";
+		else if (IsAttacking && !string.IsNullOrEmpty(CurrentAttackAnimationName))
+			nextAnimation = CurrentAttackAnimationName;
 		else if (IsAttacking && (CurrentAttackName == "LIGHT PROJECTILE" || CurrentAttackName == "HEAVY PROJECTILE"))
 			nextAnimation = "fireball";
 		else if (IsAttacking && CurrentAttackName == ThrowAttackName) nextAnimation = "throw";

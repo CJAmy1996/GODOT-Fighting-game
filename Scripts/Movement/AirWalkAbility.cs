@@ -4,7 +4,7 @@ using ModularFighter.Core;
 namespace ModularFighter.Movement;
 
 /// <summary>A controlled hover that retains normal walk-style horizontal handling.</summary>
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class AirWalkAbility : MovementAbility
 {
 	[Export] public float VerticalCorrectionSpeed { get; set; } = 2200f;

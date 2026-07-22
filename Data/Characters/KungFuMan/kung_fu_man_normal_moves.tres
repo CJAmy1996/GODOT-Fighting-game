@@ -1,0 +1,466 @@
+[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=55 format=3 uid="uid://c32qbocpsvmo4"]
+
+[ext_resource type="Script" uid="uid://br48dic8s6gkm" path="res://Scripts/Core/NormalMoveData.cs" id="1_move"]
+[ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="2_box"]
+[ext_resource type="Script" uid="uid://br5l43bdiww0l" path="res://Scripts/Core/NormalMoveSet.cs" id="3_set"]
+
+[sub_resource type="Resource" id="slp_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="slp_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 5
+LocalRect = Rect2(24, -58, 42, 28)
+Tag = "jab"
+
+[sub_resource type="Resource" id="slp"]
+script = ExtResource("1_move")
+AttackName = "LIGHT PUNCH"
+AnimationName = "light_punch"
+Stance = 1
+StartupFrames = 4
+ActiveFrames = 2
+RecoveryFrames = 4
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+BoxTimeline = [SubResource("slp_hurt"), SubResource("slp_hit")]
+
+[sub_resource type="Resource" id="clp_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-34, -62, 68, 82)
+Tag = "crouching-body"
+
+[sub_resource type="Resource" id="clp_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 5
+LocalRect = Rect2(22, -48, 48, 28)
+Tag = "crouching-jab"
+
+[sub_resource type="Resource" id="clp"]
+script = ExtResource("1_move")
+AttackName = "LIGHT PUNCH"
+AnimationName = "crouching_light_punch"
+Stance = 2
+StartupFrames = 4
+ActiveFrames = 2
+RecoveryFrames = 4
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+BoxTimeline = [SubResource("clp_hurt"), SubResource("clp_hit")]
+
+[sub_resource type="Resource" id="alp_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-34, -96, 68, 100)
+Tag = "air-body"
+
+[sub_resource type="Resource" id="alp_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 5
+LocalRect = Rect2(20, -64, 50, 32)
+Tag = "air-jab"
+
+[sub_resource type="Resource" id="alp"]
+script = ExtResource("1_move")
+AttackName = "LIGHT PUNCH"
+AnimationName = "air_light_punch"
+Stance = 3
+StartupFrames = 4
+ActiveFrames = 2
+RecoveryFrames = 4
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 4
+BoxTimeline = [SubResource("alp_hurt"), SubResource("alp_hit")]
+
+[sub_resource type="Resource" id="slk_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="slk_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 7
+LocalRect = Rect2(18, -24, 58, 24)
+Tag = "standing-light-kick"
+
+[sub_resource type="Resource" id="slk"]
+script = ExtResource("1_move")
+AttackName = "LIGHT KICK"
+AnimationName = "standing_light_kick"
+Stance = 1
+StartupFrames = 4
+ActiveFrames = 4
+RecoveryFrames = 6
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+BoxTimeline = [SubResource("slk_hurt"), SubResource("slk_hit")]
+
+[sub_resource type="Resource" id="clk_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-34, -62, 68, 82)
+Tag = "crouching-body"
+
+[sub_resource type="Resource" id="clk_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 7
+LocalRect = Rect2(18, -20, 70, 22)
+Tag = "crouching-light-kick"
+
+[sub_resource type="Resource" id="clk"]
+script = ExtResource("1_move")
+AttackName = "LIGHT KICK"
+AnimationName = "crouching_light_kick"
+Stance = 2
+StartupFrames = 4
+ActiveFrames = 4
+RecoveryFrames = 6
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+BoxTimeline = [SubResource("clk_hurt"), SubResource("clk_hit")]
+
+[sub_resource type="Resource" id="alk_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-34, -96, 68, 100)
+Tag = "air-body"
+
+[sub_resource type="Resource" id="alk_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 7
+LocalRect = Rect2(16, -42, 62, 30)
+Tag = "air-light-kick"
+
+[sub_resource type="Resource" id="alk"]
+script = ExtResource("1_move")
+AttackName = "LIGHT KICK"
+AnimationName = "air_light_kick"
+Stance = 3
+StartupFrames = 4
+ActiveFrames = 4
+RecoveryFrames = 8
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 4
+BoxTimeline = [SubResource("alk_hurt"), SubResource("alk_hit")]
+
+[sub_resource type="Resource" id="shp_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="shp_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 9
+EndFrame = 12
+LocalRect = Rect2(26, -66, 68, 36)
+Tag = "heavy-punch"
+
+[sub_resource type="Resource" id="shp"]
+script = ExtResource("1_move")
+AttackName = "HEAVY PUNCH"
+AnimationName = "heavy_punch"
+Stance = 1
+StartupFrames = 9
+ActiveFrames = 4
+RecoveryFrames = 9
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+BoxTimeline = [SubResource("shp_hurt"), SubResource("shp_hit")]
+
+[sub_resource type="Resource" id="ahp_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-36, -100, 72, 104)
+Tag = "air-body"
+
+[sub_resource type="Resource" id="ahp_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 5
+LocalRect = Rect2(24, -72, 72, 44)
+Tag = "air-heavy-punch"
+
+[sub_resource type="Resource" id="ahp"]
+script = ExtResource("1_move")
+AttackName = "HEAVY PUNCH AIR"
+AnimationName = "air_heavy_punch"
+Stance = 3
+StartupFrames = 4
+ActiveFrames = 2
+RecoveryFrames = 4
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+BoxTimeline = [SubResource("ahp_hurt"), SubResource("ahp_hit")]
+
+[sub_resource type="Resource" id="chp_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-38, -68, 76, 88)
+Tag = "crouching-body"
+
+[sub_resource type="Resource" id="chp_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 9
+EndFrame = 18
+LocalRect = Rect2(24, -70, 76, 54)
+Tag = "crouching-heavy-punch-launcher"
+
+[sub_resource type="Resource" id="chp"]
+script = ExtResource("1_move")
+AttackName = "HEAVY PUNCH CROUCHING"
+AnimationName = "crouching_heavy_punch"
+Stance = 2
+StartupFrames = 9
+ActiveFrames = 10
+RecoveryFrames = 9
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+BoxTimeline = [SubResource("chp_hurt"), SubResource("chp_hit")]
+Launches = true
+LaunchSpeed = 1265.0
+LaunchHitstunFrames = 30
+ChaseJumpSpeed = 1265.0
+
+[sub_resource type="Resource" id="fhp_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="fhp_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 8
+EndFrame = 11
+LocalRect = Rect2(30, -70, 82, 42)
+Tag = "forward-heavy-punch"
+
+[sub_resource type="Resource" id="fhp"]
+script = ExtResource("1_move")
+AttackName = "HEAVY PUNCH FORWARD"
+AnimationName = "forward_heavy_punch"
+Stance = 1
+StartupFrames = 8
+ActiveFrames = 4
+RecoveryFrames = 2
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+BoxTimeline = [SubResource("fhp_hurt"), SubResource("fhp_hit")]
+
+[sub_resource type="Resource" id="shk_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="Resource_wtxai"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 4
+LocalRect = Rect2(19.579645, -92.92036, 23.23009, 71.68142)
+Tag = "standing-heavy-kick"
+
+[sub_resource type="Resource" id="shk"]
+script = ExtResource("1_move")
+AttackName = "HEAVY KICK"
+AnimationName = "standing_heavy_kick"
+Stance = 1
+StartupFrames = 4
+ActiveFrames = 5
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+BoxTimeline = [SubResource("shk_hurt"), SubResource("Resource_wtxai")]
+
+[sub_resource type="Resource" id="ahk_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-36, -100, 72, 104)
+Tag = "air-body"
+
+[sub_resource type="Resource" id="ahk_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 8
+LocalRect = Rect2(18, -48, 88, 42)
+Tag = "air-heavy-kick"
+
+[sub_resource type="Resource" id="ahk"]
+script = ExtResource("1_move")
+AttackName = "HEAVY KICK"
+AnimationName = "air_heavy_kick"
+Stance = 3
+StartupFrames = 4
+ActiveFrames = 5
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+BoxTimeline = [SubResource("ahk_hurt"), SubResource("ahk_hit")]
+
+[sub_resource type="Resource" id="auhk_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-36, -100, 72, 104)
+Tag = "air-body"
+
+[sub_resource type="Resource" id="auhk_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 8
+LocalRect = Rect2(12, -94, 76, 70)
+Tag = "air-up-heavy-kick"
+
+[sub_resource type="Resource" id="auhk"]
+script = ExtResource("1_move")
+AttackName = "HEAVY KICK AIR UP"
+AnimationName = "air_up_heavy_kick"
+Stance = 3
+StartupFrames = 4
+ActiveFrames = 5
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+HitReaction = 1
+BoxTimeline = [SubResource("auhk_hurt"), SubResource("auhk_hit")]
+
+[sub_resource type="Resource" id="chk_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-38, -66, 76, 86)
+Tag = "crouching-body"
+
+[sub_resource type="Resource" id="chk_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 8
+LocalRect = Rect2(16, -20, 112, 42)
+Tag = "sweep"
+
+[sub_resource type="Resource" id="chk"]
+script = ExtResource("1_move")
+AttackName = "HEAVY KICK CROUCHING"
+AnimationName = "crouching_heavy_kick"
+Stance = 2
+StartupFrames = 4
+ActiveFrames = 5
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+KnockdownType = 1
+KnocksDown = true
+KnockdownFrames = 42
+BoxTimeline = [SubResource("chk_hurt"), SubResource("chk_hit")]
+
+[sub_resource type="Resource" id="flk_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="flk_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 7
+LocalRect = Rect2(24, -42, 88, 38)
+Tag = "forward-light-kick"
+
+[sub_resource type="Resource" id="flk"]
+script = ExtResource("1_move")
+AttackName = "LIGHT KICK FORWARD"
+AnimationName = "forward_light_kick"
+Stance = 1
+StartupFrames = 4
+ActiveFrames = 4
+RecoveryFrames = 6
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+BoxTimeline = [SubResource("flk_hurt"), SubResource("flk_hit")]
+
+[sub_resource type="Resource" id="cmj_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-36, -66, 72, 86)
+Tag = "crouching-body"
+
+[sub_resource type="Resource" id="cmj_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 5
+LocalRect = Rect2(22, -52, 62, 34)
+Tag = "crouching-medium-punch"
+
+[sub_resource type="Resource" id="cmj"]
+script = ExtResource("1_move")
+AttackName = "MEDIUM CROUCHING JAB"
+AnimationName = "crouching_medium_punch"
+Stance = 2
+StartupFrames = 4
+ActiveFrames = 2
+RecoveryFrames = 6
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+HitstopFrames = 6
+BoxTimeline = [SubResource("cmj_hurt"), SubResource("cmj_hit")]
+
+[sub_resource type="Resource" id="throw_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="throw_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 10
+EndFrame = 10
+LocalRect = Rect2(8, -78, 50, 70)
+Tag = "throw-grab"
+
+[sub_resource type="Resource" id="throw"]
+script = ExtResource("1_move")
+AttackName = "THROW"
+AnimationName = "throw"
+Stance = 1
+StartupFrames = 10
+ActiveFrames = 1
+RecoveryFrames = 15
+SuppressFallbackHitbox = true
+KnockdownType = 4
+KnocksDown = true
+KnockdownFrames = 42
+BoxTimeline = [SubResource("throw_hurt"), SubResource("throw_hit")]
+
+[resource]
+script = ExtResource("3_set")
+Rules = [SubResource("slp"), SubResource("clp"), SubResource("alp"), SubResource("slk"), SubResource("clk"), SubResource("alk"), SubResource("shp"), SubResource("ahp"), SubResource("chp"), SubResource("fhp"), SubResource("shk"), SubResource("ahk"), SubResource("auhk"), SubResource("chk"), SubResource("flk"), SubResource("cmj"), SubResource("throw")]

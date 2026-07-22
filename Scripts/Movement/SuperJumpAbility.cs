@@ -4,7 +4,7 @@ using ModularFighter.Core;
 namespace ModularFighter.Movement;
 
 /// <summary>Marvel-style down-to-up super jump: fixed high launch with air steering.</summary>
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class SuperJumpAbility : MovementAbility
 {
 	[Export] public int CommandWindowFrames { get; set; } = 4;

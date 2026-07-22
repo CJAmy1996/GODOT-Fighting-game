@@ -2,7 +2,7 @@ using Godot;
 
 namespace ModularFighter.Core;
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class MovementTuning : Resource
 {
 	[ExportGroup("Ground")]

@@ -5,7 +5,7 @@ namespace ModularFighter.Movement;
 
 public enum JumpDirection { Neutral, Forward, Backward }
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class JumpAbility : MovementAbility
 {
 	public override bool SuppressesGroundedPushWhileAirborne => true;

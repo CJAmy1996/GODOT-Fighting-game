@@ -190,6 +190,7 @@ public partial class FighterController : CharacterBody2D
 	public int ComboCount { get; private set; }
 	public int ComboDisplayFramesLeft { get; private set; }
 	public string CurrentAttackName { get; private set; } = "";
+	public string CurrentAttackAnimationName { get; private set; } = "";
 	public int CurrentAttackFrame { get; private set; }
 	public bool SuperActivationFreezeRequested { get; private set; }
 	public int SuperActivationFreezeFramesRequested { get; private set; }
@@ -252,6 +253,8 @@ public partial class FighterController : CharacterBody2D
 	private HitReactionKind _currentAttackHitReaction;
 	private Rect2 _currentAttackHitboxLocal;
 	private SuperMoveData _currentSuperMove;
+	private NormalMoveData _currentMoveData;
+	private SpecialMoveData _currentSpecialMove;
 	private int _launcherJumpCancelFramesLeft;
 	private int _airLightJumpCancelFramesLeft;
 	private NormalMoveRule _currentMoveRule;
@@ -303,11 +306,13 @@ public partial class FighterController : CharacterBody2D
 		public int BlockstunFrames { get; init; }
 		public int HitstopFramesOverride { get; init; }
 		public float PushbackOverride { get; init; }
+		public float ShakeStrengthOverride { get; init; }
 		public HitReactionKind HitReaction { get; init; }
 		public KnockdownType KnockdownType { get; init; }
 		public bool KnocksDown { get; init; }
 		public int KnockdownFrames { get; init; }
 		public bool CanHitGroundedKnockdown { get; init; }
+		public bool SuppressFallbackHitbox { get; init; }
 		public FighterBoxFrame[] BoxTimeline { get; init; }
 
 		public static NormalMoveRule FromData(NormalMoveData data) => data == null
@@ -335,11 +340,13 @@ public partial class FighterController : CharacterBody2D
 				BlockstunFrames = data.BlockstunFrames,
 				HitstopFramesOverride = data.HitstopFrames,
 				PushbackOverride = data.Pushback,
+				ShakeStrengthOverride = data.ShakeStrength,
 				HitReaction = data.HitReaction,
 				KnockdownType = data.KnockdownType,
 				KnocksDown = data.KnocksDown,
 				KnockdownFrames = data.KnockdownFrames,
 				CanHitGroundedKnockdown = data.CanHitGroundedKnockdown,
+				SuppressFallbackHitbox = data.SuppressFallbackHitbox,
 				BoxTimeline = data.BoxTimeline
 			};
 
@@ -1029,7 +1036,10 @@ public partial class FighterController : CharacterBody2D
 		_currentAttackStartedFromAirDash = attackStartedFromAirDash;
 		_currentAttackStartedFromRun = attackStartedFromRun;
 		_currentAttackStartedCrouching = WasGrounded && ActionInput.Vertical > 0.5f;
-		_currentMoveRule = GetNormalMoveRule(attackName, _currentAttackStartedCrouching, _currentAttackStartedAirborne);
+		_currentMoveData = GetConfiguredMoveData(attackName, _currentAttackStartedCrouching, _currentAttackStartedAirborne);
+		_currentSpecialMove = _currentMoveData as SpecialMoveData;
+		CurrentAttackAnimationName = _currentMoveData?.AnimationName ?? "";
+		_currentMoveRule = GetNormalMoveRule(attackName, _currentAttackStartedCrouching, _currentAttackStartedAirborne, _currentMoveData);
 		_currentSuperMove = GetSuperMoveData(attackName);
 		RegisterNormalUse(attackName);
 		_currentAttackStartupFrames = GetBasicAttackStartupFrames(attackName);
@@ -1074,16 +1084,19 @@ public partial class FighterController : CharacterBody2D
 
 		SuperMoveData superMove = _currentSuperMove;
 		bool super = superMove?.Projectile == true;
-		bool heavy = CurrentAttackName == HeavyProjectileName || super;
+		bool heavy = CurrentAttackName == HeavyProjectileName || _currentSpecialMove?.HeavyProjectile == true || super;
 		var projectile = new BasicProjectile { Name = super ? "SuperFireball" : heavy ? "HeavyProjectile" : "LightProjectile" };
-		Vector2 offset = new(ProjectileSpawnOffset.X * Facing, ProjectileSpawnOffset.Y);
+		Vector2 configuredOffset = _currentSpecialMove?.ProjectileSpawnOffset ?? ProjectileSpawnOffset;
+		Vector2 offset = new(configuredOffset.X * Facing, configuredOffset.Y);
 		projectile.GlobalPosition = GlobalPosition + offset;
 		projectile.Initialize(this, Facing,
-			super ? superMove.ProjectileSpeed : heavy ? HeavyProjectileSpeed : LightProjectileSpeed,
-			super ? superMove.HitstunFrames : heavy ? HeavyAttackHitstunFrames : LightAttackHitstunFrames,
-			super ? superMove.Pushback : heavy ? HeavyAttackPushback * 0.55f : LightAttackPushback * 0.75f,
-			super ? superMove.HitstopFrames : heavy ? HeavyAttackHitstopFrames : LightAttackHitstopFrames,
-			super ? superMove.ShakeStrength : heavy ? HeavyAttackShakeStrength * 0.65f : LightAttackShakeStrength,
+			super ? superMove.ProjectileSpeed : _currentSpecialMove?.Projectile == true
+				? _currentSpecialMove.ProjectileSpeed
+				: heavy ? HeavyProjectileSpeed : LightProjectileSpeed,
+			super ? superMove.HitstunFrames : _currentAttackHitstunFrames,
+			super ? superMove.Pushback : _currentAttackPushback,
+			super ? superMove.HitstopFrames : _currentAttackHitstopFrames,
+			super ? superMove.ShakeStrength : _currentAttackShakeStrength,
 			heavy,
 			super ? superMove.HitCount : 1,
 			super ? superMove.ProjectileHitCooldownFrames : 4,
@@ -1091,6 +1104,8 @@ public partial class FighterController : CharacterBody2D
 			super && superMove.FinalHitKnocksDown,
 			super ? superMove.FinalKnockdownType : KnockdownType.SoftKnockdown,
 			super ? superMove.FinalKnockdownFrames : 0);
+		if (_currentSpecialMove?.Projectile == true)
+			projectile.HitboxLocal = _currentSpecialMove.ProjectileHitboxLocal;
 		GetParent()?.AddChild(projectile);
 	}
 
@@ -1300,6 +1315,7 @@ public partial class FighterController : CharacterBody2D
 		if (_currentMoveRule.HitstunFramesOverride > 0) _currentAttackHitstunFrames = _currentMoveRule.HitstunFramesOverride;
 		if (_currentMoveRule.HitstopFramesOverride > 0) _currentAttackHitstopFrames = _currentMoveRule.HitstopFramesOverride;
 		if (_currentMoveRule.PushbackOverride > 0f) _currentAttackPushback = _currentMoveRule.PushbackOverride;
+		if (_currentMoveRule.ShakeStrengthOverride >= 0f) _currentAttackShakeStrength = _currentMoveRule.ShakeStrengthOverride;
 	}
 
 	private bool IsWithinCurrentMoveCancelWindow(int windowStartFrame, int windowEndFrame, int earliestActiveFramesLeft)
@@ -1320,9 +1336,17 @@ public partial class FighterController : CharacterBody2D
 		return true;
 	}
 
-	private NormalMoveRule GetNormalMoveRule(string attackName, bool startedCrouching, bool startedAirborne)
+	private NormalMoveData GetConfiguredMoveData(string attackName, bool startedCrouching, bool startedAirborne)
 	{
-		NormalMoveData moveData = Definition?.NormalMoves?.FindRule(attackName, startedCrouching, startedAirborne);
+		NormalMoveData normal = Definition?.NormalMoves?.FindRule(attackName, startedCrouching, startedAirborne);
+		if (normal != null) return normal;
+		return Definition?.SpecialMoves?.FindMove(attackName, startedCrouching, startedAirborne);
+	}
+
+	private NormalMoveRule GetNormalMoveRule(string attackName, bool startedCrouching, bool startedAirborne,
+		NormalMoveData configuredMove = null)
+	{
+		NormalMoveData moveData = configuredMove ?? GetConfiguredMoveData(attackName, startedCrouching, startedAirborne);
 		if (moveData != null) return NormalMoveRule.FromData(moveData);
 
 		// Backwards-compatible default rules for characters that do not yet have a NormalMoveSet.
@@ -1419,6 +1443,7 @@ public partial class FighterController : CharacterBody2D
 		_currentAttackStartedFromRun = false;
 		_currentAttackStartedCrouching = false;
 		CurrentAttackName = "";
+		CurrentAttackAnimationName = "";
 		_currentAttackStartupFrames = 0;
 		_currentAttackActiveFrames = 0;
 		_currentAttackRecoveryFrames = 0;
@@ -1435,6 +1460,8 @@ public partial class FighterController : CharacterBody2D
 		_currentAttackHitReaction = HitReactionKind.Normal;
 		_currentAttackHitboxLocal = HitboxLocal;
 		_currentSuperMove = null;
+		_currentMoveData = null;
+		_currentSpecialMove = null;
 		SuperActivationFreezeRequested = false;
 		SuperActivationFreezeFramesRequested = 0;
 		SuperBackdropFramesRequested = 0;
@@ -1589,6 +1616,7 @@ public partial class FighterController : CharacterBody2D
 
 	private int GetBasicAttackRecoveryFrames(string attackName)
 	{
+		if (_currentMoveData?.RecoveryFrames >= 0) return _currentMoveData.RecoveryFrames;
 		if (attackName == ThrowAttackName) return 15;
 		if (attackName == ForwardHeavyPunchName) return 2;
 		if (attackName == AirHeavyPunchName) return 4;
@@ -1605,6 +1633,7 @@ public partial class FighterController : CharacterBody2D
 
 	private int GetBasicAttackActiveFrames(string attackName)
 	{
+		if (_currentMoveData?.ActiveFrames >= 0) return _currentMoveData.ActiveFrames;
 		if (attackName == ThrowAttackName) return 1;
 		if (attackName == ForwardHeavyPunchName) return 4;
 		if (attackName == CrouchingHeavyPunchName) return 10;
@@ -1627,6 +1656,7 @@ public partial class FighterController : CharacterBody2D
 
 	private int GetBasicAttackStartupFrames(string attackName)
 	{
+		if (_currentMoveData?.StartupFrames >= 0) return _currentMoveData.StartupFrames;
 		if (attackName == ThrowAttackName) return 10;
 		if (attackName == ForwardHeavyPunchName) return 8;
 		if (attackName == AirHeavyPunchName) return 4;
@@ -1938,13 +1968,14 @@ public partial class FighterController : CharacterBody2D
 	public IEnumerable<ActiveFighterBox> GetActiveLocalBoxInstances(FighterBoxKind kind)
 	{
 		bool hasTimelineBoxes = false;
+		bool hasReplacingBox = HasActiveReplacingTimelineBox(kind);
 		if (IsAttacking && _currentMoveRule.BoxTimeline != null)
 		{
 			foreach (FighterBoxFrame box in _currentMoveRule.BoxTimeline)
 			{
 				if (box == null || box.Kind != kind) continue;
 				hasTimelineBoxes = true;
-				if (box.IsActiveOnFrame(CurrentAttackFrame))
+				if (box.IsActiveOnFrame(CurrentAttackFrame) && (!hasReplacingBox || box.ReplacesSameKindWhileActive))
 					yield return new ActiveFighterBox(GetFacingLocalBox(box.LocalRect, box.MirrorWithFacing), box);
 			}
 		}
@@ -1960,7 +1991,7 @@ public partial class FighterController : CharacterBody2D
 			yield return new ActiveFighterBox(ActivePushboxLocal);
 			yield break;
 		}
-		if (kind == FighterBoxKind.Hitbox && IsAttackActive)
+		if (kind == FighterBoxKind.Hitbox && IsAttackActive && !_currentMoveRule.SuppressFallbackHitbox)
 			yield return new ActiveFighterBox(GetFacingLocalBox(_currentAttackHitboxLocal, true));
 	}
 
@@ -1973,13 +2004,14 @@ public partial class FighterController : CharacterBody2D
 	public IEnumerable<ActiveFighterBox> GetActiveWorldBoxInstances(FighterBoxKind kind)
 	{
 		bool hasTimelineBoxes = false;
+		bool hasReplacingBox = HasActiveReplacingTimelineBox(kind);
 		if (IsAttacking && _currentMoveRule.BoxTimeline != null)
 		{
 			foreach (FighterBoxFrame box in _currentMoveRule.BoxTimeline)
 			{
 				if (box == null || box.Kind != kind) continue;
 				hasTimelineBoxes = true;
-				if (box.IsActiveOnFrame(CurrentAttackFrame))
+				if (box.IsActiveOnFrame(CurrentAttackFrame) && (!hasReplacingBox || box.ReplacesSameKindWhileActive))
 					yield return new ActiveFighterBox(GetWorldFacingBox(box.LocalRect, box.MirrorWithFacing), box);
 			}
 		}
@@ -1995,8 +2027,17 @@ public partial class FighterController : CharacterBody2D
 			yield return new ActiveFighterBox(new Rect2(GlobalPosition + ActivePushboxLocal.Position, ActivePushboxLocal.Size));
 			yield break;
 		}
-		if (kind == FighterBoxKind.Hitbox && IsAttackActive)
+		if (kind == FighterBoxKind.Hitbox && IsAttackActive && !_currentMoveRule.SuppressFallbackHitbox)
 			yield return new ActiveFighterBox(GetWorldFacingBox(_currentAttackHitboxLocal, true));
+	}
+
+	private bool HasActiveReplacingTimelineBox(FighterBoxKind kind)
+	{
+		if (!IsAttacking || _currentMoveRule.BoxTimeline == null) return false;
+		foreach (FighterBoxFrame box in _currentMoveRule.BoxTimeline)
+			if (box != null && box.Kind == kind && box.ReplacesSameKindWhileActive && box.IsActiveOnFrame(CurrentAttackFrame))
+				return true;
+		return false;
 	}
 
 	private Rect2 GetFirstActiveLocalBox(FighterBoxKind kind, Rect2 fallback)

@@ -22,6 +22,7 @@ GREEN = (0, 229, 111)
 MAGENTA = (255, 0, 255)
 CANVAS_SIZE = (160, 128)
 BOTTOM_MARGIN = 4
+TIMELINE_FPS = 60.0
 
 # animation: (inclusive y start, inclusive y end, maximum source x, fps, loop)
 SEQUENCES = {
@@ -65,6 +66,13 @@ ANIMATION_SETTINGS = {
     "super_fireball": (60.0, False),
     "fireball": (60.0, False),
 }
+
+
+def timeline_hold_count(frame_index, source_fps):
+    """Convert a source animation frame into whole 60 Hz simulation-frame holds."""
+    start_tick = round(frame_index * TIMELINE_FPS / source_fps)
+    end_tick = round((frame_index + 1) * TIMELINE_FPS / source_fps)
+    return max(1, end_tick - start_tick)
 
 
 def find_magenta_runs(image: Image.Image, y0: int, y1: int, max_x: int, min_width: int = 20):
@@ -144,18 +152,18 @@ def write_sprite_frames(frames_by_animation):
         animation_entries = [item for item in entries if item[0] == animation]
         lines.append("{")
         lines.append('"frames": [')
-        for frame_index, (_, _, resource_name, _) in enumerate(animation_entries):
-            comma = "," if frame_index < len(animation_entries) - 1 else ""
-            lines.extend([
-                "{",
-                '"duration": 1.0,',
-                f'"texture": ExtResource("{resource_name}")',
-                f"}}{comma}",
-            ])
+        timeline_entries = []
+        for source_frame_index, entry in enumerate(animation_entries):
+            timeline_entries.extend(
+                [entry] * timeline_hold_count(source_frame_index, fps)
+            )
+        for frame_index, (_, _, resource_name, _) in enumerate(timeline_entries):
+            comma = "," if frame_index < len(timeline_entries) - 1 else ""
+            lines.extend(["{", '"duration": 1.0,', f'"texture": ExtResource("{resource_name}")', f"}}{comma}"])
         lines.append("],")
         lines.append(f'"loop": {str(loop).lower()},')
         lines.append(f'"name": &"{animation}",')
-        lines.append(f'"speed": {fps}')
+        lines.append(f'"speed": {TIMELINE_FPS}')
         lines.append("}" + ("," if sequence_index < len(ANIMATION_SETTINGS) - 1 else ""))
     lines.append("]")
     lines.append("")
@@ -179,14 +187,19 @@ def write_all_lines_resource(line_records):
     for line_index, record in enumerate(line_records):
         animation_entries = [item for item in entries if item[0] == record["name"]]
         lines.extend(["{", '"frames": ['])
-        for frame_index, (_, resource_name, _) in enumerate(animation_entries):
-            comma = "," if frame_index < len(animation_entries) - 1 else ""
+        timeline_entries = []
+        for source_frame_index, entry in enumerate(animation_entries):
+            timeline_entries.extend(
+                [entry] * timeline_hold_count(source_frame_index, 10.0)
+            )
+        for frame_index, (_, resource_name, _) in enumerate(timeline_entries):
+            comma = "," if frame_index < len(timeline_entries) - 1 else ""
             lines.extend(["{", '"duration": 1.0,', f'"texture": ExtResource("{resource_name}")', f"}}{comma}"])
         lines.extend([
             "],",
             '"loop": true,',
             f'"name": &"{record["name"]}",',
-            '"speed": 10.0',
+            f'"speed": {TIMELINE_FPS}',
             "}" + ("," if line_index < len(line_records) - 1 else ""),
         ])
     lines.extend(["]", ""])

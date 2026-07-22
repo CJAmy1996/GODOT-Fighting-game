@@ -84,7 +84,7 @@ public partial class VersusStageRules : Node
 		{
 			_fighterOne.RequestHitstop(freezeFrames);
 			_fighterTwo.RequestHitstop(freezeFrames);
-			_fightCamera?.Shake(7.5f, freezeFrames);
+			_fightCamera?.ShakeSuper(8.5f, freezeFrames);
 		}
 		SpawnSuperBackdrop(backdropFrames);
 	}
@@ -281,7 +281,12 @@ public partial class VersusStageRules : Node
 		}
 		float shake = Mathf.Max(firstShake, secondShake);
 		int shakeFrames = Mathf.Max(firstHitstop, secondHitstop);
-		if (shake > 0f) _fightCamera?.Shake(shake, shakeFrames);
+		bool superImpact = (firstHit && _fighterOne.CurrentAttackName.StartsWith("SUPER")) ||
+			(secondHit && _fighterTwo.CurrentAttackName.StartsWith("SUPER"));
+		if (superImpact)
+			_fightCamera?.ShakeSuper(Mathf.Max(8f, shake), Mathf.Max(12, shakeFrames));
+		else if (shake > 0f)
+			_fightCamera?.Shake(shake, shakeFrames);
 	}
 
 	private void ResolveProjectileHits()
@@ -301,7 +306,10 @@ public partial class VersusStageRules : Node
 				out int hitstop, out float shake, out _, out Vector2 hitPoint, out bool heavySpark)) continue;
 
 			if (hitstop > 0) defender.RequestHitstop(hitstop);
-			if (shake > 0f) _fightCamera?.Shake(shake, hitstop);
+			if (projectile.Super)
+				_fightCamera?.ShakeSuper(Mathf.Max(9f, shake), Mathf.Max(14, hitstop));
+			else if (shake > 0f)
+				_fightCamera?.Shake(shake, hitstop);
 			_hitSparkLayer?.Spawn(hitPoint, heavySpark);
 			projectile.MarkHit(defender);
 		}

@@ -35,7 +35,7 @@ public enum FighterAttackLevel
 	Air
 }
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class FighterBoxFrame : Resource
 {
 	private const int UseMoveDefaultInt = -1;
@@ -47,6 +47,7 @@ public partial class FighterBoxFrame : Resource
 	[Export] public Rect2 LocalRect { get; set; } = new(-24f, -72f, 48f, 96f);
 	[Export] public bool MirrorWithFacing { get; set; } = true;
 	[Export] public string Tag { get; set; } = "";
+	[Export] public bool ReplacesSameKindWhileActive { get; set; }
 
 	[ExportGroup("Interaction")]
 	[Export] public FighterBoxAttribute Attributes { get; set; } = FighterBoxAttribute.Strike;

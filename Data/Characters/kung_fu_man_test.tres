@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="FighterDefinition" load_steps=12 format=3 uid="uid://bsia1qvkdppur"]
+[gd_resource type="Resource" script_class="FighterDefinition" load_steps=16 format=3 uid="uid://bsia1qvkdppur"]
 
 [ext_resource type="Script" uid="uid://p3g6dew2wiky" path="res://Scripts/Core/FighterDefinition.cs" id="1_def"]
 [ext_resource type="Script" uid="uid://s1q2kuukuw7h" path="res://Scripts/Core/MovementTuning.cs" id="2_tuning"]
@@ -10,11 +10,14 @@
 [ext_resource type="Resource" path="res://Data/Characters/Common/air_dash.tres" id="8"]
 [ext_resource type="Resource" path="res://Data/Characters/Common/backward_air_dash.tres" id="9"]
 [ext_resource type="Resource" path="res://Data/Characters/Common/super_jump.tres" id="10"]
+[ext_resource type="Resource" uid="uid://c32qbocpsvmo4" path="res://Data/Characters/KungFuMan/kung_fu_man_normal_moves.tres" id="11_normals"]
+[ext_resource type="Resource" uid="uid://ds7etjdao7hoc" path="res://Data/Characters/KungFuMan/kung_fu_man_special_moves.tres" id="12_specials"]
+[ext_resource type="Resource" path="res://Data/Characters/KungFuMan/super_rush.tres" id="13_super_rush"]
+[ext_resource type="Resource" path="res://Data/Characters/KungFuMan/super_fireball.tres" id="14_super_fireball"]
 
 [sub_resource type="Resource" id="MovementTuning_kfm"]
 script = ExtResource("2_tuning")
 WalkSpeed = 360.0
-BackWalkSpeedMultiplier = 0.82
 GroundAcceleration = 4400.0
 GroundDeceleration = 5200.0
 GroundFriction = 6000.0
@@ -30,3 +33,6 @@ script = ExtResource("1_def")
 FighterName = "Kung Fu Man (Sprite Test)"
 Tuning = SubResource("MovementTuning_kfm")
 Abilities = [ExtResource("10"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("9"), ExtResource("8")]
+NormalMoves = ExtResource("11_normals")
+SpecialMoves = ExtResource("12_specials")
+SuperMoves = [ExtResource("13_super_rush"), ExtResource("14_super_fireball")]

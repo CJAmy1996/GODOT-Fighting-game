@@ -5,7 +5,7 @@ namespace ModularFighter.Movement;
 
 public enum DashDirectionRequirement { Any, Forward, Backward }
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class DashAbility : MovementAbility
 {
 	[Export] public bool AirOnly { get; set; }

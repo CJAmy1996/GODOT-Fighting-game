@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="SuperMoveData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/SuperMoveData.cs" id="1_super"]
+
+[resource]
+script = ExtResource("1_super")
+AttackName = "SUPER FIREBALL"
+StartupFrames = 12
+ActiveFrames = 2
+RecoveryFrames = 28
+ActivationFreezeFrames = 45
+BackdropFrames = 87
+HitCount = 10
+HitIntervalFrames = 5
+HitstunFrames = 8
+HitstopFrames = 3
+Pushback = 223.2
+FinalHitstunFrames = 34
+FinalHitstopFrames = 8
+FinalPushback = 1054.0
+ShakeStrength = 8.0
+FinalShakeStrength = 11.0
+HitboxLocal = Rect2(18, -70, 88, 66)
+FinalKnockdownType = 3
+FinalKnockdownFrames = 58
+Projectile = true
+ProjectileSpeed = 620.0
+ProjectileHitCooldownFrames = 5

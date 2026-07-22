@@ -1,0 +1,95 @@
+[gd_resource type="Resource" script_class="SpecialMoveSet" load_steps=13 format=3 uid="uid://ds7etjdao7hoc"]
+
+[ext_resource type="Script" uid="uid://cvrl3b6rdaomb" path="res://Scripts/Core/SpecialMoveData.cs" id="1_move"]
+[ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="2_box"]
+[ext_resource type="Script" uid="uid://b0wbufr78dysp" path="res://Scripts/Core/SpecialMoveSet.cs" id="3_set"]
+
+[sub_resource type="Resource" id="light_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="light_projectile"]
+script = ExtResource("1_move")
+Projectile = true
+ProjectileSpeed = 720.0
+ProjectileHitboxLocal = Rect2(-13, -13, 26, 26)
+AttackName = "LIGHT PROJECTILE"
+AnimationName = "fireball"
+StartupFrames = 8
+ActiveFrames = 2
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+HitstunFrames = 10
+HitstopFrames = 5
+Pushback = 390.0
+ShakeStrength = 2.5
+BoxTimeline = [SubResource("light_hurt")]
+
+[sub_resource type="Resource" id="heavy_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="heavy_projectile"]
+script = ExtResource("1_move")
+Projectile = true
+HeavyProjectile = true
+ProjectileSpeed = 1040.0
+AttackName = "HEAVY PROJECTILE"
+AnimationName = "fireball"
+StartupFrames = 8
+ActiveFrames = 2
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+HitstunFrames = 14
+HitstopFrames = 11
+Pushback = 682.0
+ShakeStrength = 5.85
+BoxTimeline = [SubResource("heavy_hurt")]
+
+[sub_resource type="Resource" id="super_rush_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="super_rush_hit"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 7
+EndFrame = 96
+LocalRect = Rect2(20, -70, 76, 52)
+Tag = "super-rush"
+
+[sub_resource type="Resource" id="super_rush"]
+script = ExtResource("1_move")
+AttackName = "SUPER RUSH"
+AnimationName = "air_dash"
+Stance = 1
+StartupFrames = 7
+ActiveFrames = 90
+RecoveryFrames = 24
+SuppressFallbackHitbox = true
+BoxTimeline = [SubResource("super_rush_hurt"), SubResource("super_rush_hit")]
+
+[sub_resource type="Resource" id="super_fireball_hurt"]
+script = ExtResource("2_box")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="super_fireball"]
+script = ExtResource("1_move")
+Projectile = true
+ProjectileSpeed = 620.0
+ProjectileHitboxLocal = Rect2(-36, -34, 72, 68)
+AttackName = "SUPER FIREBALL"
+AnimationName = "super_fireball"
+StartupFrames = 12
+ActiveFrames = 2
+RecoveryFrames = 28
+SuppressFallbackHitbox = true
+BoxTimeline = [SubResource("super_fireball_hurt")]
+
+[resource]
+script = ExtResource("3_set")
+Moves = [SubResource("light_projectile"), SubResource("heavy_projectile"), SubResource("super_rush"), SubResource("super_fireball")]

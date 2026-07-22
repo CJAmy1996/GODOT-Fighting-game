@@ -34,6 +34,7 @@ public partial class StageCamera : Camera2D
 	private readonly RandomNumberGenerator _shakeRandom = new();
 	private int _shakeFramesLeft;
 	private float _shakeStrength;
+	private bool _cinematicShake;
 
 	public override void _Ready()
 	{
@@ -87,6 +88,13 @@ public partial class StageCamera : Camera2D
 		_shakeFramesLeft = Mathf.Max(_shakeFramesLeft, frames);
 	}
 
+	public void ShakeSuper(float strength, int frames)
+	{
+		_cinematicShake = true;
+		_shakeStrength = Mathf.Max(_shakeStrength, strength);
+		_shakeFramesLeft = Mathf.Max(_shakeFramesLeft, Mathf.Max(12, frames));
+	}
+
 	private float MinimumStageZoom()
 	{
 		float horizontalMinimum = ViewportWidth / StageWidth;
@@ -107,12 +115,13 @@ public partial class StageCamera : Camera2D
 		{
 			Offset = Vector2.Zero;
 			_shakeStrength = 0f;
+			_cinematicShake = false;
 			return;
 		}
 		_shakeFramesLeft--;
 		float x = _shakeRandom.RandfRange(-_shakeStrength, _shakeStrength);
 		float y = _shakeRandom.RandfRange(-_shakeStrength, _shakeStrength);
 		Offset = new Vector2(x, y);
-		_shakeStrength *= 0.82f;
+		_shakeStrength *= _cinematicShake ? 0.94f : 0.82f;
 	}
 }

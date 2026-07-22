@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="SuperMoveData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/SuperMoveData.cs" id="1_super"]
+
+[resource]
+script = ExtResource("1_super")
+AttackName = "SUPER RUSH"
+StartupFrames = 7
+ActiveFrames = 90
+RecoveryFrames = 24
+ActivationFreezeFrames = 45
+BackdropFrames = 150
+HitCount = 16
+HitIntervalFrames = 4
+HitstunFrames = 10
+HitstopFrames = 3
+AddsGlobalHitstopBonus = false
+Pushback = 0.0
+FinalHitstunFrames = 72
+FinalHitstopFrames = 26
+FinalPushback = 2200.0
+ShakeStrength = 5.0
+FinalShakeStrength = 16.0
+HitboxLocal = Rect2(20, -70, 76, 52)
+FinalHitKnocksDown = true
+FinalKnockdownType = 3
+FinalKnockdownFrames = 72
+RushesForward = true
+RushSpeed = 600.0
+StopRushOnFirstHit = true
+RequiresHitConfirmForMultiHit = true
+ConfirmedActiveFrames = 86
+ConfirmedAttackerOffsetFromDefender = Vector2(-48, 0)

@@ -3,7 +3,7 @@ using ModularFighter.Core;
 
 namespace ModularFighter.Movement;
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class RunAbility : MovementAbility
 {
 	[Export] public float Speed { get; set; } = 650f;

@@ -13,7 +13,7 @@ public enum CancelKind
 }
 
 /// <summary>Reusable cancel permission. Add these to a fighter definition instead of hard-coding cancel behavior per move.</summary>
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class CancelRule : Resource
 {
 	[Export] public string FromMove { get; set; } = "ANY_NORMAL";

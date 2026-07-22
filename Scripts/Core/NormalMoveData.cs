@@ -37,14 +37,21 @@ public enum KnockdownType
 /// Per-normal combo/cancel/launcher rule data. Designers should make one of these
 /// for any normal that differs from the character's default behavior.
 /// </summary>
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class NormalMoveData : Resource
 {
 	/// <summary>
 	/// Use exact names like "LIGHT PUNCH" or broad names like "LIGHT", "HEAVY", "SPECIAL", or "ANY".
 	/// </summary>
 	[Export] public string AttackName { get; set; } = "ANY";
+	[Export] public string AnimationName { get; set; } = "";
 	[Export] public NormalMoveStance Stance { get; set; } = NormalMoveStance.Any;
+
+	[ExportGroup("60 Hz Timeline")]
+	[Export] public int StartupFrames { get; set; } = -1;
+	[Export] public int ActiveFrames { get; set; } = -1;
+	[Export] public int RecoveryFrames { get; set; } = -1;
+	[Export] public bool SuppressFallbackHitbox { get; set; }
 
 	[ExportGroup("Chains")]
 	[Export] public bool CanChainToLight { get; set; }
@@ -63,6 +70,7 @@ public partial class NormalMoveData : Resource
 	[Export] public int BlockstunFrames { get; set; } = -1;
 	[Export] public int HitstopFrames { get; set; } = -1;
 	[Export] public float Pushback { get; set; } = -1f;
+	[Export] public float ShakeStrength { get; set; } = -1f;
 	[Export] public HitReactionKind HitReaction { get; set; } = HitReactionKind.Normal;
 	[Export] public KnockdownType KnockdownType { get; set; } = KnockdownType.None;
 	[Export] public bool KnocksDown { get; set; }
