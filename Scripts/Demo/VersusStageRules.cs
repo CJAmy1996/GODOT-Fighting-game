@@ -35,6 +35,8 @@ public partial class VersusStageRules : Node
 		_fightCamera = _stageCamera as StageCamera;
 		_fighterOne.FaceWithMovement = false;
 		_fighterTwo.FaceWithMovement = false;
+		_fighterOne.SetOpponent(_fighterTwo);
+		_fighterTwo.SetOpponent(_fighterOne);
 		if (GetParent().GetNodeOrNull<Node2D>("ArenaBackdrop") is { } arenaBackdrop) arenaBackdrop.ZIndex = -100;
 		_fighterOne.ZIndex = 0;
 		_fighterTwo.ZIndex = 0;
@@ -48,6 +50,7 @@ public partial class VersusStageRules : Node
 	public override void _PhysicsProcess(double delta)
 	{
 		if (_fighterOne == null || _fighterTwo == null) return;
+		ResolveSuperBackdropCancellation();
 		ResolveSuperActivations();
 		UpdateFacing();
 		GetFightBoxEdges(out float leftEdge, out float rightEdge);
@@ -59,6 +62,14 @@ public partial class VersusStageRules : Node
 		_fighterTwo.MaintainSuperHitLock();
 		ResolveProjectileHits();
 		ClampFightersToCameraCorners(leftEdge, rightEdge);
+	}
+
+	private void ResolveSuperBackdropCancellation()
+	{
+		bool cancel = _fighterOne.ConsumeSuperBackdropCancelRequest() || _fighterTwo.ConsumeSuperBackdropCancelRequest();
+		if (!cancel || !GodotObject.IsInstanceValid(_superBackdrop)) return;
+		_superBackdrop.QueueFree();
+		_superBackdrop = null;
 	}
 
 	private void ResolveSuperActivations()
@@ -259,14 +270,14 @@ public partial class VersusStageRules : Node
 		if (firstHit)
 		{
 			ApplyHitstopForHit(_fighterOne, _fighterTwo, firstHitstop);
-			ApplyCornerPushbackTransfer(_fighterOne, _fighterTwo, firstPushback);
-			_hitSparkLayer?.Spawn(firstHitPoint, firstHeavySpark);
+			if (!_fighterOne.IsPerformingThrow) ApplyCornerPushbackTransfer(_fighterOne, _fighterTwo, firstPushback);
+			if (!_fighterOne.IsPerformingThrow) _hitSparkLayer?.Spawn(firstHitPoint, firstHeavySpark);
 		}
 		if (secondHit)
 		{
 			ApplyHitstopForHit(_fighterTwo, _fighterOne, secondHitstop);
-			ApplyCornerPushbackTransfer(_fighterTwo, _fighterOne, secondPushback);
-			_hitSparkLayer?.Spawn(secondHitPoint, secondHeavySpark);
+			if (!_fighterTwo.IsPerformingThrow) ApplyCornerPushbackTransfer(_fighterTwo, _fighterOne, secondPushback);
+			if (!_fighterTwo.IsPerformingThrow) _hitSparkLayer?.Spawn(secondHitPoint, secondHeavySpark);
 		}
 		float shake = Mathf.Max(firstShake, secondShake);
 		int shakeFrames = Mathf.Max(firstHitstop, secondHitstop);

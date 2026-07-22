@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://bycdc00jmcrow"]
+
+[ext_resource type="Script" uid="uid://do0dkb2cosh1p" path="res://Scripts/Demo/SpriteTestFighter.cs" id="1_script"]
+[ext_resource type="Resource" path="res://Data/Characters/kung_fu_man_test.tres" id="2_definition"]
+[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/KungFuMan/kung_fu_man_sprite_frames.tres" id="3_frames"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(56, 100)
+
+[node name="KungFuManTest" type="CharacterBody2D" node_paths=PackedStringArray("CharacterSprite")]
+script = ExtResource("1_script")
+CharacterSprite = NodePath("CharacterSprite")
+Definition = ExtResource("2_definition")
+BasicAttackStartupFrames = 9
+LightAttackStartupFrames = 4
+LightPunchActiveFrames = 2
+LightAttackRecoveryFrames = 4
+GroundLightAttackRecoveryFrames = 4
+HeavyAttackRecoveryFrames = 9
+SpecialAttackRecoveryFrames = 12
+ProjectileAttackStartupFrames = 8
+
+[node name="CharacterSprite" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, -60)
+sprite_frames = ExtResource("3_frames")
+animation = &"super_fireball"
+autoplay = "idle"
+
+[node name="BodyCollision" type="CollisionShape2D" parent="."]
+position = Vector2(0, -50)
+shape = SubResource("RectangleShape2D_body")

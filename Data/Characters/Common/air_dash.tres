@@ -10,6 +10,6 @@ AirOnly = true
 MaxAirUses = 1
 ActiveFrames = 11
 RecoveryFrames = 6
-Speed = 820.0
+Speed = 650.0
 AimWithStick = true
-
+MinimumAirHeight = 80.0

@@ -1,0 +1,2611 @@
+[gd_resource type="SpriteFrames" load_steps=473 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_01.png" id="1_idle_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_02.png" id="2_idle_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_03.png" id="3_idle_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_04.png" id="4_idle_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_05.png" id="5_idle_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_05.png" id="6_idle_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_04.png" id="7_idle_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_03.png" id="8_idle_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_02.png" id="9_idle_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_01.png" id="10_idle_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_00.png" id="11_walk_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_01.png" id="12_walk_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_02.png" id="13_walk_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_03.png" id="14_walk_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_04.png" id="15_walk_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_05.png" id="16_walk_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_06.png" id="17_walk_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_07.png" id="18_walk_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_08.png" id="19_walk_08"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_09.png" id="20_walk_09"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_10.png" id="21_walk_10"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_11.png" id="22_walk_11"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_12.png" id="23_walk_12"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_13.png" id="24_walk_13"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_14.png" id="25_walk_14"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/walk/walk_15.png" id="26_walk_15"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_15.png" id="27_walk_back_15"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_14.png" id="28_walk_back_14"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_13.png" id="29_walk_back_13"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_12.png" id="30_walk_back_12"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_11.png" id="31_walk_back_11"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_10.png" id="32_walk_back_10"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_09.png" id="33_walk_back_09"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_08.png" id="34_walk_back_08"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_07.png" id="35_walk_back_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_06.png" id="36_walk_back_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_05.png" id="37_walk_back_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_04.png" id="38_walk_back_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_03.png" id="39_walk_back_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_02.png" id="40_walk_back_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_01.png" id="41_walk_back_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_03/line_03_00.png" id="42_walk_back_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/jump/jump_00.png" id="43_jump_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/jump/jump_01.png" id="44_jump_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/jump/jump_02.png" id="45_jump_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/jump/jump_03.png" id="46_jump_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/jump/jump_04.png" id="47_jump_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/jump/jump_05.png" id="48_jump_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/attack/attack_00.png" id="49_attack_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/attack/attack_01.png" id="50_attack_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/attack/attack_02.png" id="51_attack_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/attack/attack_03.png" id="52_attack_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/attack/attack_04.png" id="53_attack_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/attack/attack_05.png" id="54_attack_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/attack/attack_06.png" id="55_attack_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/attack/attack_07.png" id="56_attack_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/Frames/attack/attack_08.png" id="57_attack_08"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_00.png" id="58_run_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_01.png" id="59_run_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_02.png" id="60_run_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_03.png" id="61_run_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_04.png" id="62_run_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_05.png" id="63_run_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_05.png" id="64_run_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_04.png" id="65_run_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_03.png" id="66_run_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_02.png" id="67_run_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_01.png" id="68_run_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_04/line_04_00.png" id="69_run_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_00.png" id="70_neutral_jump_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_01.png" id="71_neutral_jump_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_02.png" id="72_neutral_jump_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_03.png" id="73_neutral_jump_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_04.png" id="74_neutral_jump_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_05.png" id="75_neutral_jump_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_06.png" id="76_neutral_jump_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_07.png" id="77_fall_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_08.png" id="78_fall_08"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_06/line_06_00.png" id="79_forward_jump_start_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_06/line_06_01.png" id="80_forward_jump_start_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_02.png" id="81_forward_jump_start_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_03.png" id="82_forward_jump_start_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_05/line_05_04.png" id="83_forward_jump_start_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_06/line_06_02.png" id="84_forward_jump_loop_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_06/line_06_03.png" id="85_forward_jump_loop_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_06/line_06_04.png" id="86_forward_jump_loop_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_06/line_06_05.png" id="87_forward_jump_loop_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_07/line_07_00.png" id="88_back_dash_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_07/line_07_01.png" id="89_back_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_08/line_08_00.png" id="90_crouch_start_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_08/line_08_01.png" id="91_crouch_start_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_08/line_08_03.png" id="92_crouch_start_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_08/line_08_02.png" id="93_crouch_start_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_08/line_08_02.png" id="94_crouch_hold_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_08/line_08_02.png" id="95_crouch_end_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_08/line_08_03.png" id="96_crouch_end_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_08/line_08_01.png" id="97_crouch_end_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_08/line_08_00.png" id="98_crouch_end_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_00.png" id="99_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_00.png" id="100_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_00.png" id="101_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_01.png" id="102_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_01.png" id="103_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_01.png" id="104_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_02.png" id="105_heavy_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_02.png" id="106_heavy_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_02.png" id="107_heavy_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_03.png" id="108_heavy_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_03.png" id="109_heavy_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_03.png" id="110_heavy_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_03.png" id="111_heavy_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_04.png" id="112_heavy_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_04.png" id="113_heavy_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_04.png" id="114_heavy_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_05.png" id="115_heavy_punch_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_05.png" id="116_heavy_punch_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_05.png" id="117_heavy_punch_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_02.png" id="118_heavy_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_01.png" id="119_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_11/line_11_00.png" id="120_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_00.png" id="121_crouching_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_00.png" id="122_crouching_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_01.png" id="123_crouching_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_01.png" id="124_crouching_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_02.png" id="125_crouching_heavy_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_02.png" id="126_crouching_heavy_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_03.png" id="127_crouching_heavy_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_04.png" id="128_crouching_heavy_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_05.png" id="129_crouching_heavy_punch_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_06.png" id="130_crouching_heavy_punch_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_07.png" id="131_crouching_heavy_punch_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_08.png" id="132_crouching_heavy_punch_08"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_09.png" id="133_crouching_heavy_punch_09"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_08.png" id="134_crouching_heavy_punch_08"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_07.png" id="135_crouching_heavy_punch_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_06.png" id="136_crouching_heavy_punch_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_07.png" id="137_crouching_heavy_punch_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_08.png" id="138_crouching_heavy_punch_08"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_09.png" id="139_crouching_heavy_punch_09"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_08.png" id="140_crouching_heavy_punch_08"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_07.png" id="141_crouching_heavy_punch_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_06.png" id="142_crouching_heavy_punch_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_05.png" id="143_crouching_heavy_punch_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_04.png" id="144_crouching_heavy_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_03.png" id="145_crouching_heavy_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_02.png" id="146_crouching_heavy_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_01.png" id="147_crouching_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_12/line_12_00.png" id="148_crouching_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_00.png" id="149_fireball_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_00.png" id="150_fireball_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_01.png" id="151_fireball_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_01.png" id="152_fireball_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_02.png" id="153_fireball_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_02.png" id="154_fireball_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_03.png" id="155_fireball_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_03.png" id="156_fireball_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_04.png" id="157_fireball_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_04.png" id="158_fireball_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_05.png" id="159_fireball_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_05.png" id="160_fireball_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="161_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="162_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_07.png" id="163_fireball_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_07.png" id="164_fireball_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_02.png" id="165_fireball_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_02.png" id="166_fireball_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_01.png" id="167_fireball_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_01.png" id="168_fireball_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_00.png" id="169_fireball_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_00.png" id="170_fireball_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_00.png" id="171_super_fireball_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_00.png" id="172_super_fireball_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_00.png" id="173_super_fireball_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_01.png" id="174_super_fireball_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_01.png" id="175_super_fireball_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_01.png" id="176_super_fireball_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_02.png" id="177_super_fireball_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_02.png" id="178_super_fireball_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_03.png" id="179_super_fireball_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_03.png" id="180_super_fireball_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_04.png" id="181_super_fireball_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_04.png" id="182_super_fireball_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_05.png" id="183_super_fireball_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="184_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_07.png" id="185_super_fireball_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="186_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_05.png" id="187_super_fireball_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="188_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_07.png" id="189_super_fireball_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="190_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_05.png" id="191_super_fireball_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="192_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_07.png" id="193_super_fireball_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="194_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_05.png" id="195_super_fireball_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="196_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_07.png" id="197_super_fireball_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="198_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_05.png" id="199_super_fireball_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="200_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_07.png" id="201_super_fireball_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="202_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_05.png" id="203_super_fireball_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="204_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_07.png" id="205_super_fireball_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="206_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_05.png" id="207_super_fireball_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="208_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_07.png" id="209_super_fireball_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="210_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_05.png" id="211_super_fireball_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_09/line_09_06.png" id="212_super_fireball_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_10/line_10_00.png" id="213_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_10/line_10_00.png" id="214_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_10/line_10_01.png" id="215_light_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_10/line_10_01.png" id="216_light_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_10/line_10_02.png" id="217_light_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_10/line_10_02.png" id="218_light_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_10/line_10_01.png" id="219_light_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_10/line_10_01.png" id="220_light_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_10/line_10_00.png" id="221_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_10/line_10_00.png" id="222_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_00.png" id="223_air_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_00.png" id="224_air_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_01.png" id="225_air_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_01.png" id="226_air_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_03.png" id="227_air_heavy_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_03.png" id="228_air_heavy_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_02.png" id="229_air_heavy_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_01.png" id="230_air_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_01.png" id="231_air_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_00.png" id="232_air_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="233_air_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="234_air_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="235_air_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="236_air_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_04.png" id="237_air_light_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_13/line_13_04.png" id="238_air_light_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="239_air_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="240_air_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="241_air_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="242_air_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="243_crouching_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="244_crouching_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="245_crouching_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="246_crouching_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_01.png" id="247_crouching_light_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_01.png" id="248_crouching_light_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="249_crouching_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="250_crouching_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="251_crouching_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_14/line_14_00.png" id="252_crouching_light_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_00.png" id="253_crouching_medium_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_01.png" id="254_crouching_medium_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_02.png" id="255_crouching_medium_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_03.png" id="256_crouching_medium_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_04.png" id="257_crouching_medium_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_04.png" id="258_crouching_medium_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_05.png" id="259_crouching_medium_punch_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_04.png" id="260_crouching_medium_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_03.png" id="261_crouching_medium_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_02.png" id="262_crouching_medium_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_01.png" id="263_crouching_medium_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_15/line_15_00.png" id="264_crouching_medium_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_00.png" id="265_throw_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_00.png" id="266_throw_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_01.png" id="267_throw_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_01.png" id="268_throw_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_02.png" id="269_throw_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_02.png" id="270_throw_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_03.png" id="271_throw_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_03.png" id="272_throw_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_04.png" id="273_throw_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_04.png" id="274_throw_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_05.png" id="275_throw_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_05.png" id="276_throw_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_06.png" id="277_throw_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_06.png" id="278_throw_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_07.png" id="279_throw_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_07.png" id="280_throw_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_08.png" id="281_throw_08"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_08.png" id="282_throw_08"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_09.png" id="283_throw_09"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_09.png" id="284_throw_09"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_10.png" id="285_throw_10"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_10.png" id="286_throw_10"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_11.png" id="287_throw_11"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_11.png" id="288_throw_11"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_12.png" id="289_throw_12"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_16/line_16_12.png" id="290_throw_12"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_00.png" id="291_forward_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_00.png" id="292_forward_heavy_punch_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_01.png" id="293_forward_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_01.png" id="294_forward_heavy_punch_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_02.png" id="295_forward_heavy_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_02.png" id="296_forward_heavy_punch_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_03.png" id="297_forward_heavy_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_03.png" id="298_forward_heavy_punch_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_04.png" id="299_forward_heavy_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_04.png" id="300_forward_heavy_punch_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_05.png" id="301_forward_heavy_punch_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_05.png" id="302_forward_heavy_punch_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_06.png" id="303_forward_heavy_punch_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_17/line_17_06.png" id="304_forward_heavy_punch_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_00.png" id="305_standing_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_00.png" id="306_standing_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_00.png" id="307_standing_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_00.png" id="308_standing_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_01.png" id="309_standing_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_01.png" id="310_standing_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_01.png" id="311_standing_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_01.png" id="312_standing_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_02.png" id="313_standing_light_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_02.png" id="314_standing_light_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_01.png" id="315_standing_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_01.png" id="316_standing_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_00.png" id="317_standing_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_18/line_18_00.png" id="318_standing_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_00.png" id="319_forward_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_00.png" id="320_forward_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_01.png" id="321_forward_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_02.png" id="322_forward_light_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_03.png" id="323_forward_light_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_03.png" id="324_forward_light_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_03.png" id="325_forward_light_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_03.png" id="326_forward_light_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_04.png" id="327_forward_light_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_04.png" id="328_forward_light_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_05.png" id="329_forward_light_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_05.png" id="330_forward_light_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_02.png" id="331_forward_light_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_19/line_19_00.png" id="332_forward_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_00.png" id="333_standing_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_01.png" id="334_standing_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_02.png" id="335_standing_heavy_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_03.png" id="336_standing_heavy_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_04.png" id="337_standing_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_04.png" id="338_standing_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_04.png" id="339_standing_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_04.png" id="340_standing_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_04.png" id="341_standing_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_05.png" id="342_standing_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_05.png" id="343_standing_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_06.png" id="344_standing_heavy_kick_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_06.png" id="345_standing_heavy_kick_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_07.png" id="346_standing_heavy_kick_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_07.png" id="347_standing_heavy_kick_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_06.png" id="348_standing_heavy_kick_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_06.png" id="349_standing_heavy_kick_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_05.png" id="350_standing_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_05.png" id="351_standing_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_00.png" id="352_standing_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_20/line_20_00.png" id="353_standing_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_00.png" id="354_air_up_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_01.png" id="355_air_up_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_02.png" id="356_air_up_heavy_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_03.png" id="357_air_up_heavy_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_04.png" id="358_air_up_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_04.png" id="359_air_up_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_04.png" id="360_air_up_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_04.png" id="361_air_up_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_04.png" id="362_air_up_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_05.png" id="363_air_up_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_05.png" id="364_air_up_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_06.png" id="365_air_up_heavy_kick_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_06.png" id="366_air_up_heavy_kick_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_07.png" id="367_air_up_heavy_kick_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_07.png" id="368_air_up_heavy_kick_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_06.png" id="369_air_up_heavy_kick_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_06.png" id="370_air_up_heavy_kick_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_05.png" id="371_air_up_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_05.png" id="372_air_up_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_00.png" id="373_air_up_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_21/line_21_00.png" id="374_air_up_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_00.png" id="375_air_dash_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_01.png" id="376_air_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_01.png" id="377_air_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_01.png" id="378_air_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_01.png" id="379_air_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_01.png" id="380_air_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_01.png" id="381_air_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_01.png" id="382_air_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_01.png" id="383_air_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_01.png" id="384_air_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_01.png" id="385_air_dash_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_02.png" id="386_air_dash_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_02.png" id="387_air_dash_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_02.png" id="388_air_dash_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_03.png" id="389_air_dash_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_03.png" id="390_air_dash_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_22/line_22_03.png" id="391_air_dash_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="392_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="393_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="394_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="395_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_01.png" id="396_air_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_01.png" id="397_air_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_01.png" id="398_air_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_01.png" id="399_air_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="400_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="401_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="402_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="403_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="404_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="405_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="406_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_23/line_23_00.png" id="407_air_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_00.png" id="408_air_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_00.png" id="409_air_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_01.png" id="410_air_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_01.png" id="411_air_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_02.png" id="412_air_heavy_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_02.png" id="413_air_heavy_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_02.png" id="414_air_heavy_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_02.png" id="415_air_heavy_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_02.png" id="416_air_heavy_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_01.png" id="417_air_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_01.png" id="418_air_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_01.png" id="419_air_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_01.png" id="420_air_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_01.png" id="421_air_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_01.png" id="422_air_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_00.png" id="423_air_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_00.png" id="424_air_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_00.png" id="425_air_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_00.png" id="426_air_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_00.png" id="427_air_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_24/line_24_00.png" id="428_air_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_00.png" id="429_crouching_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_00.png" id="430_crouching_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_01.png" id="431_crouching_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_01.png" id="432_crouching_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_02.png" id="433_crouching_light_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_02.png" id="434_crouching_light_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_02.png" id="435_crouching_light_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_02.png" id="436_crouching_light_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_03.png" id="437_crouching_light_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_03.png" id="438_crouching_light_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_01.png" id="439_crouching_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_01.png" id="440_crouching_light_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_00.png" id="441_crouching_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_25/line_25_00.png" id="442_crouching_light_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_00.png" id="443_crouching_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_01.png" id="444_crouching_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_02.png" id="445_crouching_heavy_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_02.png" id="446_crouching_heavy_kick_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_03.png" id="447_crouching_heavy_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_03.png" id="448_crouching_heavy_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_03.png" id="449_crouching_heavy_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_03.png" id="450_crouching_heavy_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_03.png" id="451_crouching_heavy_kick_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_04.png" id="452_crouching_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_04.png" id="453_crouching_heavy_kick_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_05.png" id="454_crouching_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_05.png" id="455_crouching_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_06.png" id="456_crouching_heavy_kick_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_06.png" id="457_crouching_heavy_kick_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_05.png" id="458_crouching_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_05.png" id="459_crouching_heavy_kick_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_01.png" id="460_crouching_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_01.png" id="461_crouching_heavy_kick_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_00.png" id="462_crouching_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_26/line_26_00.png" id="463_crouching_heavy_kick_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_00.png" id="464_super_one_finisher_00"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_01.png" id="465_super_one_finisher_01"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_02.png" id="466_super_one_finisher_02"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_03.png" id="467_super_one_finisher_03"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_04.png" id="468_super_one_finisher_04"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_05.png" id="469_super_one_finisher_05"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_06.png" id="470_super_one_finisher_06"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_07.png" id="471_super_one_finisher_07"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_08.png" id="472_super_one_finisher_08"]
+
+[resource]
+animations = [
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("1_idle_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("2_idle_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("3_idle_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("4_idle_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("5_idle_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("6_idle_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("7_idle_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("8_idle_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("9_idle_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("10_idle_01")
+}
+],
+"loop": true,
+"name": &"idle",
+"speed": 8.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("11_walk_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("12_walk_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("13_walk_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("14_walk_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("15_walk_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("16_walk_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("17_walk_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("18_walk_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("19_walk_08")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("20_walk_09")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("21_walk_10")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("22_walk_11")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("23_walk_12")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("24_walk_13")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("25_walk_14")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("26_walk_15")
+}
+],
+"loop": true,
+"name": &"walk",
+"speed": 12.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("27_walk_back_15")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("28_walk_back_14")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("29_walk_back_13")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("30_walk_back_12")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("31_walk_back_11")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("32_walk_back_10")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("33_walk_back_09")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("34_walk_back_08")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("35_walk_back_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("36_walk_back_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("37_walk_back_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("38_walk_back_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("39_walk_back_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("40_walk_back_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("41_walk_back_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("42_walk_back_00")
+}
+],
+"loop": true,
+"name": &"walk_back",
+"speed": 12.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("43_jump_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("44_jump_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("45_jump_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("46_jump_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("47_jump_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("48_jump_05")
+}
+],
+"loop": false,
+"name": &"jump",
+"speed": 10.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("49_attack_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("50_attack_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("51_attack_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("52_attack_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("53_attack_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("54_attack_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("55_attack_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("56_attack_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("57_attack_08")
+}
+],
+"loop": false,
+"name": &"attack",
+"speed": 14.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("58_run_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("59_run_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("60_run_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("61_run_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("62_run_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("63_run_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("64_run_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("65_run_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("66_run_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("67_run_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("68_run_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("69_run_00")
+}
+],
+"loop": true,
+"name": &"run",
+"speed": 12.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("70_neutral_jump_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("71_neutral_jump_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("72_neutral_jump_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("73_neutral_jump_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("74_neutral_jump_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("75_neutral_jump_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("76_neutral_jump_06")
+}
+],
+"loop": false,
+"name": &"neutral_jump",
+"speed": 14.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("77_fall_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("78_fall_08")
+}
+],
+"loop": true,
+"name": &"fall",
+"speed": 12.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("79_forward_jump_start_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("80_forward_jump_start_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("81_forward_jump_start_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("82_forward_jump_start_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("83_forward_jump_start_04")
+}
+],
+"loop": false,
+"name": &"forward_jump_start",
+"speed": 14.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("84_forward_jump_loop_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("85_forward_jump_loop_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("86_forward_jump_loop_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("87_forward_jump_loop_05")
+}
+],
+"loop": true,
+"name": &"forward_jump_loop",
+"speed": 14.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("88_back_dash_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("89_back_dash_01")
+}
+],
+"loop": false,
+"name": &"back_dash",
+"speed": 10.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("90_crouch_start_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("91_crouch_start_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("92_crouch_start_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("93_crouch_start_02")
+}
+],
+"loop": false,
+"name": &"crouch_start",
+"speed": 12.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("94_crouch_hold_02")
+}
+],
+"loop": true,
+"name": &"crouch_hold",
+"speed": 8.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("95_crouch_end_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("96_crouch_end_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("97_crouch_end_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("98_crouch_end_00")
+}
+],
+"loop": false,
+"name": &"crouch_end",
+"speed": 12.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("99_heavy_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("100_heavy_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("101_heavy_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("102_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("103_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("104_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("105_heavy_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("106_heavy_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("107_heavy_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("108_heavy_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("109_heavy_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("110_heavy_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("111_heavy_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("112_heavy_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("113_heavy_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("114_heavy_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("115_heavy_punch_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("116_heavy_punch_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("117_heavy_punch_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("118_heavy_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("119_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("120_heavy_punch_00")
+}
+],
+"loop": false,
+"name": &"heavy_punch",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("121_crouching_heavy_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("122_crouching_heavy_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("123_crouching_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("124_crouching_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("125_crouching_heavy_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("126_crouching_heavy_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("127_crouching_heavy_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("128_crouching_heavy_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("129_crouching_heavy_punch_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("130_crouching_heavy_punch_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("131_crouching_heavy_punch_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("132_crouching_heavy_punch_08")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("133_crouching_heavy_punch_09")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("134_crouching_heavy_punch_08")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("135_crouching_heavy_punch_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("136_crouching_heavy_punch_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("137_crouching_heavy_punch_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("138_crouching_heavy_punch_08")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("139_crouching_heavy_punch_09")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("140_crouching_heavy_punch_08")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("141_crouching_heavy_punch_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("142_crouching_heavy_punch_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("143_crouching_heavy_punch_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("144_crouching_heavy_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("145_crouching_heavy_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("146_crouching_heavy_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("147_crouching_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("148_crouching_heavy_punch_00")
+}
+],
+"loop": false,
+"name": &"crouching_heavy_punch",
+"speed": 30.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("213_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("214_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("215_light_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("216_light_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("217_light_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("218_light_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("219_light_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("220_light_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("221_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("222_light_punch_00")
+}
+],
+"loop": false,
+"name": &"light_punch",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("223_air_heavy_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("224_air_heavy_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("225_air_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("226_air_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("227_air_heavy_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("228_air_heavy_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("229_air_heavy_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("230_air_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("231_air_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("232_air_heavy_punch_00")
+}
+],
+"loop": false,
+"name": &"air_heavy_punch",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("233_air_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("234_air_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("235_air_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("236_air_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("237_air_light_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("238_air_light_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("239_air_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("240_air_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("241_air_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("242_air_light_punch_00")
+}
+],
+"loop": false,
+"name": &"air_light_punch",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("243_crouching_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("244_crouching_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("245_crouching_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("246_crouching_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("247_crouching_light_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("248_crouching_light_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("249_crouching_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("250_crouching_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("251_crouching_light_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("252_crouching_light_punch_00")
+}
+],
+"loop": false,
+"name": &"crouching_light_punch",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("253_crouching_medium_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("254_crouching_medium_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("255_crouching_medium_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("256_crouching_medium_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("257_crouching_medium_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("258_crouching_medium_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("259_crouching_medium_punch_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("260_crouching_medium_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("261_crouching_medium_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("262_crouching_medium_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("263_crouching_medium_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("264_crouching_medium_punch_00")
+}
+],
+"loop": false,
+"name": &"crouching_medium_punch",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("265_throw_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("266_throw_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("267_throw_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("268_throw_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("269_throw_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("270_throw_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("271_throw_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("272_throw_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("273_throw_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("274_throw_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("275_throw_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("276_throw_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("277_throw_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("278_throw_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("279_throw_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("280_throw_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("281_throw_08")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("282_throw_08")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("283_throw_09")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("284_throw_09")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("285_throw_10")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("286_throw_10")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("287_throw_11")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("288_throw_11")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("289_throw_12")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("290_throw_12")
+}
+],
+"loop": false,
+"name": &"throw",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("291_forward_heavy_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("292_forward_heavy_punch_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("293_forward_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("294_forward_heavy_punch_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("295_forward_heavy_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("296_forward_heavy_punch_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("297_forward_heavy_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("298_forward_heavy_punch_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("299_forward_heavy_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("300_forward_heavy_punch_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("301_forward_heavy_punch_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("302_forward_heavy_punch_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("303_forward_heavy_punch_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("304_forward_heavy_punch_06")
+}
+],
+"loop": false,
+"name": &"forward_heavy_punch",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("305_standing_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("306_standing_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("307_standing_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("308_standing_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("309_standing_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("310_standing_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("311_standing_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("312_standing_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("313_standing_light_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("314_standing_light_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("315_standing_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("316_standing_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("317_standing_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("318_standing_light_kick_00")
+}
+],
+"loop": false,
+"name": &"standing_light_kick",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("319_forward_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("320_forward_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("321_forward_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("322_forward_light_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("323_forward_light_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("324_forward_light_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("325_forward_light_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("326_forward_light_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("327_forward_light_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("328_forward_light_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("329_forward_light_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("330_forward_light_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("331_forward_light_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("332_forward_light_kick_00")
+}
+],
+"loop": false,
+"name": &"forward_light_kick",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("333_standing_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("334_standing_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("335_standing_heavy_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("336_standing_heavy_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("337_standing_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("338_standing_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("339_standing_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("340_standing_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("341_standing_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("342_standing_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("343_standing_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("344_standing_heavy_kick_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("345_standing_heavy_kick_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("346_standing_heavy_kick_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("347_standing_heavy_kick_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("348_standing_heavy_kick_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("349_standing_heavy_kick_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("350_standing_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("351_standing_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("352_standing_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("353_standing_heavy_kick_00")
+}
+],
+"loop": false,
+"name": &"standing_heavy_kick",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("354_air_up_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("355_air_up_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("356_air_up_heavy_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("357_air_up_heavy_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("358_air_up_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("359_air_up_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("360_air_up_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("361_air_up_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("362_air_up_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("363_air_up_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("364_air_up_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("365_air_up_heavy_kick_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("366_air_up_heavy_kick_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("367_air_up_heavy_kick_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("368_air_up_heavy_kick_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("369_air_up_heavy_kick_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("370_air_up_heavy_kick_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("371_air_up_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("372_air_up_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("373_air_up_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("374_air_up_heavy_kick_00")
+}
+],
+"loop": false,
+"name": &"air_up_heavy_kick",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("375_air_dash_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("376_air_dash_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("377_air_dash_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("378_air_dash_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("379_air_dash_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("380_air_dash_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("381_air_dash_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("382_air_dash_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("383_air_dash_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("384_air_dash_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("385_air_dash_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("386_air_dash_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("387_air_dash_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("388_air_dash_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("389_air_dash_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("390_air_dash_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("391_air_dash_03")
+}
+],
+"loop": false,
+"name": &"air_dash",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("392_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("393_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("394_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("395_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("396_air_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("397_air_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("398_air_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("399_air_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("400_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("401_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("402_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("403_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("404_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("405_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("406_air_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("407_air_light_kick_00")
+}
+],
+"loop": false,
+"name": &"air_light_kick",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("408_air_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("409_air_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("410_air_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("411_air_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("412_air_heavy_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("413_air_heavy_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("414_air_heavy_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("415_air_heavy_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("416_air_heavy_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("417_air_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("418_air_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("419_air_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("420_air_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("421_air_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("422_air_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("423_air_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("424_air_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("425_air_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("426_air_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("427_air_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("428_air_heavy_kick_00")
+}
+],
+"loop": false,
+"name": &"air_heavy_kick",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("429_crouching_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("430_crouching_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("431_crouching_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("432_crouching_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("433_crouching_light_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("434_crouching_light_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("435_crouching_light_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("436_crouching_light_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("437_crouching_light_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("438_crouching_light_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("439_crouching_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("440_crouching_light_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("441_crouching_light_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("442_crouching_light_kick_00")
+}
+],
+"loop": false,
+"name": &"crouching_light_kick",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("443_crouching_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("444_crouching_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("445_crouching_heavy_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("446_crouching_heavy_kick_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("447_crouching_heavy_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("448_crouching_heavy_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("449_crouching_heavy_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("450_crouching_heavy_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("451_crouching_heavy_kick_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("452_crouching_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("453_crouching_heavy_kick_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("454_crouching_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("455_crouching_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("456_crouching_heavy_kick_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("457_crouching_heavy_kick_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("458_crouching_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("459_crouching_heavy_kick_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("460_crouching_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("461_crouching_heavy_kick_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("462_crouching_heavy_kick_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("463_crouching_heavy_kick_00")
+}
+],
+"loop": false,
+"name": &"crouching_heavy_kick",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("464_super_one_finisher_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("465_super_one_finisher_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("466_super_one_finisher_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("467_super_one_finisher_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("468_super_one_finisher_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("469_super_one_finisher_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("470_super_one_finisher_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("471_super_one_finisher_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("472_super_one_finisher_08")
+}
+],
+"loop": false,
+"name": &"super_one_finisher",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("171_super_fireball_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("172_super_fireball_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("173_super_fireball_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("174_super_fireball_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("175_super_fireball_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("176_super_fireball_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("177_super_fireball_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("178_super_fireball_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("179_super_fireball_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("180_super_fireball_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("181_super_fireball_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("182_super_fireball_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("183_super_fireball_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("184_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("185_super_fireball_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("186_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("187_super_fireball_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("188_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("189_super_fireball_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("190_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("191_super_fireball_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("192_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("193_super_fireball_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("194_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("195_super_fireball_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("196_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("197_super_fireball_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("198_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("199_super_fireball_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("200_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("201_super_fireball_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("202_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("203_super_fireball_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("204_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("205_super_fireball_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("206_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("207_super_fireball_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("208_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("209_super_fireball_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("210_super_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("211_super_fireball_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("212_super_fireball_06")
+}
+],
+"loop": false,
+"name": &"super_fireball",
+"speed": 60.0
+},
+{
+"frames": [
+{
+"duration": 1.0,
+"texture": ExtResource("149_fireball_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("150_fireball_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("151_fireball_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("152_fireball_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("153_fireball_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("154_fireball_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("155_fireball_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("156_fireball_03")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("157_fireball_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("158_fireball_04")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("159_fireball_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("160_fireball_05")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("161_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("162_fireball_06")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("163_fireball_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("164_fireball_07")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("165_fireball_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("166_fireball_02")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("167_fireball_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("168_fireball_01")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("169_fireball_00")
+},
+{
+"duration": 1.0,
+"texture": ExtResource("170_fireball_00")
+}
+],
+"loop": false,
+"name": &"fireball",
+"speed": 60.0
+}
+]

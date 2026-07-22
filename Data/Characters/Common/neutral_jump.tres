@@ -6,12 +6,11 @@
 script = ExtResource("1")
 Id = "neutral_jump"
 Priority = 20
-Direction = 1
-InitialSpeed = 1340.0
-AirJumpInitialSpeed = 1120.0
+Direction = 0
+InitialSpeed = 990.0
+AirJumpInitialSpeed = 946.0
 MaxAirJumps = 1
 HeldFrames = 10
 JumpSquatFrames = 1
 HeldGravityMultiplier = 1.0
 ReleaseVelocityMultiplier = 0.48
-

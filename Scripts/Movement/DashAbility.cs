@@ -23,6 +23,7 @@ public partial class DashAbility : MovementAbility
 	[Export] public bool CommittedUntilComplete { get; set; }
 	[Export] public bool ConsumesAirAction { get; set; } = true;
 	[Export] public int LandingLagFrames { get; set; }
+	[Export] public float MinimumAirHeight { get; set; }
 	public override bool OwnsHorizontalVelocity => true;
 	public override bool OwnsGravity => !PreserveGravity;
 	public override bool CanBeInterruptedBy(MovementAbility incoming) => !CommittedUntilComplete && base.CanBeInterruptedBy(incoming);
@@ -38,6 +39,7 @@ public partial class DashAbility : MovementAbility
 		if (AirOnly && fighter.WasGrounded) return false;
 		if (GroundOnly && !fighter.WasGrounded) return false;
 		if (!fighter.WasGrounded && ConsumesAirAction && !fighter.CanUseAirDashAction()) return false;
+		if (AirOnly && fighter.AirHeightAboveGround < MinimumAirHeight) return false;
 		if (!MatchesDirection(fighter)) return false;
 		return fighter.WasGrounded || runtime.UsesThisAirTime < MaxAirUses;
 	}

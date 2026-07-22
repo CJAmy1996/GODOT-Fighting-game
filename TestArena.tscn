@@ -5,15 +5,13 @@
 [ext_resource type="Script" uid="uid://d4a3txbd6s580" path="res://Scripts/Demo/StageCamera.cs" id="3_camera"]
 [ext_resource type="Script" uid="uid://chkclim11sa0m" path="res://Scripts/Demo/VersusStageRules.cs" id="4_rules"]
 [ext_resource type="Script" uid="uid://dttwy7si3rte5" path="res://MotionInputBufferTests.cs" id="5_motion_tests"]
+[ext_resource type="PackedScene" path="res://Scenes/TestCharacters/KungFuManTest.tscn" id="6_kfm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleFloor"]
 size = Vector2(3360, 70)
 
 [sub_resource type="RectangleShape2D" id="RectangleWall"]
 size = Vector2(40, 800)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_qxcow"]
-size = Vector2(64, 119)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xaxui"]
 size = Vector2(66.5, 104.5)
@@ -43,14 +41,9 @@ position = Vector2(3380, 360)
 shape = SubResource("RectangleWall")
 disabled = true
 
-[node name="Fighter" type="CharacterBody2D" parent="."]
+[node name="Fighter" parent="." instance=ExtResource("6_kfm")]
 position = Vector2(420, 570)
 collision_layer = 2
-script = ExtResource("2_fighter")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Fighter"]
-position = Vector2(-1, -1)
-shape = SubResource("RectangleShape2D_qxcow")
 
 [node name="Opponent" type="CharacterBody2D" parent="."]
 position = Vector2(860, 570)
@@ -83,7 +76,7 @@ offset_left = 32.0
 offset_top = 24.0
 theme_override_colors/font_color = Color(0.72, 0.9, 1, 1)
 theme_override_font_sizes/font_size = 26
-text = "FIGHTER MOVEMENT LAB"
+text = "KUNG FU MAN COMBAT TEST"
 
 [node name="Controls" type="Label" parent="HUD"]
 offset_left = 34.0
@@ -91,4 +84,4 @@ offset_top = 68.0
 theme_override_colors/font_color = Color(0.78, 0.84, 0.95, 1)
 theme_override_font_sizes/font_size = 17
 text = "A / D: move     Forward, Forward: run     W: neutral / forward / back jump
-Super jump: tap S, then W within 4 frames. QCF + U/I: projectile. QCF + O: EWGF."
+Attacks: U/J/I/K/O/L     Super jump: tap S, then W.     QCF + U/I: projectile."
