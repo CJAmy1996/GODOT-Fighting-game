@@ -11,17 +11,24 @@ public sealed class MotionInputBuffer
 	private int _dashCommandFramesLeft;
 	private int _dashCommandDirection;
 	private int _qcfForwardCommandFramesLeft;
+	private int _qcfForwardCommandAgeFrames = int.MaxValue;
+	private int _framesSinceJumpPress = int.MaxValue;
 	private int _backDashInputLockoutFrames;
 
 	public int DashCommandDirection => _dashCommandDirection;
 	public bool HasDashCommand => _dashCommandFramesLeft > 0;
 	public bool HasQuarterCircleForwardCommand => _qcfForwardCommandFramesLeft > 0;
+	public int QuarterCircleForwardCommandAgeFrames => _qcfForwardCommandAgeFrames;
+	public bool HasMotionSpecialCommand => HasQuarterCircleForwardCommand;
+	public int MotionSpecialCommandAgeFrames => QuarterCircleForwardCommandAgeFrames;
+	public int FramesSinceJumpPress => _framesSinceJumpPress;
 
 	public void Tick()
 	{
 		if (_framesSinceDown < int.MaxValue) _framesSinceDown++;
 		if (_framesSinceLeftTap < int.MaxValue) _framesSinceLeftTap++;
 		if (_framesSinceRightTap < int.MaxValue) _framesSinceRightTap++;
+		if (_framesSinceJumpPress < int.MaxValue) _framesSinceJumpPress++;
 		if (_backDashInputLockoutFrames > 0) _backDashInputLockoutFrames--;
 		if (_downThenUpCommandFramesLeft > 0) _downThenUpCommandFramesLeft--;
 		if (_dashCommandFramesLeft > 0) _dashCommandFramesLeft--;
@@ -30,13 +37,22 @@ public sealed class MotionInputBuffer
 
 	public void TickQuarterCircleForwardCommand()
 	{
-		if (_qcfForwardCommandFramesLeft > 0) _qcfForwardCommandFramesLeft--;
+		if (_qcfForwardCommandFramesLeft > 0)
+		{
+			_qcfForwardCommandFramesLeft--;
+			if (_qcfForwardCommandAgeFrames < int.MaxValue) _qcfForwardCommandAgeFrames++;
+		}
+		else
+		{
+			_qcfForwardCommandAgeFrames = int.MaxValue;
+		}
 	}
 
 	public void PressDown() => _framesSinceDown = 0;
 
 	public void PressJump(int inputBufferFrames)
 	{
+		_framesSinceJumpPress = 0;
 		if (_framesSinceDown >= int.MaxValue) return;
 		_downToUpFrames = _framesSinceDown;
 		_downThenUpCommandFramesLeft = inputBufferFrames;
@@ -48,7 +64,10 @@ public sealed class MotionInputBuffer
 		int normalizedDirection = direction >= 0 ? 1 : -1;
 		int normalizedFacing = facing >= 0 ? 1 : -1;
 		if (normalizedDirection == normalizedFacing && _framesSinceDown <= quarterCircleForwardWindowFrames)
+		{
 			_qcfForwardCommandFramesLeft = quarterCircleForwardLatchFrames;
+			_qcfForwardCommandAgeFrames = 0;
+		}
 
 		int framesSinceTap = normalizedDirection < 0 ? _framesSinceLeftTap : _framesSinceRightTap;
 		if (framesSinceTap <= doubleTapWindowFrames)
@@ -77,7 +96,11 @@ public sealed class MotionInputBuffer
 		_dashCommandDirection = 0;
 	}
 
-	public void ConsumeQuarterCircleForwardCommand() => _qcfForwardCommandFramesLeft = 0;
+	public void ConsumeQuarterCircleForwardCommand()
+	{
+		_qcfForwardCommandFramesLeft = 0;
+		_qcfForwardCommandAgeFrames = int.MaxValue;
+	}
 
 	public void ConsumeDownThenUpCommand()
 	{

@@ -25,6 +25,7 @@ public partial class VersusStageRules : Node
 	private Camera2D _stageCamera;
 	private StageCamera _fightCamera;
 	private HitSparkLayer _hitSparkLayer;
+	private SuperBackdrop _superBackdrop;
 
 	public override void _Ready()
 	{
@@ -34,21 +35,71 @@ public partial class VersusStageRules : Node
 		_fightCamera = _stageCamera as StageCamera;
 		_fighterOne.FaceWithMovement = false;
 		_fighterTwo.FaceWithMovement = false;
+		if (GetParent().GetNodeOrNull<Node2D>("ArenaBackdrop") is { } arenaBackdrop) arenaBackdrop.ZIndex = -100;
+		_fighterOne.ZIndex = 0;
+		_fighterTwo.ZIndex = 0;
 		_hitSparkLayer = new HitSparkLayer { Name = "HitSparkLayer" };
-		GetParent().AddChild(_hitSparkLayer);
+		_hitSparkLayer.TopLevel = true;
+		_hitSparkLayer.ZAsRelative = false;
+		_hitSparkLayer.ZIndex = 4096;
+		GetParent().CallDeferred(Node.MethodName.AddChild, _hitSparkLayer);
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
 		if (_fighterOne == null || _fighterTwo == null) return;
+		ResolveSuperActivations();
 		UpdateFacing();
 		GetFightBoxEdges(out float leftEdge, out float rightEdge);
 		if (_fighterOne.JustLanded) ResolveLandingOverlap(_fighterOne, _fighterTwo, leftEdge, rightEdge);
 		if (_fighterTwo.JustLanded) ResolveLandingOverlap(_fighterTwo, _fighterOne, leftEdge, rightEdge);
 		ResolvePushboxes();
 		ResolveBasicAttackHits();
+		_fighterOne.MaintainSuperHitLock();
+		_fighterTwo.MaintainSuperHitLock();
 		ResolveProjectileHits();
 		ClampFightersToCameraCorners(leftEdge, rightEdge);
+	}
+
+	private void ResolveSuperActivations()
+	{
+		bool firstSuper = _fighterOne.ConsumeSuperActivationData(out int firstFreezeFrames, out int firstBackdropFrames);
+		bool secondSuper = _fighterTwo.ConsumeSuperActivationData(out int secondFreezeFrames, out int secondBackdropFrames);
+		if (!firstSuper && !secondSuper) return;
+
+		int freezeFrames = Mathf.Max(firstFreezeFrames, secondFreezeFrames);
+		int backdropFrames = Mathf.Max(Mathf.Max(firstBackdropFrames, secondBackdropFrames), freezeFrames);
+		if (freezeFrames > 0)
+		{
+			_fighterOne.RequestHitstop(freezeFrames);
+			_fighterTwo.RequestHitstop(freezeFrames);
+			_fightCamera?.Shake(7.5f, freezeFrames);
+		}
+		SpawnSuperBackdrop(backdropFrames);
+	}
+
+	private void SpawnSuperBackdrop(int backdropFrames)
+	{
+		if (GodotObject.IsInstanceValid(_superBackdrop)) _superBackdrop.QueueFree();
+		_superBackdrop = null;
+
+		SuperBackdrop backdrop = new()
+		{
+			Name = "SuperBackdrop",
+			LifetimeFrames = Mathf.Max(75, backdropFrames),
+			Width = ViewportWidth + 240f,
+			Height = 900f,
+			ParticleCount = 110,
+			ZIndex = -50
+		};
+		Vector2 center = _stageCamera?.GlobalPosition ?? new Vector2(ViewportWidth * 0.5f, 450f);
+		backdrop.GlobalPosition = new Vector2(center.X - backdrop.Width * 0.5f, center.Y - backdrop.Height * 0.5f);
+		backdrop.TreeExited += () =>
+		{
+			if (_superBackdrop == backdrop) _superBackdrop = null;
+		};
+		_superBackdrop = backdrop;
+		GetParent().AddChild(backdrop);
 	}
 
 	private void UpdateFacing()
@@ -226,19 +277,22 @@ public partial class VersusStageRules : Node
 	{
 		foreach (Node node in GetTree().GetNodesInGroup(BasicProjectile.ProjectileGroup))
 		{
-			if (node is not BasicProjectile projectile || projectile.HasHit || projectile.OwnerFighter == null) continue;
+			if (node is not BasicProjectile projectile || projectile.HasHit || !projectile.CanHit || projectile.OwnerFighter == null) continue;
 			FighterController defender = projectile.OwnerFighter == _fighterOne
 				? _fighterTwo
 				: projectile.OwnerFighter == _fighterTwo ? _fighterOne : null;
 			if (defender == null) continue;
 
+			bool finalProjectileHit = projectile.NextHitIsFinal;
 			if (!projectile.OwnerFighter.TryApplyProjectileHit(defender, projectile.WorldHitbox, projectile.HitstunFrames, projectile.Pushback,
-				projectile.HitstopFrames, projectile.ShakeStrength, out int hitstop, out float shake, out _, out Vector2 hitPoint, out bool heavySpark)) continue;
+				projectile.HitstopFrames, projectile.ShakeStrength,
+				finalProjectileHit && projectile.FinalHitKnocksDown, projectile.FinalKnockdownType, projectile.FinalKnockdownFrames,
+				out int hitstop, out float shake, out _, out Vector2 hitPoint, out bool heavySpark)) continue;
 
 			if (hitstop > 0) defender.RequestHitstop(hitstop);
 			if (shake > 0f) _fightCamera?.Shake(shake, hitstop);
 			_hitSparkLayer?.Spawn(hitPoint, heavySpark);
-			projectile.MarkHit();
+			projectile.MarkHit(defender);
 		}
 	}
 

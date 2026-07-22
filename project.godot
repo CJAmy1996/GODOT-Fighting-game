@@ -23,6 +23,10 @@ window/size/viewport_height=720
 
 project/assembly_name="Modular Fighter Movement Framework"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/fighter_box_editor/plugin.cfg")
+
 [input]
 
 move_left={

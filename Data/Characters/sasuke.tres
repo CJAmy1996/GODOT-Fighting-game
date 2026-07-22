@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="FighterDefinition" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/FighterDefinition.cs" id="1_def"]
+[ext_resource type="Script" path="res://Scripts/Core/MovementTuning.cs" id="2_tuning"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/neutral_jump.tres" id="3"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/forward_jump.tres" id="4"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/backward_jump.tres" id="5"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/forward_run.tres" id="6"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/backdash.tres" id="7"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/air_dash.tres" id="8"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/backward_air_dash.tres" id="9"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/super_jump.tres" id="10"]
+
+[sub_resource type="Resource" id="MovementTuning_sasuke"]
+script = ExtResource("2_tuning")
+WalkSpeed = 375.0
+BackWalkSpeedMultiplier = 0.82
+GroundAcceleration = 4400.0
+GroundTurnAcceleration = 50000.0
+GroundDeceleration = 5200.0
+GroundFriction = 6000.0
+Gravity = 4200.0
+TerminalFallSpeed = 2800.0
+AirSpeed = 445.0
+AirAcceleration = 2600.0
+AirDeceleration = 1700.0
+AllowAirControl = false
+MaxAirActions = 1
+NormalJumpAirActionsRequirePeak = true
+CoyoteFrames = 3
+InputBufferFrames = 3
+
+[resource]
+script = ExtResource("1_def")
+FighterName = "Sasuke"
+Tuning = SubResource("MovementTuning_sasuke")
+Abilities = Array[Resource]([ExtResource("10"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("9"), ExtResource("8")])
+

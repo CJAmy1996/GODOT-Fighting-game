@@ -36,8 +36,10 @@ public partial class StickFigureFighter : FighterController
 		float facing = Facing;
 		float walkPhase = walking ? Mathf.Sin((float)Engine.GetPhysicsFrames() * 0.55f) : 0f;
 		float runPhase = running ? Mathf.Sin((float)Engine.GetPhysicsFrames() * 0.9f) : 0f;
+		float superPhase = Mathf.Sin(CurrentAttackFrame * 1.35f);
 		bool heavyAttack = CurrentAttackName.StartsWith("HEAVY");
-		bool specialAttack = CurrentAttackName.StartsWith("SPECIAL");
+		bool superAttack = CurrentAttackName.StartsWith("SUPER");
+		bool specialAttack = CurrentAttackName.StartsWith("SPECIAL") || superAttack;
 		bool electricAttack = CurrentAttackName == "ELECTRIC WIND GOD FIST";
 		bool kickAttack = CurrentAttackName.Contains("KICK");
 		bool airKickAttack = airborne && IsAttacking && kickAttack;
@@ -130,6 +132,13 @@ public partial class StickFigureFighter : FighterController
 					leftFoot = new Vector2(-32 + lean * 35f, 47);
 					rightFoot = new Vector2(34 + lean * 42f, 46);
 				}
+				else if (superAttack)
+				{
+					leftHand = new Vector2(facing * (58f + superPhase * 24f) + lean * 28f, -26f);
+					rightHand = new Vector2(facing * (82f - superPhase * 18f) + lean * 28f, -8f);
+					leftFoot = new Vector2(facing * (42f - superPhase * 16f) + lean * 35f, 47);
+					rightFoot = new Vector2(facing * (78f + superPhase * 20f) + lean * 42f, 28f);
+				}
 				else
 				{
 					float reach = heavyAttack ? 78f : specialAttack ? 66f : 56f;
@@ -218,6 +227,65 @@ public partial class StickFigureFighter : FighterController
 			}
 		},
 		NormalMoves = CreateBaselineNormalMoveSet(),
+		SuperMoves = new SuperMoveData[]
+		{
+			new()
+			{
+				AttackName = "SUPER RUSH",
+				StartupFrames = 7,
+				ActiveFrames = 70,
+				RecoveryFrames = 24,
+				ActivationFreezeFrames = 45,
+				BackdropFrames = 150,
+				HitCount = 16,
+				HitIntervalFrames = 4,
+				HitstunFrames = 10,
+				HitstopFrames = 1,
+				AddsGlobalHitstopBonus = false,
+				Pushback = 0f,
+				FinalHitstunFrames = 34,
+				FinalHitstopFrames = 5,
+				FinalPushback = 2200f,
+				ShakeStrength = 5f,
+				FinalShakeStrength = 13f,
+				HitboxLocal = new Rect2(16f, -72f, 96f, 76f),
+				FinalHitKnocksDown = false,
+				FinalKnockdownType = KnockdownType.SoftKnockdown,
+				FinalKnockdownFrames = 50,
+				RushesForward = true,
+				RushSpeed = 1280f,
+				StopRushOnFirstHit = true,
+				RequiresHitConfirmForMultiHit = true,
+				ConfirmedActiveFrames = 66,
+				LockPositionsDuringConfirmedHits = true,
+				ConfirmedAttackerOffsetFromDefender = new Vector2(-76f, 0f)
+			},
+			new()
+			{
+				AttackName = "SUPER FIREBALL",
+				StartupFrames = 12,
+				ActiveFrames = 2,
+				RecoveryFrames = 28,
+				ActivationFreezeFrames = 45,
+				BackdropFrames = 87,
+				HitCount = 10,
+				HitIntervalFrames = 5,
+				HitstunFrames = 8,
+				HitstopFrames = 3,
+				Pushback = 223f,
+				FinalHitstunFrames = 34,
+				FinalHitstopFrames = 8,
+				FinalPushback = 1054f,
+				ShakeStrength = 8f,
+				FinalShakeStrength = 11f,
+				FinalHitKnocksDown = true,
+				FinalKnockdownType = KnockdownType.HardKnockdown,
+				FinalKnockdownFrames = 58,
+				Projectile = true,
+				ProjectileSpeed = 620f,
+				ProjectileHitCooldownFrames = 5
+			}
+		},
 		Abilities = new MovementAbility[]
 		{
 			new SuperJumpAbility { Id = "super_jump", Priority = 40, InitialSpeed = 1920f, ForwardSpeed = 540f, CommandWindowFrames = 4 },

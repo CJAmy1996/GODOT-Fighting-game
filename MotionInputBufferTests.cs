@@ -10,8 +10,8 @@ public partial class MotionInputBufferTests : Node
 
 	private const int InputBufferFrames = 3;
 	private const int DoubleTapWindowFrames = 12;
-	private const int QuarterCircleForwardWindowFrames = 9;
-	private const int QuarterCircleForwardLatchFrames = 9;
+	private const int QuarterCircleForwardWindowFrames = 12;
+	private const int QuarterCircleForwardLatchFrames = 12;
 	private const int BackDashInputLockoutWindowFrames = 18;
 
 	public override void _Ready()

@@ -5,4 +5,6 @@
 [node name="HitSparkLight" type="Node2D"]
 script = ExtResource("1_spark")
 Heavy = false
-LifetimeFrames = 8
+LifetimeFrames = 18
+LightEnergy = 3.4
+LightTextureScale = 0.85

@@ -72,6 +72,25 @@ public partial class NormalMoveData : Resource
 	[ExportGroup("Box Timeline")]
 	[Export] public FighterBoxFrame[] BoxTimeline { get; set; } = Array.Empty<FighterBoxFrame>();
 
+	/// <summary>Adds an initialized hitbox, hurtbox, or other combat box to this attack.</summary>
+	public FighterBoxFrame AddBox(FighterBoxFrame box)
+	{
+		if (box == null) throw new ArgumentNullException(nameof(box));
+		var boxes = new FighterBoxFrame[(BoxTimeline?.Length ?? 0) + 1];
+		if (BoxTimeline != null) System.Array.Copy(BoxTimeline, boxes, BoxTimeline.Length);
+		boxes[^1] = box;
+		BoxTimeline = boxes;
+		return box;
+	}
+
+	/// <summary>
+	/// Creates timeline data from a CollisionShape2D node and adds it to this attack.
+	/// This is useful for shapes positioned visually in a character or move scene.
+	/// </summary>
+	public FighterBoxFrame AddBox(CollisionShape2D shapeNode, FighterBoxKind kind,
+		int startFrame = 0, int endFrame = -1, bool mirrorWithFacing = true, string tag = "") =>
+		AddBox(FighterBoxFrame.FromCollisionShape(shapeNode, kind, startFrame, endFrame, mirrorWithFacing, tag));
+
 	[ExportGroup("Launcher / Jump Cancel")]
 	[Export] public bool Launches { get; set; }
 	[Export] public float LaunchSpeed { get; set; } = 1820f;

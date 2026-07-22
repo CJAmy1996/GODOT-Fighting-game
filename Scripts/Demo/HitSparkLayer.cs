@@ -8,6 +8,7 @@ public partial class HitSparkLayer : Node2D
 {
 	private const string LightSparkScenePath = "res://Effects/HitSparkLight.tscn";
 	private const string HeavySparkScenePath = "res://Effects/HitSparkHeavy.tscn";
+	private const int SparkZIndex = 4096;
 
 	private readonly List<Spark> _sparks = new();
 	private PackedScene _lightSparkScene;
@@ -28,7 +29,10 @@ public partial class HitSparkLayer : Node2D
 			Node instance = scene.Instantiate();
 			if (instance is Node2D node)
 			{
-				node.Position = position;
+				node.TopLevel = true;
+				node.ZAsRelative = false;
+				node.ZIndex = SparkZIndex;
+				node.GlobalPosition = position;
 				AddChild(node);
 				return;
 			}
@@ -41,6 +45,10 @@ public partial class HitSparkLayer : Node2D
 
 	public override void _Ready()
 	{
+		TopLevel = true;
+		ZAsRelative = false;
+		ZIndex = SparkZIndex;
+		GlobalPosition = Vector2.Zero;
 		if (ResourceLoader.Exists(LightSparkScenePath))
 			_lightSparkScene = GD.Load<PackedScene>(LightSparkScenePath);
 		if (ResourceLoader.Exists(HeavySparkScenePath))

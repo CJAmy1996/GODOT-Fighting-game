@@ -1,10 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://dd14cvfwh6wm0"]
+[gd_scene load_steps=10 format=3 uid="uid://dd14cvfwh6wm0"]
 
 [ext_resource type="Script" uid="uid://bjcen2m8a7qky" path="res://Scripts/Demo/ArenaBackdrop.cs" id="1_backdrop"]
 [ext_resource type="Script" uid="uid://dphsgsf4u0aad" path="res://Scripts/Demo/StickFigureFighter.cs" id="2_fighter"]
 [ext_resource type="Script" uid="uid://d4a3txbd6s580" path="res://Scripts/Demo/StageCamera.cs" id="3_camera"]
 [ext_resource type="Script" uid="uid://chkclim11sa0m" path="res://Scripts/Demo/VersusStageRules.cs" id="4_rules"]
-[ext_resource type="Script" uid="uid://dttwy7si3rte5" path="res://Scripts/Tests/MotionInputBufferTests.cs" id="5_motion_tests"]
+[ext_resource type="Script" uid="uid://dttwy7si3rte5" path="res://MotionInputBufferTests.cs" id="5_motion_tests"]
 
 [sub_resource type="RectangleShape2D" id="RectangleFloor"]
 size = Vector2(3360, 70)
@@ -12,9 +12,11 @@ size = Vector2(3360, 70)
 [sub_resource type="RectangleShape2D" id="RectangleWall"]
 size = Vector2(40, 800)
 
-[sub_resource type="CapsuleShape2D" id="CapsuleFighter"]
-radius = 22.0
-height = 104.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qxcow"]
+size = Vector2(64, 119)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xaxui"]
+size = Vector2(66.5, 104.5)
 
 [node name="TestArena" type="Node2D"]
 
@@ -47,7 +49,8 @@ collision_layer = 2
 script = ExtResource("2_fighter")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Fighter"]
-shape = SubResource("CapsuleFighter")
+position = Vector2(-1, -1)
+shape = SubResource("RectangleShape2D_qxcow")
 
 [node name="Opponent" type="CharacterBody2D" parent="."]
 position = Vector2(860, 570)
@@ -57,20 +60,18 @@ BodyColor = Color(1, 0.39, 0.45, 1)
 ReadLocalInput = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Opponent"]
-shape = SubResource("CapsuleFighter")
+position = Vector2(-0.75, 3.25)
+shape = SubResource("RectangleShape2D_xaxui")
 
 [node name="StageCamera" type="Camera2D" parent="."]
 script = ExtResource("3_camera")
 FighterOnePath = NodePath("../Fighter")
 FighterTwoPath = NodePath("../Opponent")
-StageWidth = 3360.0
-StageHeight = 1008.0
 
 [node name="VersusStageRules" type="Node" parent="."]
 script = ExtResource("4_rules")
 FighterOnePath = NodePath("../Fighter")
 FighterTwoPath = NodePath("../Opponent")
-StageWidth = 3360.0
 
 [node name="MotionInputBufferTests" type="Node" parent="."]
 script = ExtResource("5_motion_tests")
