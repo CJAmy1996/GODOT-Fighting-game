@@ -11,6 +11,7 @@ public partial class HitSparkLayer : Node2D
 	private const int SparkZIndex = 4096;
 
 	private readonly List<Spark> _sparks = new();
+	private readonly List<BlockShield> _blockShields = new();
 	private PackedScene _lightSparkScene;
 	private PackedScene _heavySparkScene;
 
@@ -19,6 +20,24 @@ public partial class HitSparkLayer : Node2D
 		public Vector2 Position;
 		public int FramesLeft;
 		public bool Heavy;
+	}
+
+	private struct BlockShield
+	{
+		public Vector2 Position;
+		public int FramesLeft;
+		public int Facing;
+	}
+
+	public void SpawnBlockShield(Vector2 position, int defenderFacing)
+	{
+		_blockShields.Add(new BlockShield
+		{
+			Position = position,
+			FramesLeft = 11,
+			Facing = defenderFacing >= 0 ? 1 : -1
+		});
+		QueueRedraw();
 	}
 
 	public void Spawn(Vector2 position, bool heavy)
@@ -66,7 +85,16 @@ public partial class HitSparkLayer : Node2D
 			else
 				_sparks[i] = spark;
 		}
-		if (_sparks.Count > 0) QueueRedraw();
+		for (int i = _blockShields.Count - 1; i >= 0; i--)
+		{
+			BlockShield shield = _blockShields[i];
+			shield.FramesLeft--;
+			if (shield.FramesLeft <= 0)
+				_blockShields.RemoveAt(i);
+			else
+				_blockShields[i] = shield;
+		}
+		if (_sparks.Count > 0 || _blockShields.Count > 0) QueueRedraw();
 	}
 
 	public override void _Draw()
@@ -90,6 +118,20 @@ public partial class HitSparkLayer : Node2D
 			{
 				DrawArc(spark.Position, radius * 0.72f, 0f, Mathf.Tau, 18, edge, 2f, true);
 			}
+		}
+
+		foreach (BlockShield shield in _blockShields)
+		{
+			float life = shield.FramesLeft / 11f;
+			float radius = Mathf.Lerp(38f, 28f, life);
+			float startAngle = shield.Facing > 0 ? -Mathf.Pi * 0.5f : Mathf.Pi * 0.5f;
+			float endAngle = startAngle + Mathf.Pi;
+			Color fill = new Color(0.28f, 0.78f, 1f, 0.11f * life);
+			Color edge = new Color(0.55f, 0.9f, 1f, 0.76f * life);
+			Color glint = new Color(1f, 1f, 1f, 0.9f * life);
+			DrawCircle(shield.Position, radius, fill);
+			DrawArc(shield.Position, radius, startAngle, endAngle, 32, edge, 6f, true);
+			DrawArc(shield.Position, radius - 8f, startAngle + 0.18f, endAngle - 0.18f, 28, glint, 2f, true);
 		}
 	}
 }

@@ -1,11 +1,13 @@
 using Godot;
 using ModularFighter.Core;
+using System.Collections.Generic;
 
 namespace ModularFighter.Demo;
 
 /// <summary>Shared versus rules: opponent-facing and Street Fighter-style pushboxes.</summary>
 public partial class VersusStageRules : Node
 {
+	private const string KungFuManSuperPortraitPath = "res://Assets/TestFighter/KungFuMan/kung_fu_man_super_portrait.png";
 	[Export] public NodePath FighterOnePath { get; set; }
 	[Export] public NodePath FighterTwoPath { get; set; }
 	[Export] public NodePath CameraPath { get; set; }
@@ -26,17 +28,53 @@ public partial class VersusStageRules : Node
 	private StageCamera _fightCamera;
 	private HitSparkLayer _hitSparkLayer;
 	private SuperBackdrop _superBackdrop;
+	private SuperPortraitOverlay _superPortrait;
+	private Texture2D _kungFuManSuperPortrait;
+	private readonly List<FighterController> _primaryTeam = new();
+
+	public void SetPrimaryFighter(FighterController fighter)
+	{
+		if (fighter == null || fighter == _fighterOne) return;
+		FighterCollisionPolicy.Apply(fighter);
+		fighter.TeamId = 1;
+		_fighterOne = fighter;
+		_fighterOne.FaceWithMovement = false;
+		_fighterOne.SetOpponent(_fighterTwo);
+		_fighterTwo?.SetOpponent(_fighterOne);
+	}
+
+	public void RegisterPrimaryTeamFighter(FighterController fighter)
+	{
+		if (fighter == null || _primaryTeam.Contains(fighter)) return;
+		FighterCollisionPolicy.Apply(fighter);
+		fighter.TeamId = 1;
+		_primaryTeam.Add(fighter);
+		fighter.FaceWithMovement = false;
+		fighter.SetOpponent(_fighterTwo);
+	}
+
+	public void UnregisterPrimaryTeamFighter(FighterController fighter)
+	{
+		if (fighter != null) _primaryTeam.Remove(fighter);
+	}
 
 	public override void _Ready()
 	{
+		// Fighters simulate first; the match resolver consumes their final fixed-step state.
+		ProcessPhysicsPriority = 100;
 		_fighterOne = GetNode<FighterController>(FighterOnePath);
 		_fighterTwo = GetNode<FighterController>(FighterTwoPath);
+		FighterCollisionPolicy.Apply(_fighterOne);
+		FighterCollisionPolicy.Apply(_fighterTwo);
+		_fighterOne.TeamId = 1;
+		_fighterTwo.TeamId = 2;
 		_stageCamera = CameraPath == null || CameraPath.IsEmpty ? GetParent().GetNodeOrNull<Camera2D>("StageCamera") : GetNode<Camera2D>(CameraPath);
 		_fightCamera = _stageCamera as StageCamera;
 		_fighterOne.FaceWithMovement = false;
 		_fighterTwo.FaceWithMovement = false;
 		_fighterOne.SetOpponent(_fighterTwo);
 		_fighterTwo.SetOpponent(_fighterOne);
+		RegisterPrimaryTeamFighter(_fighterOne);
 		if (GetParent().GetNodeOrNull<Node2D>("ArenaBackdrop") is { } arenaBackdrop) arenaBackdrop.ZIndex = -100;
 		_fighterOne.ZIndex = 0;
 		_fighterTwo.ZIndex = 0;
@@ -45,6 +83,7 @@ public partial class VersusStageRules : Node
 		_hitSparkLayer.ZAsRelative = false;
 		_hitSparkLayer.ZIndex = 4096;
 		GetParent().CallDeferred(Node.MethodName.AddChild, _hitSparkLayer);
+		_kungFuManSuperPortrait = ResourceLoader.Load<Texture2D>(KungFuManSuperPortraitPath);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -56,9 +95,18 @@ public partial class VersusStageRules : Node
 		GetFightBoxEdges(out float leftEdge, out float rightEdge);
 		if (_fighterOne.JustLanded) ResolveLandingOverlap(_fighterOne, _fighterTwo, leftEdge, rightEdge);
 		if (_fighterTwo.JustLanded) ResolveLandingOverlap(_fighterTwo, _fighterOne, leftEdge, rightEdge);
-		ResolvePushboxes();
+		ResolvePushboxes(leftEdge, rightEdge);
 		ResolveBasicAttackHits();
-		_fighterOne.MaintainSuperHitLock();
+		for (int index = _primaryTeam.Count - 1; index >= 0; index--)
+		{
+			FighterController ally = _primaryTeam[index];
+			if (!GodotObject.IsInstanceValid(ally))
+			{
+				_primaryTeam.RemoveAt(index);
+				continue;
+			}
+			ally.MaintainSuperHitLock();
+		}
 		_fighterTwo.MaintainSuperHitLock();
 		ResolveProjectileHits();
 		ClampFightersToCameraCorners(leftEdge, rightEdge);
@@ -85,8 +133,34 @@ public partial class VersusStageRules : Node
 			_fighterOne.RequestHitstop(freezeFrames);
 			_fighterTwo.RequestHitstop(freezeFrames);
 			_fightCamera?.ShakeSuper(8.5f, freezeFrames);
+			FighterController activatingFighter = firstSuper ? _fighterOne : _fighterTwo;
+			FighterController otherFighter = activatingFighter == _fighterOne ? _fighterTwo : _fighterOne;
+			SpawnSuperPortrait(activatingFighter, otherFighter, freezeFrames);
 		}
 		SpawnSuperBackdrop(backdropFrames);
+	}
+
+	private void SpawnSuperPortrait(FighterController activatingFighter, FighterController otherFighter, int freezeFrames)
+	{
+		if (_kungFuManSuperPortrait == null || activatingFighter is not SpriteTestFighter) return;
+		if (GodotObject.IsInstanceValid(_superPortrait)) _superPortrait.QueueFree();
+
+		bool entersFromLeft = activatingFighter.GlobalPosition.X <= otherFighter.GlobalPosition.X;
+		var portrait = new SuperPortraitOverlay
+		{
+			Name = "KungFuManSuperPortrait",
+			Portrait = _kungFuManSuperPortrait,
+			FightCamera = _fightCamera,
+			FocusPosition = activatingFighter.GlobalPosition + new Vector2(0f, -55f),
+			EntersFromLeft = entersFromLeft,
+			LifetimeFrames = Mathf.Max(1, freezeFrames)
+		};
+		portrait.TreeExited += () =>
+		{
+			if (_superPortrait == portrait) _superPortrait = null;
+		};
+		_superPortrait = portrait;
+		GetParent().AddChild(portrait);
 	}
 
 	private void SpawnSuperBackdrop(int backdropFrames)
@@ -131,20 +205,20 @@ public partial class VersusStageRules : Node
 	private static bool IsAirborneGroundedPushSuppressed(FighterController fighter) =>
 		!IsGroundedForPushbox(fighter) && fighter.SuppressesGroundedPushWhileAirborne;
 
-	private void ResolvePushboxes()
+	private void ResolvePushboxes(float leftEdge, float rightEdge)
 	{
 		// A jump passes through a grounded opponent without body push, but two airborne
 		// fighters still collide. Air dashes use the default false rule and can push ground.
 		if (IsGroundedForPushbox(_fighterOne) && IsAirborneGroundedPushSuppressed(_fighterTwo))
 		{
 			if (_fighterTwo.JumpInteractsWithGroundedPushbox || _fighterTwo.ShortHopInteractsWithGroundedPushbox)
-				ResolveAirborneVsGroundedPushbox(_fighterTwo, _fighterOne);
+				ResolveAirborneVsGroundedPushbox(_fighterTwo, _fighterOne, leftEdge, rightEdge);
 			return;
 		}
 		if (IsGroundedForPushbox(_fighterTwo) && IsAirborneGroundedPushSuppressed(_fighterOne))
 		{
 			if (_fighterOne.JumpInteractsWithGroundedPushbox || _fighterOne.ShortHopInteractsWithGroundedPushbox)
-				ResolveAirborneVsGroundedPushbox(_fighterOne, _fighterTwo);
+				ResolveAirborneVsGroundedPushbox(_fighterOne, _fighterTwo, leftEdge, rightEdge);
 			return;
 		}
 		if (!_fighterOne.WorldPushbox.Intersects(_fighterTwo.WorldPushbox)) return;
@@ -152,20 +226,22 @@ public partial class VersusStageRules : Node
 		FighterController left = _fighterOne.WorldPushbox.GetCenter().X <= _fighterTwo.WorldPushbox.GetCenter().X ? _fighterOne : _fighterTwo;
 		FighterController right = left == _fighterOne ? _fighterTwo : _fighterOne;
 		float overlap = HorizontalOverlap(left.WorldPushbox, right.WorldPushbox);
-		ApplyImmediateHorizontalPush(left, -overlap * 0.5f);
-		ApplyImmediateHorizontalPush(right, overlap * 0.5f);
+		float requestedLeft = -overlap * 0.5f;
+		float requestedRight = overlap * 0.5f;
+		float appliedLeft = ApplyImmediateHorizontalPush(left, requestedLeft, leftEdge, rightEdge);
+		ApplyImmediateHorizontalPush(right, requestedRight, leftEdge, rightEdge);
 
 		float remaining = HorizontalOverlap(left.WorldPushbox, right.WorldPushbox);
 		if (remaining > 0)
 		{
-			if (Mathf.IsEqualApprox(left.GlobalPosition.X, MinOriginX(left)))
-				ApplyImmediateHorizontalPush(right, remaining);
+			if (Mathf.Abs(appliedLeft) + 0.01f < Mathf.Abs(requestedLeft))
+				ApplyImmediateHorizontalPush(right, remaining, leftEdge, rightEdge);
 			else
-				ApplyImmediateHorizontalPush(left, -remaining);
+				ApplyImmediateHorizontalPush(left, -remaining, leftEdge, rightEdge);
 		}
 	}
 
-	private void ResolveAirborneVsGroundedPushbox(FighterController airborne, FighterController grounded)
+	private void ResolveAirborneVsGroundedPushbox(FighterController airborne, FighterController grounded, float leftEdge, float rightEdge)
 	{
 		if (!airborne.WorldPushbox.Intersects(grounded.WorldPushbox)) return;
 
@@ -173,7 +249,7 @@ public partial class VersusStageRules : Node
 		if (overlap <= 0f) return;
 		if (TryGetCornerProtectionOpenSide(grounded, out int openSide) && IsOnProtectedCornerSide(airborne, grounded, openSide))
 		{
-			ApplySmoothHorizontalPush(airborne, openSide * overlap);
+			ApplySmoothHorizontalPush(airborne, openSide * overlap, leftEdge, rightEdge);
 			return;
 		}
 		float currentDelta = airborne.WorldPositionBox.GetCenter().X - grounded.WorldPositionBox.GetCenter().X;
@@ -184,8 +260,8 @@ public partial class VersusStageRules : Node
 
 		float groundedShare = Mathf.Clamp(airborne.JumpGroundedPushStrength, 0f, 1f);
 		float airborneShare = 1f - groundedShare;
-		ApplySmoothHorizontalPush(airborne, side * overlap * airborneShare);
-		ApplySmoothHorizontalPush(grounded, -side * overlap * groundedShare);
+		ApplySmoothHorizontalPush(airborne, side * overlap * airborneShare, leftEdge, rightEdge);
+		ApplySmoothHorizontalPush(grounded, -side * overlap * groundedShare, leftEdge, rightEdge);
 	}
 
 	private void ResolveLandingOverlap(FighterController lander, FighterController opponent, float leftEdge, float rightEdge)
@@ -240,63 +316,59 @@ public partial class VersusStageRules : Node
 	private float HorizontalOverlap(Rect2 first, Rect2 second) =>
 		Mathf.Max(0, Mathf.Min(first.End.X, second.End.X) - Mathf.Max(first.Position.X, second.Position.X));
 
-	private void ApplySmoothHorizontalPush(FighterController fighter, float pushDelta)
-	{
-		ApplySmoothHorizontalPush(fighter, pushDelta, float.NegativeInfinity, float.PositiveInfinity);
-	}
-
 	private void ApplySmoothHorizontalPush(FighterController fighter, float pushDelta, float leftEdge, float rightEdge)
 	{
 		if (Mathf.IsZeroApprox(pushDelta)) return;
 
 		float oldX = fighter.GlobalPosition.X;
-		float targetX = float.IsNegativeInfinity(leftEdge) || float.IsPositiveInfinity(rightEdge)
-			? ClampOriginX(fighter, fighter.GlobalPosition.X + pushDelta)
-			: ClampOriginX(fighter, fighter.GlobalPosition.X + pushDelta, leftEdge, rightEdge);
+		float targetX = ClampOriginX(fighter, fighter.GlobalPosition.X + pushDelta, leftEdge, rightEdge);
 		fighter.GlobalPosition = new Vector2(targetX, fighter.GlobalPosition.Y);
 		fighter.AddVisualCorrection(new Vector2(targetX - oldX, 0f));
 	}
 
-	private void ApplyImmediateHorizontalPush(FighterController fighter, float pushDelta)
+	private float ApplyImmediateHorizontalPush(FighterController fighter, float pushDelta, float leftEdge, float rightEdge)
 	{
-		if (Mathf.IsZeroApprox(pushDelta)) return;
-		fighter.GlobalPosition = new Vector2(ClampOriginX(fighter, fighter.GlobalPosition.X + pushDelta), fighter.GlobalPosition.Y);
+		if (Mathf.IsZeroApprox(pushDelta)) return 0f;
+		float oldX = fighter.GlobalPosition.X;
+		fighter.GlobalPosition = new Vector2(ClampOriginX(fighter, oldX + pushDelta, leftEdge, rightEdge), fighter.GlobalPosition.Y);
+		return fighter.GlobalPosition.X - oldX;
 	}
 
 	private void ResolveBasicAttackHits()
 	{
-		bool firstHit = _fighterOne.TryApplyBasicAttackHit(_fighterTwo, out int firstHitstop, out float firstShake, out float firstPushback, out Vector2 firstHitPoint, out bool firstHeavySpark);
-		bool secondHit = _fighterTwo.TryApplyBasicAttackHit(_fighterOne, out int secondHitstop, out float secondShake, out float secondPushback, out Vector2 secondHitPoint, out bool secondHeavySpark);
-		if (firstHit)
-		{
-			ApplyHitstopForHit(_fighterOne, _fighterTwo, firstHitstop);
-			if (!_fighterOne.IsPerformingThrow) ApplyCornerPushbackTransfer(_fighterOne, _fighterTwo, firstPushback);
-			if (!_fighterOne.IsPerformingThrow) _hitSparkLayer?.Spawn(firstHitPoint, firstHeavySpark);
-		}
-		if (secondHit)
-		{
-			ApplyHitstopForHit(_fighterTwo, _fighterOne, secondHitstop);
-			if (!_fighterTwo.IsPerformingThrow) ApplyCornerPushbackTransfer(_fighterTwo, _fighterOne, secondPushback);
-			if (!_fighterTwo.IsPerformingThrow) _hitSparkLayer?.Spawn(secondHitPoint, secondHeavySpark);
-		}
-		float shake = Mathf.Max(firstShake, secondShake);
-		int shakeFrames = Mathf.Max(firstHitstop, secondHitstop);
-		bool superImpact = (firstHit && _fighterOne.CurrentAttackName.StartsWith("SUPER")) ||
-			(secondHit && _fighterTwo.CurrentAttackName.StartsWith("SUPER"));
-		if (superImpact)
-			_fightCamera?.ShakeSuper(Mathf.Max(8f, shake), Mathf.Max(12, shakeFrames));
+		foreach (FighterController ally in _primaryTeam.ToArray())
+			if (GodotObject.IsInstanceValid(ally)) ResolveOneBasicAttack(ally, _fighterTwo);
+		ResolveOneBasicAttack(_fighterTwo, _fighterOne);
+	}
+
+	private void ResolveOneBasicAttack(FighterController attacker, FighterController defender)
+	{
+		if (attacker == null || defender == null || attacker.IsSameTeam(defender) || !attacker.TryApplyBasicAttackHit(defender,
+			out int hitstop, out float shake, out float pushback, out Vector2 hitPoint, out bool heavySpark)) return;
+
+		ApplyHitstopForHit(attacker, defender, hitstop);
+		if (!attacker.IsPerformingThrow) ApplyCornerPushbackTransfer(attacker, defender, pushback);
+		if (attacker.LastContactWasBlocked) _hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing);
+		else if (!attacker.IsPerformingThrow) _hitSparkLayer?.Spawn(hitPoint, heavySpark);
+		if (attacker.CurrentAttackName.StartsWith("SUPER"))
+			_fightCamera?.ShakeSuper(Mathf.Max(8f, shake), Mathf.Max(12, hitstop));
 		else if (shake > 0f)
-			_fightCamera?.Shake(shake, shakeFrames);
+			_fightCamera?.Shake(shake, hitstop);
 	}
 
 	private void ResolveProjectileHits()
 	{
 		foreach (Node node in GetTree().GetNodesInGroup(BasicProjectile.ProjectileGroup))
 		{
-			if (node is not BasicProjectile projectile || projectile.HasHit || !projectile.CanHit || projectile.OwnerFighter == null) continue;
-			FighterController defender = projectile.OwnerFighter == _fighterOne
+			if (node is not BasicProjectile projectile || projectile.HasHit || !projectile.CanHit) continue;
+			if (!GodotObject.IsInstanceValid(projectile.OwnerFighter))
+			{
+				projectile.QueueFree();
+				continue;
+			}
+			FighterController defender = projectile.OwnerFighter.TeamId == _fighterOne.TeamId
 				? _fighterTwo
-				: projectile.OwnerFighter == _fighterTwo ? _fighterOne : null;
+				: projectile.OwnerFighter.TeamId == _fighterTwo.TeamId ? _fighterOne : null;
 			if (defender == null) continue;
 
 			bool finalProjectileHit = projectile.NextHitIsFinal;
@@ -310,7 +382,8 @@ public partial class VersusStageRules : Node
 				_fightCamera?.ShakeSuper(Mathf.Max(9f, shake), Mathf.Max(14, hitstop));
 			else if (shake > 0f)
 				_fightCamera?.Shake(shake, hitstop);
-			_hitSparkLayer?.Spawn(hitPoint, heavySpark);
+			if (projectile.OwnerFighter.LastContactWasBlocked) _hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing);
+			else _hitSparkLayer?.Spawn(hitPoint, heavySpark);
 			projectile.MarkHit(defender);
 		}
 	}
@@ -366,8 +439,9 @@ public partial class VersusStageRules : Node
 
 	private void ClampFighterToCameraRange(FighterController fighter, float leftEdge, float rightEdge)
 	{
-		float min = Mathf.Max(MinOriginX(fighter), leftEdge - fighter.PushboxLocal.Position.X);
-		float max = Mathf.Min(MaxOriginX(fighter), rightEdge - fighter.PushboxLocal.End.X);
+		Rect2 localPushbox = GetCurrentPushboxLocal(fighter);
+		float min = Mathf.Max(MinOriginX(fighter), leftEdge - localPushbox.Position.X);
+		float max = Mathf.Min(MaxOriginX(fighter), rightEdge - localPushbox.End.X);
 		float clampedX = Mathf.Clamp(fighter.GlobalPosition.X, min, max);
 		if (Mathf.IsEqualApprox(clampedX, fighter.GlobalPosition.X)) return;
 
@@ -376,10 +450,15 @@ public partial class VersusStageRules : Node
 		fighter.GlobalPosition = new Vector2(clampedX, fighter.GlobalPosition.Y);
 	}
 
-	private float MinOriginX(FighterController fighter) => -fighter.PushboxLocal.Position.X;
-	private float MaxOriginX(FighterController fighter) => StageWidth - fighter.PushboxLocal.End.X;
-	private float ClampOriginX(FighterController fighter, float x) => Mathf.Clamp(x, MinOriginX(fighter), MaxOriginX(fighter));
-	private float MinOriginX(FighterController fighter, float leftEdge) => Mathf.Max(MinOriginX(fighter), leftEdge - fighter.PushboxLocal.Position.X);
-	private float MaxOriginX(FighterController fighter, float rightEdge) => Mathf.Min(MaxOriginX(fighter), rightEdge - fighter.PushboxLocal.End.X);
+	private static Rect2 GetCurrentPushboxLocal(FighterController fighter)
+	{
+		Rect2 world = fighter.WorldPushbox;
+		return new Rect2(world.Position - fighter.GlobalPosition, world.Size);
+	}
+
+	private float MinOriginX(FighterController fighter) => -GetCurrentPushboxLocal(fighter).Position.X;
+	private float MaxOriginX(FighterController fighter) => StageWidth - GetCurrentPushboxLocal(fighter).End.X;
+	private float MinOriginX(FighterController fighter, float leftEdge) => Mathf.Max(MinOriginX(fighter), leftEdge - GetCurrentPushboxLocal(fighter).Position.X);
+	private float MaxOriginX(FighterController fighter, float rightEdge) => Mathf.Min(MaxOriginX(fighter), rightEdge - GetCurrentPushboxLocal(fighter).End.X);
 	private float ClampOriginX(FighterController fighter, float x, float leftEdge, float rightEdge) => Mathf.Clamp(x, MinOriginX(fighter, leftEdge), MaxOriginX(fighter, rightEdge));
 }

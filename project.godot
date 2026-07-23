@@ -27,6 +27,14 @@ project/assembly_name="Modular Fighter Movement Framework"
 
 enabled=PackedStringArray("res://addons/fighter_box_editor/plugin.cfg")
 
+[layer_names]
+
+2d_physics/layer_1="Stage Geometry"
+2d_physics/layer_2="Fighter Bodies (stage physics only)"
+2d_physics/layer_5="Optional Hitbox Area Adapter"
+2d_physics/layer_6="Optional Hurtbox Area Adapter"
+2d_physics/layer_7="Optional Pushbox Area Adapter"
+
 [input]
 
 move_left={

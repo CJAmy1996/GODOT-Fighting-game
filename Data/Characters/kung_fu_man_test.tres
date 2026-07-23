@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="FighterDefinition" load_steps=16 format=3 uid="uid://bsia1qvkdppur"]
+[gd_resource type="Resource" script_class="FighterDefinition" load_steps=18 format=3 uid="uid://bsia1qvkdppur"]
 
 [ext_resource type="Script" uid="uid://p3g6dew2wiky" path="res://Scripts/Core/FighterDefinition.cs" id="1_def"]
 [ext_resource type="Script" uid="uid://s1q2kuukuw7h" path="res://Scripts/Core/MovementTuning.cs" id="2_tuning"]
@@ -14,6 +14,7 @@
 [ext_resource type="Resource" uid="uid://ds7etjdao7hoc" path="res://Data/Characters/KungFuMan/kung_fu_man_special_moves.tres" id="12_specials"]
 [ext_resource type="Resource" path="res://Data/Characters/KungFuMan/super_rush.tres" id="13_super_rush"]
 [ext_resource type="Resource" path="res://Data/Characters/KungFuMan/super_fireball.tres" id="14_super_fireball"]
+[ext_resource type="Script" path="res://Scripts/Core/CancelRule.cs" id="15_cancel_rule"]
 
 [sub_resource type="Resource" id="MovementTuning_kfm"]
 script = ExtResource("2_tuning")
@@ -28,6 +29,15 @@ AirAcceleration = 2600.0
 AirDeceleration = 1700.0
 AllowAirControl = false
 
+[sub_resource type="Resource" id="CancelRule_normal_to_special_on_contact"]
+script = ExtResource("15_cancel_rule")
+FromMove = "ANY_NORMAL"
+Kind = 1
+RequiresContact = true
+StartFrame = 0
+EndFrame = -1
+AllowedTargets = ["LIGHT PROJECTILE", "HEAVY PROJECTILE"]
+
 [resource]
 script = ExtResource("1_def")
 FighterName = "Kung Fu Man (Sprite Test)"
@@ -36,3 +46,4 @@ Abilities = [ExtResource("10"), ExtResource("3"), ExtResource("4"), ExtResource(
 NormalMoves = ExtResource("11_normals")
 SpecialMoves = ExtResource("12_specials")
 SuperMoves = [ExtResource("13_super_rush"), ExtResource("14_super_fireball")]
+CancelRules = [SubResource("CancelRule_normal_to_special_on_contact")]

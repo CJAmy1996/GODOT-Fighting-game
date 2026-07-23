@@ -10,7 +10,7 @@ namespace ModularFighter.Characters;
 public partial class CloneCommandRelay : Node
 {
 	[Export] public FighterController Clone { get; set; }
-	[Export] public FighterController Owner { get; set; }
+	[Export] public FighterController OwnerFighter { get; set; }
 	[Export] public bool MirrorOwnerMovement { get; set; } = true;
 
 	public override void _Ready()
@@ -20,8 +20,8 @@ public partial class CloneCommandRelay : Node
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (Clone == null || Owner == null || !MirrorOwnerMovement) return;
-		var ownerInput = Owner.CurrentInput;
+		if (Clone == null || OwnerFighter == null || !MirrorOwnerMovement) return;
+		var ownerInput = OwnerFighter.CurrentInput;
 		// Clones may receive the same command, a delayed command history, or scripted inputs.
 		Clone.SetExternalInput(new FighterInput(ownerInput.Horizontal, ownerInput.Vertical,
 			ownerInput.JumpPressed, ownerInput.JumpHeld, ownerInput.DashPressed, ownerInput.FlightHeld,

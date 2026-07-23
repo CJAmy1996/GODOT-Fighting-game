@@ -10,8 +10,8 @@ public partial class MotionInputBufferTests : Node
 
 	private const int InputBufferFrames = 3;
 	private const int DoubleTapWindowFrames = 12;
-	private const int QuarterCircleForwardWindowFrames = 12;
-	private const int QuarterCircleForwardLatchFrames = 12;
+	private const int QuarterCircleForwardWindowFrames = 20;
+	private const int QuarterCircleForwardLatchFrames = 18;
 	private const int BackDashInputLockoutWindowFrames = 18;
 
 	public override void _Ready()
@@ -31,6 +31,7 @@ public partial class MotionInputBufferTests : Node
 	{
 		TestQuarterCircleForward();
 		TestQuarterCircleForwardMirrorsWithFacing();
+		TestLenientQuarterCircleForwardWindow();
 		TestQuarterCircleForwardExpires();
 		TestDoubleTapDash();
 		TestDoubleTapOutsideWindowDoesNotDash();
@@ -56,6 +57,16 @@ public partial class MotionInputBufferTests : Node
 		buffer.PressHorizontalTap(-1, -1, InputBufferFrames, DoubleTapWindowFrames,
 			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
 		Expect(buffer.HasQuarterCircleForwardCommand, "QCF should use fighter-facing forward.");
+	}
+
+	private static void TestLenientQuarterCircleForwardWindow()
+	{
+		var buffer = new MotionInputBuffer();
+		buffer.PressDown();
+		Tick(buffer, 19);
+		buffer.PressHorizontalTap(1, 1, InputBufferFrames, DoubleTapWindowFrames,
+			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
+		Expect(buffer.HasQuarterCircleForwardCommand, "QCF should accept a 19-frame down-to-forward gap.");
 	}
 
 	private static void TestQuarterCircleForwardExpires()

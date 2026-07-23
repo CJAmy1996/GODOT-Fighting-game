@@ -3,6 +3,11 @@ using Godot;
 
 namespace ModularFighter.Core;
 
+/// <summary>
+/// Optional Area2D adapter for scene-authored shapes and experiments. The canonical
+/// deterministic runtime uses FighterBoxFrame Rect2 data; these Areas never replace
+/// the stage-only CharacterBody or the VersusStageRules pushbox resolver.
+/// </summary>
 public abstract partial class FighterCollisionBox : Area2D
 {
 	[Export] public FighterBoxKind Kind { get; protected set; } = FighterBoxKind.Hurtbox;

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=55 format=3 uid="uid://c32qbocpsvmo4"]
+[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=56 format=3 uid="uid://c32qbocpsvmo4"]
 
 [ext_resource type="Script" uid="uid://br48dic8s6gkm" path="res://Scripts/Core/NormalMoveData.cs" id="1_move"]
 [ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="2_box"]
@@ -9,13 +9,13 @@ script = ExtResource("2_box")
 LocalRect = Rect2(-32, -92, 64, 142)
 Tag = "body"
 
-[sub_resource type="Resource" id="slp_hit"]
+[sub_resource type="Resource" id="Resource_yund7"]
 script = ExtResource("2_box")
 Kind = 1
 StartFrame = 4
-EndFrame = 5
-LocalRect = Rect2(24, -58, 42, 28)
-Tag = "jab"
+EndFrame = 6
+LocalRect = Rect2(20, -91, 33, 35)
+Tag = "Jab hitbox"
 
 [sub_resource type="Resource" id="slp"]
 script = ExtResource("1_move")
@@ -30,20 +30,20 @@ CanChainToLight = true
 CanChainToHeavy = true
 CanChainToSpecial = true
 ChainEarliestActiveFramesLeft = 3
-BoxTimeline = [SubResource("slp_hurt"), SubResource("slp_hit")]
+BoxTimeline = [SubResource("slp_hurt"), SubResource("Resource_yund7")]
 
 [sub_resource type="Resource" id="clp_hurt"]
 script = ExtResource("2_box")
 LocalRect = Rect2(-34, -62, 68, 82)
 Tag = "crouching-body"
 
-[sub_resource type="Resource" id="clp_hit"]
+[sub_resource type="Resource" id="Resource_vvk62"]
 script = ExtResource("2_box")
 Kind = 1
 StartFrame = 4
-EndFrame = 5
-LocalRect = Rect2(22, -48, 48, 28)
-Tag = "crouching-jab"
+EndFrame = 6
+LocalRect = Rect2(20, -66, 33, 33)
+Tag = "crouching jab"
 
 [sub_resource type="Resource" id="clp"]
 script = ExtResource("1_move")
@@ -58,7 +58,7 @@ CanChainToLight = true
 CanChainToHeavy = true
 CanChainToSpecial = true
 ChainEarliestActiveFramesLeft = 3
-BoxTimeline = [SubResource("clp_hurt"), SubResource("clp_hit")]
+BoxTimeline = [SubResource("clp_hurt"), SubResource("Resource_vvk62")]
 
 [sub_resource type="Resource" id="alp_hurt"]
 script = ExtResource("2_box")
@@ -227,12 +227,20 @@ script = ExtResource("2_box")
 LocalRect = Rect2(-38, -68, 76, 88)
 Tag = "crouching-body"
 
-[sub_resource type="Resource" id="chp_hit"]
+[sub_resource type="Resource" id="Resource_71nvs"]
 script = ExtResource("2_box")
 Kind = 1
-StartFrame = 9
-EndFrame = 18
-LocalRect = Rect2(24, -70, 76, 54)
+StartFrame = 14
+EndFrame = 15
+LocalRect = Rect2(5, -102, 39, 84)
+Tag = "crouching-heavy-punch-launcher"
+
+[sub_resource type="Resource" id="Resource_te6b0"]
+script = ExtResource("2_box")
+Kind = 1
+StartFrame = 16
+EndFrame = 27
+LocalRect = Rect2(8, -126, 62, 58)
 Tag = "crouching-heavy-punch-launcher"
 
 [sub_resource type="Resource" id="chp"]
@@ -245,7 +253,7 @@ ActiveFrames = 10
 RecoveryFrames = 9
 SuppressFallbackHitbox = true
 CanChainToSpecial = true
-BoxTimeline = [SubResource("chp_hurt"), SubResource("chp_hit")]
+BoxTimeline = [SubResource("chp_hurt"), SubResource("Resource_71nvs"), SubResource("Resource_te6b0")]
 Launches = true
 LaunchSpeed = 1265.0
 LaunchHitstunFrames = 30
@@ -285,8 +293,8 @@ Tag = "body"
 script = ExtResource("2_box")
 Kind = 1
 StartFrame = 4
-EndFrame = 4
-LocalRect = Rect2(19.579645, -92.92036, 23.23009, 71.68142)
+EndFrame = 6
+LocalRect = Rect2(20, -93, 23, 72)
 Tag = "standing-heavy-kick"
 
 [sub_resource type="Resource" id="shk"]
@@ -306,12 +314,12 @@ script = ExtResource("2_box")
 LocalRect = Rect2(-36, -100, 72, 104)
 Tag = "air-body"
 
-[sub_resource type="Resource" id="ahk_hit"]
+[sub_resource type="Resource" id="Resource_glwf2"]
 script = ExtResource("2_box")
 Kind = 1
 StartFrame = 4
-EndFrame = 8
-LocalRect = Rect2(18, -48, 88, 42)
+EndFrame = 6
+LocalRect = Rect2(-36, -31, 90, 42)
 Tag = "air-heavy-kick"
 
 [sub_resource type="Resource" id="ahk"]
@@ -324,7 +332,7 @@ ActiveFrames = 5
 RecoveryFrames = 12
 SuppressFallbackHitbox = true
 CanChainToSpecial = true
-BoxTimeline = [SubResource("ahk_hurt"), SubResource("ahk_hit")]
+BoxTimeline = [SubResource("ahk_hurt"), SubResource("Resource_glwf2")]
 
 [sub_resource type="Resource" id="auhk_hurt"]
 script = ExtResource("2_box")

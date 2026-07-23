@@ -38,6 +38,9 @@ public partial class StageCamera : Camera2D
 
 	public override void _Ready()
 	{
+		// Fighters update at the default priority, then the camera establishes the
+		// deterministic fight box, then VersusStageRules resolves at priority 100.
+		ProcessPhysicsPriority = 50;
 		_fighterOne = GetNode<FighterController>(FighterOnePath);
 		_fighterTwo = GetNode<FighterController>(FighterTwoPath);
 		Position = new Vector2(ViewportWidth * 0.5f, CameraHeight);
@@ -45,7 +48,7 @@ public partial class StageCamera : Camera2D
 		UpdateCurrentFightBox();
 	}
 
-	public override void _Process(double delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		if (_fighterOne == null || _fighterTwo == null) return;
 
@@ -81,6 +84,10 @@ public partial class StageCamera : Camera2D
 
 	public float FightBoxLeft => CurrentFightBox.Position.X;
 	public float FightBoxRight => CurrentFightBox.End.X;
+	public void SetPrimaryFighter(FighterController fighter)
+	{
+		if (fighter != null) _fighterOne = fighter;
+	}
 	public void Shake(float strength, int frames)
 	{
 		if (strength <= _shakeStrength && frames <= _shakeFramesLeft) return;

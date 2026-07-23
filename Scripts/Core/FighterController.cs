@@ -8,6 +8,7 @@ public enum FighterHitState
 {
 	None,
 	Hitstun,
+	Blockstun,
 	CounterHit,
 	Tumble,
 	Knockdown,
@@ -26,6 +27,12 @@ public partial class FighterController : CharacterBody2D
 	[Export] public FighterDefinition Definition { get; set; }
 	[Export] public bool ReadLocalInput { get; set; } = true;
 	[Export] public bool FaceWithMovement { get; set; } = true;
+	[ExportGroup("Match Identity")]
+	[Export] public int TeamId { get; set; }
+	public bool ParticipatesInPointCollision { get; private set; } = true;
+	[ExportGroup("Training Guard")]
+	[Export] public bool TrainingAutoBlock { get; set; }
+	[Export] public bool TrainingAirBlock { get; set; }
 	[ExportGroup("Collision")]
 	[Export] public Rect2 PushboxLocal { get; set; } = new(-28f, -50f, 56f, 100f);
 	[Export] public Rect2 AirbornePushboxLocal { get; set; } = new(-20f, -42f, 40f, 78f);
@@ -71,6 +78,9 @@ public partial class FighterController : CharacterBody2D
 	[Export] public int SpecialAttackHitstopFrames { get; set; } = 6;
 	[Export(PropertyHint.Range, "0.0,1.0,0.05")] public float NormalAttackHitstopMultiplier { get; set; } = 0.5f;
 	[Export] public int GlobalHitstopBonusFrames { get; set; } = 6;
+	[Export] public int BlockHitstopBonusFrames { get; set; } = 2;
+	[Export(PropertyHint.Range, "0.0,2.0,0.01")] public float BlockPushbackMultiplier { get; set; } = 1.2f;
+	[Export] public float BlockShakeStrength { get; set; } = 1.25f;
 	[Export] public int GroundedAttackHitstopBonusFrames { get; set; } = 4;
 	[Export] public int AirAttackHitstopBonusFrames { get; set; } = 2;
 	[Export] public int LightAirToGroundAttackerHitstopFrames { get; set; } = 4;
@@ -145,8 +155,12 @@ public partial class FighterController : CharacterBody2D
 	public MovementAbility ActiveAbility { get; private set; }
 	/// <summary>Pushbox in world space. It follows this fighter's origin exactly.</summary>
 	public Rect2 ActivePushboxLocal => !IsOnFloor() && SuppressesGroundedPushWhileAirborne ? AirbornePushboxLocal : PushboxLocal;
-	public Rect2 WorldPushbox => new(GlobalPosition + ActivePushboxLocal.Position, ActivePushboxLocal.Size);
-	public Rect2 WorldHurtbox => GetFirstActiveWorldBox(FighterBoxKind.Hurtbox, HurtboxLocal, false);
+	public Rect2 WorldPushbox => ParticipatesInPointCollision
+		? GetCombinedActiveWorldBox(FighterBoxKind.Pushbox, ActivePushboxLocal, false)
+		: new Rect2(GlobalPosition, Vector2.Zero);
+	public Rect2 WorldHurtbox => ParticipatesInPointCollision
+		? GetFirstActiveWorldBox(FighterBoxKind.Hurtbox, HurtboxLocal, false)
+		: new Rect2(GlobalPosition, Vector2.Zero);
 	public Rect2 CurrentHitboxLocal => GetFirstActiveLocalBox(FighterBoxKind.Hitbox, IsAttacking ? _currentAttackHitboxLocal : HitboxLocal);
 	public Rect2 WorldHitbox => GetFirstActiveWorldBox(FighterBoxKind.Hitbox, CurrentHitboxLocal, true);
 	/// <summary>Small torso/axis tracker used for side/crossup decisions. It does not push anything.</summary>
@@ -179,6 +193,8 @@ public partial class FighterController : CharacterBody2D
 	public bool CurrentAttackStartedAirborne => _currentAttackStartedAirborne;
 	public int CurrentAirToGroundAttackerHitstopFrames => GetAirToGroundAttackerHitstopFrames(CurrentAttackName);
 	public bool IsInHitstun => HitstunFramesLeft > 0;
+	public bool IsInBlockstun => HitState == FighterHitState.Blockstun && HitstunFramesLeft > 0;
+	public bool LastContactWasBlocked { get; private set; }
 	public bool IsKnockedDown => (HitState == FighterHitState.Knockdown || HitState == FighterHitState.GroundedKnockdown ||
 		HitState == FighterHitState.WallBounce || HitState == FighterHitState.GroundBounce || HitState == FighterHitState.Crumple) && HitstunFramesLeft > 0;
 	public bool IsGroundedKnockdown => HitState == FighterHitState.GroundedKnockdown && HitstunFramesLeft > 0;
@@ -259,8 +275,9 @@ public partial class FighterController : CharacterBody2D
 	private int _airLightJumpCancelFramesLeft;
 	private NormalMoveRule _currentMoveRule;
 	private const int DoubleTapDashWindowFrames = 12;
-	private const int QuarterCircleForwardWindowFrames = 9;
-	private const int QuarterCircleForwardLatchFrames = 9;
+	private const int QuarterCircleForwardWindowFrames = 20;
+	private const int QuarterCircleForwardLatchFrames = 18;
+	private const int SuperChordGraceFrames = 2;
 	private const int UpInputMotionSpecialStrictWindowFrames = 4;
 	private const int BackDashInputLockoutWindowFrames = 18;
 	private const string ElectricWindGodFistName = "ELECTRIC WIND GOD FIST";
@@ -281,6 +298,12 @@ public partial class FighterController : CharacterBody2D
 	private FighterController _opponent;
 
 	public void SetOpponent(FighterController opponent) => _opponent = opponent;
+	public bool IsSameTeam(FighterController other) => other != null && TeamId != 0 && TeamId == other.TeamId;
+	/// <summary>
+	/// Only the controlled point fighter owns a pushbox and can receive hits. Helpers
+	/// remain stage bodies and may finish attacks, but cannot create team collision piles.
+	/// </summary>
+	public void SetPointCollisionParticipation(bool active) => ParticipatesInPointCollision = active;
 
 	private readonly struct NormalMoveRule
 	{
@@ -367,6 +390,7 @@ public partial class FighterController : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		EnsureCollisionPolicy();
 		if (Definition?.Tuning is null) return;
 		Simulate(ReadLocalInput ? FighterInput.ReadLocal() : CurrentInput, (float)delta);
 	}
@@ -389,6 +413,7 @@ public partial class FighterController : CharacterBody2D
 
 	public void Simulate(FighterInput input, float delta)
 	{
+		EnsureCollisionPolicy();
 		JustLanded = false;
 		PreviousGlobalPosition = GlobalPosition;
 		CurrentInput = input;
@@ -585,7 +610,8 @@ public partial class FighterController : CharacterBody2D
 		hitPushback = 0f;
 		hitPoint = Vector2.Zero;
 		heavySpark = false;
-		if (!IsAttackActive || IsProjectileAttackName(CurrentAttackName) || defender == null || defender == this) return false;
+		LastContactWasBlocked = false;
+		if (!IsAttackActive || IsProjectileAttackName(CurrentAttackName) || defender == null || defender == this || IsSameTeam(defender)) return false;
 		if (_currentSuperMove == null && _attackHasHit) return false;
 		if (_currentSuperMove != null && (_currentAttackHitsRemaining <= 0 || _currentAttackHitCooldownFramesLeft > 0)) return false;
 		if (!TryFindBoxContact(GetActiveWorldBoxInstances(FighterBoxKind.Hitbox), defender.GetActiveWorldBoxInstances(FighterBoxKind.Hurtbox),
@@ -626,6 +652,25 @@ public partial class FighterController : CharacterBody2D
 		int appliedHitstun = baseHitstun + (counterHit ? CounterHitExtraHitstunFrames : 0);
 		if (_currentAttackStartedAirborne && !defender.WasGrounded)
 			appliedHitstun += AirToAirHitstunBonusFrames;
+		if (defender.CanTrainingBlockStrike())
+		{
+			int authoredBlockstun = ResolveIntOverride(hitboxData?.BlockstunFrames, _currentAttackBlockstunFrames);
+			int appliedBlockstun = authoredBlockstun > 0 ? authoredBlockstun : Mathf.Max(1, baseHitstun - 4);
+			float blockPushback = appliedPushback * BlockPushbackMultiplier;
+			defender.ApplyBlockstun(appliedBlockstun, Facing * blockPushback);
+			LastContactWasBlocked = true;
+			hitstopFrames = ResolveIntOverride(hitboxData?.HitstopFrames, _currentAttackHitstopFrames);
+			hitstopFrames += GlobalHitstopBonusFrames + (_currentAttackStartedAirborne ? AirAttackHitstopBonusFrames : GroundedAttackHitstopBonusFrames);
+			hitstopFrames = Mathf.Max(1, hitstopFrames + BlockHitstopBonusFrames);
+			shakeStrength = BlockShakeStrength;
+			hitPushback = blockPushback;
+			if (_currentSuperMove != null)
+			{
+				_currentAttackHitsRemaining = 0;
+				ResolveBlockedSuperRush();
+			}
+			return true;
+		}
 		if (isLauncher)
 		{
 			int launchHitstun = ResolveIntOverride(hitboxData?.LaunchHitstunFrames, _currentMoveRule.LaunchHitstunFrames) + (counterHit ? CounterHitExtraHitstunFrames : 0);
@@ -720,12 +765,24 @@ public partial class FighterController : CharacterBody2D
 		hitPushback = 0f;
 		hitPoint = Vector2.Zero;
 		heavySpark = false;
-		if (defender == null || defender == this) return false;
+		LastContactWasBlocked = false;
+		if (defender == null || defender == this || IsSameTeam(defender)) return false;
 		if (defender.IsGroundedKnockdown) return false;
 		if (!TryFindBoxContact(new[] { new ActiveFighterBox(projectileHitbox) }, defender.GetActiveWorldBoxInstances(FighterBoxKind.Hurtbox),
 			out hitPoint, out ActiveFighterBox hitbox, out ActiveFighterBox hurtbox)) return false;
 
 		float appliedPushback = Facing * pushback;
+		if (defender.CanTrainingBlockStrike())
+		{
+			int blockstunFrames = Mathf.Max(1, hitstunFrames - 4);
+			float blockPushback = appliedPushback * BlockPushbackMultiplier;
+			defender.ApplyBlockstun(blockstunFrames, blockPushback);
+			LastContactWasBlocked = true;
+			appliedHitstopFrames = Mathf.Max(1, hitstopFrames + BlockHitstopBonusFrames);
+			appliedShakeStrength = BlockShakeStrength;
+			hitPushback = Mathf.Abs(blockPushback);
+			return true;
+		}
 		if (knocksDown)
 		{
 			int appliedKnockdownFrames = knockdownFrames > 0 ? knockdownFrames : hitstunFrames;
@@ -779,6 +836,19 @@ public partial class FighterController : CharacterBody2D
 	{
 		ApplyHitReaction(frames, counterHit ? FighterHitState.CounterHit : FighterHitState.Hitstun);
 		Velocity = new Vector2(horizontalPushback, Velocity.Y);
+	}
+
+	private bool CanTrainingBlockStrike() =>
+		TrainingAutoBlock && !IsKnockedDown && (WasGrounded || TrainingAirBlock);
+
+	private void ApplyBlockstun(int frames, float horizontalPushback)
+	{
+		HitstunFramesLeft = Mathf.Max(1, frames);
+		HitState = FighterHitState.Blockstun;
+		CurrentKnockdownType = KnockdownType.None;
+		Velocity = new Vector2(horizontalPushback, Velocity.Y);
+		StopActiveAbility();
+		ClearAttackState();
 	}
 
 	private void ApplyLaunchHitstun(int frames, float horizontalPushback, float verticalLaunchSpeed, bool counterHit = false)
@@ -1071,7 +1141,8 @@ public partial class FighterController : CharacterBody2D
 					_currentAttackStartupFrames + _currentAttackActiveFrames + _currentAttackRecoveryFrames + _currentSuperMove.ActivationFreezeFrames);
 			if (_currentSuperMove.RushesForward) Velocity = new Vector2(Facing * _currentSuperMove.RushSpeed, Velocity.Y);
 		}
-		if (attackName == ElectricWindGodFistName || IsProjectileAttackName(attackName)) ConsumeQuarterCircleForwardCommand();
+		if (attackName == ElectricWindGodFistName || IsProjectileAttackName(attackName) || _currentSuperMove != null)
+			ConsumeQuarterCircleForwardCommand();
 		ConsumeDashBuffer();
 		ClearAttackInputBuffers();
 		ApplyAirAttackMomentum(attackName);
@@ -1274,16 +1345,11 @@ public partial class FighterController : CharacterBody2D
 		int remainingFrames = _attackStartupFramesLeft + _attackActiveFramesLeft + _attackRecoveryFramesLeft;
 		int elapsedFrames = totalFrames - remainingFrames;
 		bool currentMoveIsNormal = IsNormalAttackName(CurrentAttackName);
+		if (kind == CancelKind.Special && CurrentAttackName == ThrowAttackName) return false;
 
 		foreach (CancelRule rule in Definition.CancelRules)
 		{
 			if (rule == null) continue;
-			if (kind == CancelKind.Special && currentMoveIsNormal)
-			{
-				string from = rule.FromMove?.Trim().ToUpperInvariant() ?? "";
-				if (from == "" || from == "ANY" || from == "ANY_NORMAL" || from == "NORMAL" ||
-					from == "LIGHT" || from == "HEAVY") continue;
-			}
 			if (rule.Allows(CurrentAttackName, targetMove, kind, currentMoveIsNormal, _attackHasHit,
 				elapsedFrames, _attackStartupFramesLeft, _attackActiveFramesLeft)) return true;
 		}
@@ -1476,14 +1542,27 @@ public partial class FighterController : CharacterBody2D
 		// a previous attack cannot turn into a throw after recovery ends.
 		if (CurrentInput.LightPunchPressed && CurrentInput.LightKickPressed && CanAttemptDirectionalThrow())
 			return ThrowAttackName;
+		bool hasQuarterCircleForward = _motionInputBuffer.HasQuarterCircleForwardCommand;
+		bool punchSuperChord = input.LightPunchPressed && input.HeavyPunchPressed;
+		bool kickSuperChord = input.LightKickPressed && input.HeavyKickPressed;
+		if (hasQuarterCircleForward && punchSuperChord && IsOnFloor()) return SuperRushName;
+		if (hasQuarterCircleForward && kickSuperChord) return SuperFireballName;
+		// Give near-simultaneous attack buttons a brief chance to become a super
+		// chord before resolving QCF+LP/HP as a projectile or a kick as a normal.
+		if (hasQuarterCircleForward && _motionInputBuffer.QuarterCircleForwardCommandAgeFrames < SuperChordGraceFrames &&
+			(input.LightPunchPressed || input.HeavyPunchPressed || input.LightKickPressed || input.HeavyKickPressed))
+			return "";
+		// Command moves outrank directional normals. QCF commonly ends while the
+		// player is still holding forward or down-forward, which must not turn
+		// QCF+HP into forward HP/crouching HP.
+		if (input.LightPunchPressed && CanUseMotionSpecialCommand()) return LightProjectileName;
+		if (input.HeavyPunchPressed && CanUseMotionSpecialCommand()) return HeavyProjectileName;
 		if (input.HeavyPunchPressed && WasGrounded && input.Vertical > 0.5f)
 			return CrouchingHeavyPunchName;
 		if (input.HeavyPunchPressed && WasGrounded && input.Horizontal * Facing > 0.5f)
 			return ForwardHeavyPunchName;
 		if (input.LightPunchPressed && WasGrounded && input.Vertical > 0.5f && input.Horizontal * Facing > 0.5f)
 			return CrouchingMediumJabName;
-		if (input.LightPunchPressed && CanUseMotionSpecialCommand()) return LightProjectileName;
-		if (input.HeavyPunchPressed && CanUseMotionSpecialCommand()) return HeavyProjectileName;
 		if (input.LightPunchPressed) return "LIGHT PUNCH";
 		if (input.LightKickPressed && WasGrounded && input.Horizontal * Facing > 0.5f) return ForwardLightKickName;
 		if (input.LightKickPressed) return "LIGHT KICK";
@@ -1492,8 +1571,6 @@ public partial class FighterController : CharacterBody2D
 		if (input.HeavyKickPressed && !WasGrounded && input.Vertical < -0.5f) return AirUpHeavyKickName;
 		if (input.HeavyKickPressed && WasGrounded && input.Vertical > 0.5f) return CrouchingHeavyKickName;
 		if (input.HeavyKickPressed) return "HEAVY KICK";
-		if (input.Special1Pressed && IsOnFloor()) return SuperRushName;
-		if (input.Special2Pressed) return SuperFireballName;
 		return "";
 	}
 
@@ -1967,32 +2044,29 @@ public partial class FighterController : CharacterBody2D
 
 	public IEnumerable<ActiveFighterBox> GetActiveLocalBoxInstances(FighterBoxKind kind)
 	{
-		bool hasTimelineBoxes = false;
+		if (!ParticipatesInPointCollision && (kind == FighterBoxKind.Hurtbox || kind == FighterBoxKind.Pushbox))
+			yield break;
+		bool hasActiveTimelineBox = HasActiveTimelineBox(kind);
 		bool hasReplacingBox = HasActiveReplacingTimelineBox(kind);
+		if (!hasActiveTimelineBox)
+		{
+			if (kind == FighterBoxKind.Hurtbox)
+				yield return new ActiveFighterBox(HurtboxLocal);
+			else if (kind == FighterBoxKind.Pushbox)
+				yield return new ActiveFighterBox(ActivePushboxLocal);
+			else if (kind == FighterBoxKind.Hitbox && IsAttackActive && !_currentMoveRule.SuppressFallbackHitbox)
+				yield return new ActiveFighterBox(GetFacingLocalBox(_currentAttackHitboxLocal, true));
+		}
+
 		if (IsAttacking && _currentMoveRule.BoxTimeline != null)
 		{
 			foreach (FighterBoxFrame box in _currentMoveRule.BoxTimeline)
 			{
 				if (box == null || box.Kind != kind) continue;
-				hasTimelineBoxes = true;
 				if (box.IsActiveOnFrame(CurrentAttackFrame) && (!hasReplacingBox || box.ReplacesSameKindWhileActive))
 					yield return new ActiveFighterBox(GetFacingLocalBox(box.LocalRect, box.MirrorWithFacing), box);
 			}
 		}
-
-		if (hasTimelineBoxes) yield break;
-		if (kind == FighterBoxKind.Hurtbox)
-		{
-			yield return new ActiveFighterBox(HurtboxLocal);
-			yield break;
-		}
-		if (kind == FighterBoxKind.Pushbox)
-		{
-			yield return new ActiveFighterBox(ActivePushboxLocal);
-			yield break;
-		}
-		if (kind == FighterBoxKind.Hitbox && IsAttackActive && !_currentMoveRule.SuppressFallbackHitbox)
-			yield return new ActiveFighterBox(GetFacingLocalBox(_currentAttackHitboxLocal, true));
 	}
 
 	public IEnumerable<Rect2> GetActiveWorldBoxes(FighterBoxKind kind)
@@ -2003,32 +2077,29 @@ public partial class FighterController : CharacterBody2D
 
 	public IEnumerable<ActiveFighterBox> GetActiveWorldBoxInstances(FighterBoxKind kind)
 	{
-		bool hasTimelineBoxes = false;
+		if (!ParticipatesInPointCollision && (kind == FighterBoxKind.Hurtbox || kind == FighterBoxKind.Pushbox))
+			yield break;
+		bool hasActiveTimelineBox = HasActiveTimelineBox(kind);
 		bool hasReplacingBox = HasActiveReplacingTimelineBox(kind);
+		if (!hasActiveTimelineBox)
+		{
+			if (kind == FighterBoxKind.Hurtbox)
+				yield return new ActiveFighterBox(GetWorldFacingBox(HurtboxLocal, false));
+			else if (kind == FighterBoxKind.Pushbox)
+				yield return new ActiveFighterBox(new Rect2(GlobalPosition + ActivePushboxLocal.Position, ActivePushboxLocal.Size));
+			else if (kind == FighterBoxKind.Hitbox && IsAttackActive && !_currentMoveRule.SuppressFallbackHitbox)
+				yield return new ActiveFighterBox(GetWorldFacingBox(_currentAttackHitboxLocal, true));
+		}
+
 		if (IsAttacking && _currentMoveRule.BoxTimeline != null)
 		{
 			foreach (FighterBoxFrame box in _currentMoveRule.BoxTimeline)
 			{
 				if (box == null || box.Kind != kind) continue;
-				hasTimelineBoxes = true;
 				if (box.IsActiveOnFrame(CurrentAttackFrame) && (!hasReplacingBox || box.ReplacesSameKindWhileActive))
 					yield return new ActiveFighterBox(GetWorldFacingBox(box.LocalRect, box.MirrorWithFacing), box);
 			}
 		}
-
-		if (hasTimelineBoxes) yield break;
-		if (kind == FighterBoxKind.Hurtbox)
-		{
-			yield return new ActiveFighterBox(GetWorldFacingBox(HurtboxLocal, false));
-			yield break;
-		}
-		if (kind == FighterBoxKind.Pushbox)
-		{
-			yield return new ActiveFighterBox(new Rect2(GlobalPosition + ActivePushboxLocal.Position, ActivePushboxLocal.Size));
-			yield break;
-		}
-		if (kind == FighterBoxKind.Hitbox && IsAttackActive && !_currentMoveRule.SuppressFallbackHitbox)
-			yield return new ActiveFighterBox(GetWorldFacingBox(_currentAttackHitboxLocal, true));
 	}
 
 	private bool HasActiveReplacingTimelineBox(FighterBoxKind kind)
@@ -2037,6 +2108,14 @@ public partial class FighterController : CharacterBody2D
 		foreach (FighterBoxFrame box in _currentMoveRule.BoxTimeline)
 			if (box != null && box.Kind == kind && box.ReplacesSameKindWhileActive && box.IsActiveOnFrame(CurrentAttackFrame))
 				return true;
+		return false;
+	}
+
+	private bool HasActiveTimelineBox(FighterBoxKind kind)
+	{
+		if (!IsAttacking || _currentMoveRule.BoxTimeline == null) return false;
+		foreach (FighterBoxFrame box in _currentMoveRule.BoxTimeline)
+			if (box != null && box.Kind == kind && box.IsActiveOnFrame(CurrentAttackFrame)) return true;
 		return false;
 	}
 
@@ -2052,6 +2131,32 @@ public partial class FighterController : CharacterBody2D
 		foreach (Rect2 box in GetActiveWorldBoxes(kind))
 			return box;
 		return GetWorldFacingBox(fallback, mirrorFallback);
+	}
+
+	private Rect2 GetCombinedActiveWorldBox(FighterBoxKind kind, Rect2 fallback, bool mirrorFallback)
+	{
+		bool found = false;
+		Rect2 combined = default;
+		foreach (Rect2 box in GetActiveWorldBoxes(kind))
+		{
+			combined = found ? MergeRects(combined, box) : box;
+			found = true;
+		}
+		return found ? combined : GetWorldFacingBox(fallback, mirrorFallback);
+	}
+
+	private static Rect2 MergeRects(Rect2 first, Rect2 second)
+	{
+		float left = Mathf.Min(first.Position.X, second.Position.X);
+		float top = Mathf.Min(first.Position.Y, second.Position.Y);
+		float right = Mathf.Max(first.End.X, second.End.X);
+		float bottom = Mathf.Max(first.End.Y, second.End.Y);
+		return new Rect2(left, top, right - left, bottom - top);
+	}
+
+	private void EnsureCollisionPolicy()
+	{
+		if (!FighterCollisionPolicy.IsNormalized(this)) FighterCollisionPolicy.Apply(this);
 	}
 
 	private static bool TryFindBoxContact(IEnumerable<ActiveFighterBox> attackerBoxes, IEnumerable<ActiveFighterBox> defenderBoxes,

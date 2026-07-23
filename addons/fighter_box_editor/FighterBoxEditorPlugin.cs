@@ -212,7 +212,7 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 		_content.AddChild(_replaceSameKind);
 		_content.AddChild(new Label
 		{
-			Text = "Off: combine boxes for coverage (still only one hit). On: while this box is active, ignore the move's other boxes of the same kind.",
+			Text = "Off: combine active authored boxes for coverage (still only one hit). On: while this box is active, ignore the move's other authored boxes of the same kind. Uncovered frames use the fighter fallback box.",
 			AutowrapMode = TextServer.AutowrapMode.WordSmart
 		});
 
@@ -562,20 +562,15 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 		int total = Mathf.Max(1, Mathf.Max(0, _currentMove.StartupFrames) + Mathf.Max(0, _currentMove.ActiveFrames) + Mathf.Max(0, _currentMove.RecoveryFrames));
 		FighterBoxFrame[] hurtboxes = (_currentMove.BoxTimeline ?? Array.Empty<FighterBoxFrame>())
 			.Where(box => box != null && box.Kind == FighterBoxKind.Hurtbox).ToArray();
-		int firstGap = Enumerable.Range(0, total).FirstOrDefault(frame => !hurtboxes.Any(box => box.IsActiveOnFrame(frame)), -1);
 		if (hurtboxes.Length == 0)
 		{
-			_coverage.Text = "Hurtbox: using the fighter fallback. Draw one only when you are ready to cover the whole move.";
+			_coverage.Text = "Hurtbox: the fighter fallback covers every frame. Draw authored boxes only where the pose needs different coverage.";
 			_coverage.Modulate = new Color(1f, 0.82f, 0.35f);
-		}
-		else if (firstGap >= 0)
-		{
-			_coverage.Text = $"WARNING: no hurtbox covers frame {firstGap}. Once any hurtbox is authored, uncovered frames are invulnerable.";
-			_coverage.Modulate = new Color(1f, 0.35f, 0.25f);
 		}
 		else
 		{
-			_coverage.Text = $"Hurtbox coverage complete: frames 0–{total - 1}.";
+			int authoredFrames = Enumerable.Range(0, total).Count(frame => hurtboxes.Any(box => box.IsActiveOnFrame(frame)));
+			_coverage.Text = $"Hurtbox coverage: {authoredFrames}/{total} frames authored; fallback safely covers the rest.";
 			_coverage.Modulate = new Color(0.35f, 1f, 0.55f);
 		}
 	}
