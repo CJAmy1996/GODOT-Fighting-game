@@ -8,10 +8,10 @@ public partial class MotionInputBufferTests : Node
 {
 	[Export] public bool RunOnReady { get; set; } = true;
 
-	private const int InputBufferFrames = 3;
+	private const int InputBufferFrames = 4;
 	private const int DoubleTapWindowFrames = 12;
-	private const int QuarterCircleForwardWindowFrames = 20;
-	private const int QuarterCircleForwardLatchFrames = 18;
+	private const int QuarterCircleForwardWindowFrames = 16;
+	private const int QuarterCircleForwardLatchFrames = 10;
 	private const int BackDashInputLockoutWindowFrames = 18;
 
 	public override void _Ready()
@@ -32,6 +32,7 @@ public partial class MotionInputBufferTests : Node
 		TestQuarterCircleForward();
 		TestQuarterCircleForwardMirrorsWithFacing();
 		TestLenientQuarterCircleForwardWindow();
+		TestQuarterCircleForwardRejectsSlowMotion();
 		TestQuarterCircleForwardExpires();
 		TestDoubleTapDash();
 		TestDoubleTapOutsideWindowDoesNotDash();
@@ -63,10 +64,10 @@ public partial class MotionInputBufferTests : Node
 	{
 		var buffer = new MotionInputBuffer();
 		buffer.PressDown();
-		Tick(buffer, 19);
+		Tick(buffer, 15);
 		buffer.PressHorizontalTap(1, 1, InputBufferFrames, DoubleTapWindowFrames,
 			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
-		Expect(buffer.HasQuarterCircleForwardCommand, "QCF should accept a 19-frame down-to-forward gap.");
+		Expect(buffer.HasQuarterCircleForwardCommand, "QCF should accept a 15-frame down-to-forward gap.");
 	}
 
 	private static void TestQuarterCircleForwardExpires()
@@ -77,6 +78,16 @@ public partial class MotionInputBufferTests : Node
 			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
 		Tick(buffer, QuarterCircleForwardLatchFrames);
 		Expect(!buffer.HasQuarterCircleForwardCommand, "QCF should expire after its motion window.");
+	}
+
+	private static void TestQuarterCircleForwardRejectsSlowMotion()
+	{
+		var buffer = new MotionInputBuffer();
+		buffer.PressDown();
+		Tick(buffer, QuarterCircleForwardWindowFrames + 1);
+		buffer.PressHorizontalTap(1, 1, InputBufferFrames, DoubleTapWindowFrames,
+			QuarterCircleForwardWindowFrames, QuarterCircleForwardLatchFrames, BackDashInputLockoutWindowFrames);
+		Expect(!buffer.HasQuarterCircleForwardCommand, "QCF should reject down-to-forward input outside the 16-frame window.");
 	}
 
 	private static void TestDoubleTapDash()

@@ -15,4 +15,4 @@ VerticalSpeed = -360.0
 PreserveGravity = true
 CommittedUntilComplete = true
 SuspendsInputBufferWhileActive = true
-
+InvulnerabilityFrames = 3

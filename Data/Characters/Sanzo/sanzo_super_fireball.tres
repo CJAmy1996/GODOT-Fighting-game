@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SuperMoveData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/SuperMoveData.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Assets/TestFighter/Sanzo/sanzo_reflector.tscn" id="2_reflector"]
+
+[resource]
+script = ExtResource("1")
+AttackName = "SUPER REFLECTOR"
+StartupFrames = 7
+ActiveFrames = 2
+RecoveryFrames = 24
+ActivationFreezeFrames = 45
+BackdropFrames = 87
+HitCount = 8
+HitIntervalFrames = 30
+HitstunFrames = 12
+HitstopFrames = 4
+Pushback = 170.0
+ShakeStrength = 4.5
+FinalHitKnocksDown = false
+Projectile = true
+ProjectileScene = ExtResource("2_reflector")
+ProjectileSpawnOffset = Vector2(78, -62)
+ProjectileSpeed = 18.0
+ProjectileHitCooldownFrames = 30

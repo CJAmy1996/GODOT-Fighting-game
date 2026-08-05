@@ -12,6 +12,8 @@ public partial class HitSparkLayer : Node2D
 
 	private readonly List<Spark> _sparks = new();
 	private readonly List<BlockShield> _blockShields = new();
+	private readonly List<DustPuff> _dustPuffs = new();
+	private readonly List<WallBurst> _wallBursts = new();
 	private PackedScene _lightSparkScene;
 	private PackedScene _heavySparkScene;
 
@@ -27,6 +29,53 @@ public partial class HitSparkLayer : Node2D
 		public Vector2 Position;
 		public int FramesLeft;
 		public int Facing;
+	}
+
+	private struct DustPuff
+	{
+		public Vector2 Position;
+		public Vector2 Velocity;
+		public int FramesLeft;
+		public int Lifetime;
+		public float Radius;
+	}
+
+	private struct WallBurst
+	{
+		public Vector2 Position;
+		public int Direction;
+		public int FramesLeft;
+		public float Scale;
+	}
+
+	public void SpawnWallSplat(Vector2 position, int wallDirection, float scale = 1f)
+	{
+		_wallBursts.Add(new WallBurst
+		{
+			Position = position,
+			Direction = wallDirection >= 0 ? 1 : -1,
+			FramesLeft = 12,
+			Scale = Mathf.Max(0.1f, scale)
+		});
+		QueueRedraw();
+	}
+
+	public void SpawnDust(Vector2 position, int particleCount, float spread)
+	{
+		int count = Mathf.Max(1, particleCount);
+		for (int i = 0; i < count; i++)
+		{
+			float across = count == 1 ? 0f : Mathf.Lerp(-spread, spread, i / (float)(count - 1));
+			_dustPuffs.Add(new DustPuff
+			{
+				Position = position + new Vector2(across * 0.35f, -3f),
+				Velocity = new Vector2(across * 0.055f, -Mathf.Lerp(0.8f, 2.4f, (i % 3) / 2f)),
+				FramesLeft = 18,
+				Lifetime = 18,
+				Radius = Mathf.Lerp(7f, 13f, (i % 4) / 3f)
+			});
+		}
+		QueueRedraw();
 	}
 
 	public void SpawnBlockShield(Vector2 position, int defenderFacing)
@@ -94,7 +143,27 @@ public partial class HitSparkLayer : Node2D
 			else
 				_blockShields[i] = shield;
 		}
-		if (_sparks.Count > 0 || _blockShields.Count > 0) QueueRedraw();
+		for (int i = _dustPuffs.Count - 1; i >= 0; i--)
+		{
+			DustPuff puff = _dustPuffs[i];
+			puff.FramesLeft--;
+			puff.Position += puff.Velocity;
+			puff.Velocity = new Vector2(puff.Velocity.X * 0.9f, puff.Velocity.Y * 0.92f);
+			if (puff.FramesLeft <= 0)
+				_dustPuffs.RemoveAt(i);
+			else
+				_dustPuffs[i] = puff;
+		}
+		for (int i = _wallBursts.Count - 1; i >= 0; i--)
+		{
+			WallBurst burst = _wallBursts[i];
+			burst.FramesLeft--;
+			if (burst.FramesLeft <= 0)
+				_wallBursts.RemoveAt(i);
+			else
+				_wallBursts[i] = burst;
+		}
+		if (_sparks.Count > 0 || _blockShields.Count > 0 || _dustPuffs.Count > 0 || _wallBursts.Count > 0) QueueRedraw();
 	}
 
 	public override void _Draw()
@@ -132,6 +201,28 @@ public partial class HitSparkLayer : Node2D
 			DrawCircle(shield.Position, radius, fill);
 			DrawArc(shield.Position, radius, startAngle, endAngle, 32, edge, 6f, true);
 			DrawArc(shield.Position, radius - 8f, startAngle + 0.18f, endAngle - 0.18f, 28, glint, 2f, true);
+		}
+
+		foreach (DustPuff puff in _dustPuffs)
+		{
+			float life = puff.FramesLeft / (float)puff.Lifetime;
+			Color dust = new(0.84f, 0.8f, 0.7f, life * 0.55f);
+			DrawCircle(puff.Position, puff.Radius * (1.35f - life * 0.35f), dust);
+		}
+
+		foreach (WallBurst burst in _wallBursts)
+		{
+			float life = burst.FramesLeft / 12f;
+			Color core = new(0.9f, 0.95f, 1f, 0.8f * life);
+			Color edge = new(0.35f, 0.65f, 1f, 0.65f * life);
+			float radius = Mathf.Lerp(50f, 22f, life) * burst.Scale;
+			DrawArc(burst.Position, radius, -Mathf.Pi * 0.5f, Mathf.Pi * 0.5f, 18, core, 4f, true);
+			for (int i = -2; i <= 2; i++)
+			{
+				Vector2 away = new Vector2(-burst.Direction, i * 0.38f).Normalized();
+				DrawLine(burst.Position, burst.Position + away * (34f + Mathf.Abs(i) * 9f) * life * burst.Scale,
+					i == 0 ? core : edge, (i == 0 ? 4f : 2.5f) * burst.Scale, true);
+			}
 		}
 	}
 }

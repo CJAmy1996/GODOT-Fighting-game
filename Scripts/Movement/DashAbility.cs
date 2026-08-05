@@ -23,6 +23,7 @@ public partial class DashAbility : MovementAbility
 	[Export] public bool CommittedUntilComplete { get; set; }
 	[Export] public bool ConsumesAirAction { get; set; } = true;
 	[Export] public int LandingLagFrames { get; set; }
+	[Export] public int InvulnerabilityFrames { get; set; }
 	[Export] public float MinimumAirHeight { get; set; }
 	public override bool OwnsHorizontalVelocity => true;
 	public override bool OwnsGravity => !PreserveGravity;
@@ -54,6 +55,7 @@ public partial class DashAbility : MovementAbility
 			fighter.QueueLandingLag(LandingLagFrames);
 		}
 		runtime.FramesRemaining = ActiveFrames;
+		fighter.BeginMovementInvulnerability(InvulnerabilityFrames);
 		Vector2 direction = AimWithStick ? new Vector2(fighter.CurrentInput.Horizontal, fighter.CurrentInput.Vertical) : Vector2.Right * fighter.DashInputDirection;
 		if (direction == Vector2.Zero) direction = Vector2.Right * fighter.Facing;
 		direction = direction.Normalized();

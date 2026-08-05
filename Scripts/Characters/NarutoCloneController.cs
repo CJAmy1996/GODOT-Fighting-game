@@ -18,6 +18,8 @@ public partial class NarutoCloneController : Node
 	[Export] public int CloneLifetimeFrames { get; set; } = 600;
 	[Export] public float FirstCloneForwardOffset { get; set; } = 135f;
 	[Export] public float SecondCloneRearOffset { get; set; } = 115f;
+	[Export] public float SecondCloneSpawnHeight { get; set; } = 165f;
+	[Export] public float SecondCloneFallSpeed { get; set; } = 430f;
 
 	private FighterController _original;
 	private FighterController _opponent;
@@ -30,6 +32,9 @@ public partial class NarutoCloneController : Node
 	{
 		public FighterController Fighter;
 		public int FramesLeft;
+		public bool EntranceActive;
+		public bool EntranceCommandSent;
+		public bool EntranceSawAttack;
 	}
 
 	public override void _Ready()
@@ -39,12 +44,20 @@ public partial class NarutoCloneController : Node
 		_stageRules = GetNodeOrNull<VersusStageRules>(StageRulesPath);
 		_stageCamera = GetNodeOrNull<StageCamera>(StageCameraPath);
 		SwitchControl(_original);
+		if (_original is SanzoKongoumaruFighter ||
+			string.Equals(_original.Definition?.FighterName, "Sanzou Kongoumaru", System.StringComparison.OrdinalIgnoreCase))
+		{
+			// Defensive guard for custom arenas: Sanzou never owns clone slots.
+			SetPhysicsProcess(false);
+		}
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
 		TickCloneLifetime(0);
 		TickCloneLifetime(1);
+		TickCloneEntrance(0);
+		TickCloneEntrance(1);
 
 		if (Input.IsActionJustPressed("special_1")) ActivateSlot(0);
 		if (Input.IsActionJustPressed("special_2")) ActivateSlot(1);
@@ -53,7 +66,8 @@ public partial class NarutoCloneController : Node
 		// the last command they received before a control transfer.
 		if (_original != _controlled) _original.SetExternalInput(default);
 		for (int index = 0; index < _slots.Length; index++)
-			if (GodotObject.IsInstanceValid(_slots[index].Fighter) && _slots[index].Fighter != _controlled)
+			if (GodotObject.IsInstanceValid(_slots[index].Fighter) && _slots[index].Fighter != _controlled &&
+				!_slots[index].EntranceActive)
 				_slots[index].Fighter.SetExternalInput(default);
 	}
 
@@ -62,9 +76,11 @@ public partial class NarutoCloneController : Node
 		CloneSlot slot = _slots[index];
 		if (!GodotObject.IsInstanceValid(slot.Fighter))
 		{
+			if (!GodotObject.IsInstanceValid(_controlled) || !_controlled.TryBeginCloneCall()) return;
 			SummonClone(index);
 			return;
 		}
+		if (slot.EntranceActive) return;
 		SwitchControl(_controlled == slot.Fighter ? _original : slot.Fighter);
 	}
 
@@ -77,18 +93,53 @@ public partial class NarutoCloneController : Node
 		CopyKungFuManPhysicsProfile(_original, clone);
 		FighterCollisionPolicy.Apply(clone);
 		float offset = index == 0 ? FirstCloneForwardOffset * _controlled.Facing : -SecondCloneRearOffset * _controlled.Facing;
-		clone.GlobalPosition = _controlled.GlobalPosition + new Vector2(offset, 0f);
-		clone.Velocity = _controlled.Velocity;
+		float height = index == 1 ? -SecondCloneSpawnHeight : 0f;
+		clone.GlobalPosition = _controlled.GlobalPosition + new Vector2(offset, height);
+		clone.Velocity = index == 1 ? new Vector2(0f, SecondCloneFallSpeed) : Vector2.Zero;
 		GetParent().AddChild(clone);
-		clone.ApplyFloorSnap();
+		if (index == 0) clone.ApplyFloorSnap();
 		clone.SetFacing(_controlled.Facing);
 		clone.SetOpponent(_opponent);
 		_stageRules?.RegisterPrimaryTeamFighter(clone);
 		MoveCloneOutOfOpponent(clone);
 		TintClone(clone, index);
+		SpawnSmoke(clone.GlobalPosition);
 
 		_slots[index].Fighter = clone;
-		_slots[index].FramesLeft = Mathf.Max(1, CloneLifetimeFrames);
+		_slots[index].FramesLeft = 0;
+		_slots[index].EntranceActive = true;
+		_slots[index].EntranceCommandSent = false;
+		_slots[index].EntranceSawAttack = false;
+		SetStandby(clone, true);
+	}
+
+	private void TickCloneEntrance(int index)
+	{
+		CloneSlot slot = _slots[index];
+		if (!slot.EntranceActive || !GodotObject.IsInstanceValid(slot.Fighter)) return;
+		FighterController clone = slot.Fighter;
+		if (!slot.EntranceCommandSent)
+		{
+			FighterInput entrance = index == 0
+				? new FighterInput(clone.Facing, 0f, false, false, false, false,
+					heavyPunchPressed: true, heavyPunchHeld: true)
+				: new FighterInput(0f, 0f, false, false, false, false,
+					heavyKickPressed: true, heavyKickHeld: true);
+			clone.SetExternalInput(entrance);
+			slot.EntranceCommandSent = true;
+			return;
+		}
+
+		clone.SetExternalInput(default);
+		if (clone.IsAttacking)
+		{
+			slot.EntranceSawAttack = true;
+			return;
+		}
+		if (!slot.EntranceSawAttack || (index == 1 && !clone.WasGrounded)) return;
+
+		slot.EntranceActive = false;
+		slot.FramesLeft = Mathf.Max(1, CloneLifetimeFrames);
 		SwitchControl(clone);
 	}
 
@@ -100,14 +151,21 @@ public partial class NarutoCloneController : Node
 		// A projectile keeps its owner alive because hit resolution/logging still
 		// needs the fighter snapshot. The clone is freed as soon as its last attack
 		// and projectile are both finished.
-		if (slot.FramesLeft > 0 || slot.Fighter.IsAttacking || HasLiveOwnedProjectile(slot.Fighter)) return;
+		if (slot.EntranceActive || slot.FramesLeft > 0 || slot.Fighter.IsAttacking || HasLiveOwnedProjectile(slot.Fighter)) return;
 
 		FighterController expired = slot.Fighter;
 		if (_controlled == expired) SwitchControl(_original);
+		SpawnSmoke(expired.GlobalPosition);
 		slot.Fighter = null;
 		slot.FramesLeft = 0;
 		_stageRules?.UnregisterPrimaryTeamFighter(expired);
 		expired.QueueFree();
+	}
+
+	private void SpawnSmoke(Vector2 worldPosition)
+	{
+		CloneSmokeBurst smoke = new() { GlobalPosition = worldPosition + new Vector2(0f, -48f) };
+		GetParent().AddChild(smoke);
 	}
 
 	private void SwitchControl(FighterController fighter)

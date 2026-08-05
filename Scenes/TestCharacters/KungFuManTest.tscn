@@ -2,14 +2,13 @@
 
 [ext_resource type="Script" uid="uid://do0dkb2cosh1p" path="res://Scripts/Demo/SpriteTestFighter.cs" id="1_script"]
 [ext_resource type="Resource" uid="uid://bsia1qvkdppur" path="res://Data/Characters/kung_fu_man_test.tres" id="2_definition"]
-[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/KungFuMan/kung_fu_man_sprite_frames.tres" id="3_frames"]
+[ext_resource type="SpriteFrames" uid="uid://cpa0pwly2qtf" path="res://Assets/TestFighter/KungFuMan/kung_fu_man_sprite_frames.tres" id="3_frames"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(56, 100)
 
 [node name="KungFuManTest" type="CharacterBody2D" node_paths=PackedStringArray("CharacterSprite")]
 collision_layer = 2
-collision_mask = 1
 script = ExtResource("1_script")
 CharacterSprite = NodePath("CharacterSprite")
 Definition = ExtResource("2_definition")

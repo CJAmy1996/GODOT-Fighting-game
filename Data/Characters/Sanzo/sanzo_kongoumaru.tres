@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="FighterDefinition" load_steps=19 format=3 uid="uid://b0k6g3xnv1h4f"]
+
+[ext_resource type="Script" uid="uid://p3g6dew2wiky" path="res://Scripts/Core/FighterDefinition.cs" id="1_def"]
+[ext_resource type="Script" uid="uid://s1q2kuukuw7h" path="res://Scripts/Core/MovementTuning.cs" id="2_tuning"]
+[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_neutral_jump.tres" id="3"]
+[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_forward_jump.tres" id="4"]
+[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_backward_jump.tres" id="5"]
+[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_backdash.tres" id="7"]
+[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_forward_short_hop.tres" id="8_short_hop"]
+[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_super_jump.tres" id="10"]
+[ext_resource type="Resource" uid="uid://pp527ft7w32" path="res://Data/Characters/Sanzo/sanzo_normal_moves.tres" id="10_qhcut"]
+[ext_resource type="Resource" uid="uid://564wyp23f63v" path="res://Data/Characters/Sanzo/sanzo_special_moves.tres" id="11_kirvy"]
+[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_super_fireball.tres" id="14_super_fireball"]
+[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_super_spd.tres" id="14_super_spd"]
+[ext_resource type="Script" uid="uid://ccpi48jqc0xq" path="res://Scripts/Core/CancelRule.cs" id="15_cancel_rule"]
+[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_gauges.tres" id="16_gauges"]
+[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_state_boxes.tres" id="17_state_boxes"]
+
+[sub_resource type="Resource" id="CancelRule_normal_to_special_on_contact"]
+script = ExtResource("15_cancel_rule")
+AllowedTargets = PackedStringArray("QCF POWER PUNCH LIGHT", "QCF POWER PUNCH HEAVY", "SANZOU PARRY", "SANZOU SUPER SPD", "SUPER REFLECTOR")
+
+[sub_resource type="Resource" id="MovementTuning_sanzo"]
+script = ExtResource("2_tuning")
+WalkSpeed = 330.0
+GroundAcceleration = 4200.0
+GroundDeceleration = 5000.0
+GroundFriction = 5800.0
+Gravity = 2780.0
+TerminalFallSpeed = 2400.0
+AirSpeed = 390.0
+AirAcceleration = 2400.0
+AirDeceleration = 1650.0
+AllowAirControl = false
+InputBufferFrames = 4
+
+[resource]
+script = ExtResource("1_def")
+FighterName = "Sanzou Kongoumaru"
+Gauges = ExtResource("16_gauges")
+Tuning = SubResource("MovementTuning_sanzo")
+Abilities = [ExtResource("10"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("7"), ExtResource("8_short_hop")]
+NormalMoves = ExtResource("10_qhcut")
+StateBoxes = ExtResource("17_state_boxes")
+SpecialMoves = ExtResource("11_kirvy")
+SuperMoves = [ExtResource("14_super_spd"), ExtResource("14_super_fireball")]
+CancelRules = [SubResource("CancelRule_normal_to_special_on_contact")]

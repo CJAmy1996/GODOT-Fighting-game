@@ -93,12 +93,12 @@ script = ExtResource("2_box")
 LocalRect = Rect2(-32, -92, 64, 142)
 Tag = "body"
 
-[sub_resource type="Resource" id="slk_hit"]
+[sub_resource type="Resource" id="Resource_c7pek"]
 script = ExtResource("2_box")
 Kind = 1
 StartFrame = 4
 EndFrame = 7
-LocalRect = Rect2(18, -24, 58, 24)
+LocalRect = Rect2(20, -51, 35, 40)
 Tag = "standing-light-kick"
 
 [sub_resource type="Resource" id="slk"]
@@ -114,7 +114,7 @@ CanChainToLight = true
 CanChainToHeavy = true
 CanChainToSpecial = true
 ChainEarliestActiveFramesLeft = 3
-BoxTimeline = [SubResource("slk_hurt"), SubResource("slk_hit")]
+BoxTimeline = [SubResource("slk_hurt"), SubResource("Resource_c7pek")]
 
 [sub_resource type="Resource" id="clk_hurt"]
 script = ExtResource("2_box")
@@ -264,12 +264,12 @@ script = ExtResource("2_box")
 LocalRect = Rect2(-32, -92, 64, 142)
 Tag = "body"
 
-[sub_resource type="Resource" id="fhp_hit"]
+[sub_resource type="Resource" id="Resource_wjvkg"]
 script = ExtResource("2_box")
 Kind = 1
 StartFrame = 8
-EndFrame = 11
-LocalRect = Rect2(30, -70, 82, 42)
+EndFrame = 12
+LocalRect = Rect2(-66, -88, 145, 37)
 Tag = "forward-heavy-punch"
 
 [sub_resource type="Resource" id="fhp"]
@@ -282,7 +282,7 @@ ActiveFrames = 4
 RecoveryFrames = 2
 SuppressFallbackHitbox = true
 CanChainToSpecial = true
-BoxTimeline = [SubResource("fhp_hurt"), SubResource("fhp_hit")]
+BoxTimeline = [SubResource("fhp_hurt"), SubResource("Resource_wjvkg")]
 
 [sub_resource type="Resource" id="shk_hurt"]
 script = ExtResource("2_box")
@@ -428,6 +428,7 @@ StartFrame = 4
 EndFrame = 5
 LocalRect = Rect2(22, -52, 62, 34)
 Tag = "crouching-medium-punch"
+AttackLevel = 3
 
 [sub_resource type="Resource" id="cmj"]
 script = ExtResource("1_move")
@@ -441,6 +442,12 @@ SuppressFallbackHitbox = true
 CanChainToSpecial = true
 HitstopFrames = 6
 BoxTimeline = [SubResource("cmj_hurt"), SubResource("cmj_hit")]
+Launches = true
+LaunchSpeed = 760.0
+LaunchPushback = 85.0
+LaunchHitstunFrames = 34
+JumpCancelWindowFrames = 30
+ChaseJumpSpeed = 760.0
 
 [sub_resource type="Resource" id="throw_hurt"]
 script = ExtResource("2_box")

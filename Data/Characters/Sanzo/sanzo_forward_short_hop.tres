@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DashAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/DashAbility.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Id = "forward_short_hop"
+Priority = 11
+GroundOnly = true
+DirectionRequirement = 1
+ActiveFrames = 10
+RecoveryFrames = 8
+Speed = 590.0
+VerticalSpeed = -270.0
+PreserveGravity = true
+CommittedUntilComplete = true
+SuspendsInputBufferWhileActive = true

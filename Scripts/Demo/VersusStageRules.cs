@@ -7,7 +7,10 @@ namespace ModularFighter.Demo;
 /// <summary>Shared versus rules: opponent-facing and Street Fighter-style pushboxes.</summary>
 public partial class VersusStageRules : Node
 {
+	private const int BackFighterZIndex = 0;
+	private const int LatestAttackerZIndex = 10;
 	private const string KungFuManSuperPortraitPath = "res://Assets/TestFighter/KungFuMan/kung_fu_man_super_portrait.png";
+	private const string SanzouSuperPortraitPath = "res://Assets/TestFighter/Sanzo/sanzou_kongoumaru/9999.png";
 	[Export] public NodePath FighterOnePath { get; set; }
 	[Export] public NodePath FighterTwoPath { get; set; }
 	[Export] public NodePath CameraPath { get; set; }
@@ -21,6 +24,46 @@ public partial class VersusStageRules : Node
 	[Export] public float CornerProtectionDistance { get; set; } = 8f;
 	[Export(PropertyHint.Range, "0.0,1.0,0.01")] public float PushboxInstantCorrectionShare { get; set; } = 0.55f;
 	[Export] public float PushboxSmoothVelocityScale { get; set; } = 30f;
+	[Export] public float JuggleWallSplatDetectionDistance { get; set; } = 30f;
+	[Export] public float JuggleWallSplatPushProjection { get; set; } = 0.08f;
+	[Export] public bool AllowHealthToReachZero { get; set; } = false;
+	[Export] public float RoundTimeSeconds { get; set; } = 99f;
+	[Export] public float KoResetDelaySeconds { get; set; } = 1.5f;
+	[Export] public float TrainingLifeRecoveryPerSecond { get; set; } = 650f;
+	[Export] public float TrainingLifeRecoveryDelaySeconds { get; set; } = 2.25f;
+	public float RoundSecondsRemaining { get; private set; }
+	public bool IsKoActive { get; private set; }
+	[Export] public StateImpactEffectProfile KnockdownLandingEffect { get; set; } = new()
+	{
+		TriggerState = FighterHitState.GroundedKnockdown,
+		SpawnDust = true,
+		DustParticles = 7,
+		DustSpread = 42f,
+		ShakeStrength = 2.25f,
+		ShakeFrames = 6
+	};
+	[Export] public StateImpactEffectProfile WallSplatImpactEffect { get; set; } = new()
+	{
+		TriggerState = FighterHitState.WallSplat,
+		SpawnDust = false,
+		SpawnWallBurst = true,
+		WallBurstScale = 1.65f,
+		ShakeStrength = 9f,
+		ShakeFrames = 11,
+		FreezeFrames = 5
+	};
+	[Export] public StateImpactEffectProfile WallSplatFollowupImpactEffect { get; set; } = new()
+	{
+		TriggerState = FighterHitState.WallSplat,
+		SpawnDust = true,
+		SpawnWallBurst = true,
+		WallBurstScale = 0.55f,
+		DustParticles = 3,
+		DustSpread = 18f,
+		ShakeStrength = 2.4f,
+		ShakeFrames = 4,
+		FreezeFrames = 1
+	};
 
 	private FighterController _fighterOne;
 	private FighterController _fighterTwo;
@@ -30,7 +73,13 @@ public partial class VersusStageRules : Node
 	private SuperBackdrop _superBackdrop;
 	private SuperPortraitOverlay _superPortrait;
 	private Texture2D _kungFuManSuperPortrait;
+	private Texture2D _sanzouSuperPortrait;
 	private readonly List<FighterController> _primaryTeam = new();
+	private double _koResetCountdown;
+	private float _fighterOneRecoveryDelay;
+	private float _fighterTwoRecoveryDelay;
+	private float _fighterOneLastLife;
+	private float _fighterTwoLastLife;
 
 	public void SetPrimaryFighter(FighterController fighter)
 	{
@@ -49,6 +98,7 @@ public partial class VersusStageRules : Node
 		FighterCollisionPolicy.Apply(fighter);
 		fighter.TeamId = 1;
 		_primaryTeam.Add(fighter);
+		fighter.ResetPlaceholderGauges();
 		fighter.FaceWithMovement = false;
 		fighter.SetOpponent(_fighterTwo);
 	}
@@ -68,6 +118,7 @@ public partial class VersusStageRules : Node
 		FighterCollisionPolicy.Apply(_fighterTwo);
 		_fighterOne.TeamId = 1;
 		_fighterTwo.TeamId = 2;
+		_fighterTwo.ResetPlaceholderGauges();
 		_stageCamera = CameraPath == null || CameraPath.IsEmpty ? GetParent().GetNodeOrNull<Camera2D>("StageCamera") : GetNode<Camera2D>(CameraPath);
 		_fightCamera = _stageCamera as StageCamera;
 		_fighterOne.FaceWithMovement = false;
@@ -84,6 +135,43 @@ public partial class VersusStageRules : Node
 		_hitSparkLayer.ZIndex = 4096;
 		GetParent().CallDeferred(Node.MethodName.AddChild, _hitSparkLayer);
 		_kungFuManSuperPortrait = ResourceLoader.Load<Texture2D>(KungFuManSuperPortraitPath);
+		_sanzouSuperPortrait = ResourceLoader.Load<Texture2D>(SanzouSuperPortraitPath);
+		RoundSecondsRemaining = Mathf.Max(0f, RoundTimeSeconds);
+		_fighterOneLastLife = _fighterOne.PlaceholderLife;
+		_fighterTwoLastLife = _fighterTwo.PlaceholderLife;
+	}
+
+	public override void _Process(double delta)
+	{
+		if (IsKoActive)
+		{
+			_koResetCountdown -= delta;
+			if (_koResetCountdown <= 0.0)
+				GetTree().ReloadCurrentScene();
+			return;
+		}
+		RoundSecondsRemaining = Mathf.Max(0f, RoundSecondsRemaining - (float)delta);
+		if (!AllowHealthToReachZero)
+		{
+			RecoverTrainingLife(_fighterOne, ref _fighterOneLastLife, ref _fighterOneRecoveryDelay, (float)delta);
+			RecoverTrainingLife(_fighterTwo, ref _fighterTwoLastLife, ref _fighterTwoRecoveryDelay, (float)delta);
+		}
+	}
+
+	private void RecoverTrainingLife(FighterController fighter, ref float lastLife, ref float recoveryDelay, float delta)
+	{
+		if (fighter == null) return;
+		if (fighter.PlaceholderLife < lastLife)
+			recoveryDelay = TrainingLifeRecoveryDelaySeconds;
+		lastLife = fighter.PlaceholderLife;
+		if (fighter.HitstunFramesLeft > 0 || fighter.ComboCount > 0) return;
+		if (recoveryDelay > 0f)
+		{
+			recoveryDelay -= delta;
+			return;
+		}
+		fighter.RecoverPlaceholderLife(TrainingLifeRecoveryPerSecond * delta);
+		lastLife = fighter.PlaceholderLife;
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -91,12 +179,19 @@ public partial class VersusStageRules : Node
 		if (_fighterOne == null || _fighterTwo == null) return;
 		ResolveSuperBackdropCancellation();
 		ResolveSuperActivations();
-		UpdateFacing();
 		GetFightBoxEdges(out float leftEdge, out float rightEdge);
+		ResolveWallSplatCornerProtection(_fighterOne, _fighterTwo, leftEdge, rightEdge);
+		ResolveWallSplatCornerProtection(_fighterTwo, _fighterOne, leftEdge, rightEdge);
+		if (_fighterTwo.IsWallSplatSliding)
+			foreach (FighterController ally in _primaryTeam)
+				if (ally != _fighterOne && GodotObject.IsInstanceValid(ally))
+					ResolveWallSplatCornerProtection(_fighterTwo, ally, leftEdge, rightEdge);
+		UpdateFacing();
 		if (_fighterOne.JustLanded) ResolveLandingOverlap(_fighterOne, _fighterTwo, leftEdge, rightEdge);
 		if (_fighterTwo.JustLanded) ResolveLandingOverlap(_fighterTwo, _fighterOne, leftEdge, rightEdge);
 		ResolvePushboxes(leftEdge, rightEdge);
 		ResolveBasicAttackHits();
+		ResolveSpdSlamImpacts();
 		for (int index = _primaryTeam.Count - 1; index >= 0; index--)
 		{
 			FighterController ally = _primaryTeam[index];
@@ -110,6 +205,37 @@ public partial class VersusStageRules : Node
 		_fighterTwo.MaintainSuperHitLock();
 		ResolveProjectileHits();
 		ClampFightersToCameraCorners(leftEdge, rightEdge);
+		ResolveStateImpactEffects();
+	}
+
+	private void SetLatestAttackerLayer(FighterController fighter)
+	{
+		if (!GodotObject.IsInstanceValid(fighter)) return;
+		foreach (FighterController ally in _primaryTeam)
+			if (GodotObject.IsInstanceValid(ally)) ally.ZIndex = BackFighterZIndex;
+		if (GodotObject.IsInstanceValid(_fighterTwo)) _fighterTwo.ZIndex = BackFighterZIndex;
+		fighter.ZIndex = LatestAttackerZIndex;
+	}
+
+	private void ResolveWallSplatCornerProtection(FighterController wallSliding, FighterController other,
+		float leftEdge, float rightEdge)
+	{
+		if (wallSliding == null || other == null || !wallSliding.IsWallSplatSliding) return;
+		int openSide = wallSliding.WorldPushbox.GetCenter().X <= (leftEdge + rightEdge) * 0.5f ? 1 : -1;
+		float currentDelta = other.WorldPositionBox.GetCenter().X - wallSliding.WorldPositionBox.GetCenter().X;
+		if (currentDelta * openSide >= 8f) return;
+
+		Rect2 otherLocal = GetCurrentPushboxLocal(other);
+		Rect2 wallBox = wallSliding.WorldPushbox;
+		float targetX = openSide > 0
+			? wallBox.End.X + 4f - otherLocal.Position.X
+			: wallBox.Position.X - 4f - otherLocal.End.X;
+		float oldX = other.GlobalPosition.X;
+		targetX = ClampOriginX(other, targetX, leftEdge, rightEdge);
+		other.GlobalPosition = new Vector2(targetX, other.GlobalPosition.Y);
+		other.AddVisualCorrection(new Vector2(targetX - oldX, 0f));
+		if (other.Velocity.X * openSide < 0f)
+			other.Velocity = new Vector2(0f, other.Velocity.Y);
 	}
 
 	private void ResolveSuperBackdropCancellation()
@@ -128,28 +254,34 @@ public partial class VersusStageRules : Node
 
 		int freezeFrames = Mathf.Max(firstFreezeFrames, secondFreezeFrames);
 		int backdropFrames = Mathf.Max(Mathf.Max(firstBackdropFrames, secondBackdropFrames), freezeFrames);
+		FighterController activatingFighter = firstSuper ? _fighterOne : _fighterTwo;
+		FighterController otherFighter = activatingFighter == _fighterOne ? _fighterTwo : _fighterOne;
+		// Portrait ignition and its collapsing spark rings are shared by every
+		// super, including supers with a zero-frame gameplay freeze.
+		SpawnSuperPortrait(activatingFighter, otherFighter, Mathf.Max(1, freezeFrames));
 		if (freezeFrames > 0)
 		{
 			_fighterOne.RequestHitstop(freezeFrames);
 			_fighterTwo.RequestHitstop(freezeFrames);
 			_fightCamera?.ShakeSuper(8.5f, freezeFrames);
-			FighterController activatingFighter = firstSuper ? _fighterOne : _fighterTwo;
-			FighterController otherFighter = activatingFighter == _fighterOne ? _fighterTwo : _fighterOne;
-			SpawnSuperPortrait(activatingFighter, otherFighter, freezeFrames);
 		}
 		SpawnSuperBackdrop(backdropFrames);
 	}
 
 	private void SpawnSuperPortrait(FighterController activatingFighter, FighterController otherFighter, int freezeFrames)
 	{
-		if (_kungFuManSuperPortrait == null || activatingFighter is not SpriteTestFighter) return;
+		if (activatingFighter is not SpriteTestFighter) return;
+		bool sanzou = string.Equals(activatingFighter.Definition?.FighterName,
+			"Sanzou Kongoumaru", System.StringComparison.OrdinalIgnoreCase);
+		Texture2D portraitTexture = sanzou ? _sanzouSuperPortrait : _kungFuManSuperPortrait;
+		if (portraitTexture == null) return;
 		if (GodotObject.IsInstanceValid(_superPortrait)) _superPortrait.QueueFree();
 
 		bool entersFromLeft = activatingFighter.GlobalPosition.X <= otherFighter.GlobalPosition.X;
 		var portrait = new SuperPortraitOverlay
 		{
-			Name = "KungFuManSuperPortrait",
-			Portrait = _kungFuManSuperPortrait,
+			Name = sanzou ? "SanzouSuperPortrait9999" : "KungFuManSuperPortrait",
+			Portrait = portraitTexture,
 			FightCamera = _fightCamera,
 			FocusPosition = activatingFighter.GlobalPosition + new Vector2(0f, -55f),
 			EntersFromLeft = entersFromLeft,
@@ -343,17 +475,109 @@ public partial class VersusStageRules : Node
 
 	private void ResolveOneBasicAttack(FighterController attacker, FighterController defender)
 	{
+		bool defenderWasJuggled = defender?.HitState == FighterHitState.Juggle;
+		bool groundedNormal = attacker?.CurrentAttackIsGroundedNormal == true;
 		if (attacker == null || defender == null || attacker.IsSameTeam(defender) || !attacker.TryApplyBasicAttackHit(defender,
 			out int hitstop, out float shake, out float pushback, out Vector2 hitPoint, out bool heavySpark)) return;
 
 		ApplyHitstopForHit(attacker, defender, hitstop);
+		if (attacker.LastContactWasParried)
+		{
+			_fightCamera?.Shake(Mathf.Max(4.5f, shake), Mathf.Max(8, hitstop));
+			return;
+		}
+		// A real strike/throw contact earns foreground priority. Whiffed attacks never reorder sprites.
+		SetLatestAttackerLayer(attacker);
+		if (defenderWasJuggled && groundedNormal && !attacker.LastContactWasBlocked)
+			TryApplyJuggleWallSplat(attacker, defender, pushback);
 		if (!attacker.IsPerformingThrow) ApplyCornerPushbackTransfer(attacker, defender, pushback);
 		if (attacker.LastContactWasBlocked) _hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing);
-		else if (!attacker.IsPerformingThrow) _hitSparkLayer?.Spawn(hitPoint, heavySpark);
+		else
+		{
+			if (!attacker.IsPerformingThrow) _hitSparkLayer?.Spawn(hitPoint, heavySpark);
+			float dramaticDrain = attacker.CurrentAttackName.StartsWith("SUPER")
+				? 58f
+				: heavySpark ? 92f : 44f;
+			defender.ApplyPlaceholderLifeDrain(dramaticDrain, AllowHealthToReachZero);
+			CheckForKo();
+		}
 		if (attacker.CurrentAttackName.StartsWith("SUPER"))
 			_fightCamera?.ShakeSuper(Mathf.Max(8f, shake), Mathf.Max(12, hitstop));
 		else if (shake > 0f)
 			_fightCamera?.Shake(shake, hitstop);
+	}
+
+	private void TryApplyJuggleWallSplat(FighterController attacker, FighterController defender, float pushback)
+	{
+		if (defender.WasGrounded || pushback <= 0f) return;
+		GetFightBoxEdges(out float leftEdge, out float rightEdge);
+		int pushDirection = attacker.Facing >= 0 ? 1 : -1;
+		float available = pushDirection > 0
+			? rightEdge - defender.WorldPushbox.End.X
+			: defender.WorldPushbox.Position.X - leftEdge;
+		float projectedReach = JuggleWallSplatDetectionDistance + pushback * JuggleWallSplatPushProjection;
+		if (available > projectedReach) return;
+
+		float wallX = pushDirection > 0
+			? MaxOriginX(defender, rightEdge)
+			: MinOriginX(defender, leftEdge);
+		defender.GlobalPosition = new Vector2(wallX, defender.GlobalPosition.Y);
+		defender.ApplyWallSplat(pushDirection);
+	}
+
+	private void ResolveStateImpactEffects()
+	{
+		ResolveStateImpactEffect(_fighterOne);
+		ResolveStateImpactEffect(_fighterTwo);
+		foreach (FighterController ally in _primaryTeam)
+			if (ally != _fighterOne && GodotObject.IsInstanceValid(ally)) ResolveStateImpactEffect(ally);
+	}
+
+	private void ResolveSpdSlamImpacts()
+	{
+		foreach (FighterController ally in _primaryTeam)
+			if (GodotObject.IsInstanceValid(ally)) ResolveSpdSlamImpact(ally);
+		ResolveSpdSlamImpact(_fighterTwo);
+	}
+
+	private void ResolveSpdSlamImpact(FighterController attacker)
+	{
+		if (attacker == null || !attacker.TryConsumeSpdSlamImpact(
+			out FighterController victim, out Vector2 position, out int damage, out bool wasSuper)) return;
+		_hitSparkLayer?.SpawnDust(position, wasSuper ? 30 : 18, wasSuper ? 180f : 105f);
+		_fightCamera?.ShakeSuper(wasSuper ? 34f : 18f, wasSuper ? 45 : 24);
+		int impactFreeze = wasSuper ? 18 : 10;
+		attacker.AddHitstop(impactFreeze);
+		victim?.AddHitstop(impactFreeze);
+		if (victim != null)
+		{
+			victim.ApplyPlaceholderLifeDrain(damage > 0 ? damage : 220f, AllowHealthToReachZero);
+			CheckForKo();
+		}
+	}
+
+	private void ResolveStateImpactEffect(FighterController fighter)
+	{
+		if (fighter == null || !fighter.TryConsumeStateImpact(out FighterHitState state, out Vector2 position,
+			out int direction, out bool followup)) return;
+		StateImpactEffectProfile profile = state == FighterHitState.WallSplat
+			? (followup ? WallSplatFollowupImpactEffect : WallSplatImpactEffect)
+			: KnockdownLandingEffect;
+		if (profile == null || !profile.Matches(state)) return;
+		Vector2 effectPosition = state == FighterHitState.WallSplat
+			? position + new Vector2(direction * 24f, -48f)
+			: position;
+		if (profile.SpawnDust)
+			_hitSparkLayer?.SpawnDust(effectPosition, profile.DustParticles, profile.DustSpread);
+		if (profile.SpawnWallBurst)
+			_hitSparkLayer?.SpawnWallSplat(effectPosition, direction, profile.WallBurstScale);
+		if (profile.ShakeStrength > 0f && profile.ShakeFrames > 0)
+			_fightCamera?.Shake(profile.ShakeStrength, profile.ShakeFrames);
+		if (profile.FreezeFrames > 0)
+		{
+			_fighterOne?.AddHitstop(profile.FreezeFrames);
+			_fighterTwo?.AddHitstop(profile.FreezeFrames);
+		}
 	}
 
 	private void ResolveProjectileHits()
@@ -378,14 +602,35 @@ public partial class VersusStageRules : Node
 				out int hitstop, out float shake, out _, out Vector2 hitPoint, out bool heavySpark)) continue;
 
 			if (hitstop > 0) defender.RequestHitstop(hitstop);
+			if (projectile.OwnerFighter.LastContactWasParried)
+			{
+				_fightCamera?.Shake(Mathf.Max(4.5f, shake), Mathf.Max(8, hitstop));
+				projectile.Despawn();
+				continue;
+			}
+			SetLatestAttackerLayer(projectile.OwnerFighter);
 			if (projectile.Super)
 				_fightCamera?.ShakeSuper(Mathf.Max(9f, shake), Mathf.Max(14, hitstop));
 			else if (shake > 0f)
 				_fightCamera?.Shake(shake, hitstop);
 			if (projectile.OwnerFighter.LastContactWasBlocked) _hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing);
-			else _hitSparkLayer?.Spawn(hitPoint, heavySpark);
+			else
+			{
+				_hitSparkLayer?.Spawn(hitPoint, heavySpark);
+				defender.ApplyPlaceholderLifeDrain(projectile.Super ? 58f : 72f, AllowHealthToReachZero);
+				CheckForKo();
+			}
 			projectile.MarkHit(defender);
 		}
+	}
+
+	private void CheckForKo()
+	{
+		if (!AllowHealthToReachZero || IsKoActive || (_fighterOne.PlaceholderLife > 0f && _fighterTwo.PlaceholderLife > 0f)) return;
+		IsKoActive = true;
+		_koResetCountdown = Mathf.Max(0.1f, KoResetDelaySeconds);
+		_fighterOne.SetPhysicsProcess(false);
+		_fighterTwo.SetPhysicsProcess(false);
 	}
 
 	private void ApplyCornerPushbackTransfer(FighterController attacker, FighterController defender, float hitPushback)
@@ -412,11 +657,8 @@ public partial class VersusStageRules : Node
 	private static void ApplyHitstopForHit(FighterController attacker, FighterController defender, int hitstop)
 	{
 		if (hitstop <= 0) return;
-		bool airAttackHitGroundedDefender = attacker.CurrentAttackStartedAirborne && defender.WasGrounded;
-		int attackerHitstop = airAttackHitGroundedDefender
-			? System.Math.Min(hitstop, attacker.CurrentAirToGroundAttackerHitstopFrames)
-			: hitstop;
-		if (attackerHitstop > 0) attacker.RequestHitstop(attackerHitstop);
+		bool jumpInHitGroundedDefender = attacker.CurrentAttackStartedAirborne && defender.WasGrounded;
+		attacker.RequestHitstop(hitstop, continueVerticalPhysics: jumpInHitGroundedDefender);
 		defender.RequestHitstop(hitstop);
 	}
 

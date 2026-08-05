@@ -37,5 +37,5 @@ Rename the animations after identifying them, or provide the line-number mapping
 | `line_30` | 3142–3214 | 3 | [PNG](LinePreviews/line_30.png) |
 | `line_31` | 3220–3324 | 3 | [PNG](LinePreviews/line_31.png) |
 | `line_32` | 3330–3403 | 2 | [PNG](LinePreviews/line_32.png) |
-| `line_33` | 3409–3619 | 4 | [PNG](LinePreviews/line_33.png) |
-| `line_34` | 3625–3852 | 8 | [PNG](LinePreviews/line_34.png) |
+| `line_33` | 3409–3619 | 22 | [PNG](LinePreviews/line_33.png) |
+| `line_34` | 3625–3852 | 18 | [PNG](LinePreviews/line_34.png) |

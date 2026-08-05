@@ -1,14 +1,16 @@
-[gd_scene load_steps=13 format=3 uid="uid://dd14cvfwh6wm0"]
+[gd_scene load_steps=14 format=3 uid="uid://dd14cvfwh6wm0"]
 
 [ext_resource type="Script" uid="uid://bjcen2m8a7qky" path="res://Scripts/Demo/ArenaBackdrop.cs" id="1_backdrop"]
-[ext_resource type="Script" uid="uid://dphsgsf4u0aad" path="res://Scripts/Demo/StickFigureFighter.cs" id="2_fighter"]
 [ext_resource type="Script" uid="uid://d4a3txbd6s580" path="res://Scripts/Demo/StageCamera.cs" id="3_camera"]
 [ext_resource type="Script" uid="uid://chkclim11sa0m" path="res://Scripts/Demo/VersusStageRules.cs" id="4_rules"]
 [ext_resource type="Script" uid="uid://dttwy7si3rte5" path="res://MotionInputBufferTests.cs" id="5_motion_tests"]
 [ext_resource type="PackedScene" path="res://Scenes/TestCharacters/KungFuManTest.tscn" id="6_kfm"]
+[ext_resource type="PackedScene" path="res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn" id="6_sanzo"]
 [ext_resource type="Script" path="res://Scripts/Demo/TrainingBlockControls.cs" id="7_block_controls"]
 [ext_resource type="Script" path="res://Scripts/Characters/NarutoCloneController.cs" id="8_clone_controller"]
 [ext_resource type="Script" path="res://CollisionArchitectureTests.cs" id="9_collision_tests"]
+[ext_resource type="Script" path="res://Scripts/Demo/CombatHud.cs" id="10_combat_hud"]
+[ext_resource type="Script" path="res://Scripts/Demo/ArenaCharacterLoader.cs" id="11_character_loader"]
 
 [sub_resource type="RectangleShape2D" id="RectangleFloor"]
 size = Vector2(3360, 70)
@@ -16,10 +18,10 @@ size = Vector2(3360, 70)
 [sub_resource type="RectangleShape2D" id="RectangleWall"]
 size = Vector2(40, 800)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_xaxui"]
-size = Vector2(66.5, 104.5)
-
 [node name="TestArena" type="Node2D"]
+script = ExtResource("11_character_loader")
+KungFuManScene = ExtResource("6_kfm")
+SanzouScene = ExtResource("6_sanzo")
 
 [node name="ArenaBackdrop" type="Node2D" parent="."]
 script = ExtResource("1_backdrop")
@@ -50,17 +52,9 @@ disabled = true
 position = Vector2(420, 570)
 collision_layer = 2
 
-[node name="Opponent" type="CharacterBody2D" parent="."]
+[node name="Opponent" parent="." instance=ExtResource("6_sanzo")]
 position = Vector2(860, 570)
-collision_layer = 2
-collision_mask = 1
-script = ExtResource("2_fighter")
-BodyColor = Color(1, 0.39, 0.45, 1)
 ReadLocalInput = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Opponent"]
-position = Vector2(-0.75, 3.25)
-shape = SubResource("RectangleShape2D_xaxui")
 
 [node name="StageCamera" type="Camera2D" parent="."]
 script = ExtResource("3_camera")
@@ -90,33 +84,22 @@ FighterTwoPath = NodePath("../Opponent")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
-[node name="Title" type="Label" parent="HUD"]
-offset_left = 32.0
-offset_top = 24.0
-theme_override_colors/font_color = Color(0.72, 0.9, 1, 1)
-theme_override_font_sizes/font_size = 26
-text = "KUNG FU MAN COMBAT TEST"
+[node name="CombatGauges" type="Node2D" parent="."]
+script = ExtResource("10_combat_hud")
+FighterOnePath = NodePath("../Fighter")
+FighterTwoPath = NodePath("../Opponent")
+StageCameraPath = NodePath("../StageCamera")
+StageRulesPath = NodePath("../VersusStageRules")
 
-[node name="Controls" type="Label" parent="HUD"]
-offset_left = 34.0
-offset_top = 68.0
-theme_override_colors/font_color = Color(0.78, 0.84, 0.95, 1)
-theme_override_font_sizes/font_size = 17
-text = "A / D: move     Forward, Forward: run     W: neutral / forward / back jump
-Attacks: U/J/I/K     Super jump: tap S, then W.     QCF + U/I: projectile.
-Supers: QCF + U+I (Super 1)     QCF + J+K (Super 2)"
-
-[node name="CloneControls" type="Label" parent="HUD"]
-offset_left = 34.0
-offset_top = 118.0
-theme_override_colors/font_color = Color(0.55, 0.86, 1, 1)
-theme_override_font_sizes/font_size = 17
-text = "FAKE NARUTO CLONE TEST: O = summon/select forward clone     L = summon/select rear clone     Lifetime: 10 sec"
-
-[node name="TrainingBlockControls" type="VBoxContainer" parent="HUD"]
-offset_left = 900.0
-offset_top = 24.0
-offset_right = 1248.0
-offset_bottom = 132.0
+[node name="TrainingBlockControls" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("7_block_controls")
+FighterOnePath = NodePath("../../Fighter")
 OpponentPath = NodePath("../../Opponent")
+StageRulesPath = NodePath("../../VersusStageRules")
+CombatHudPath = NodePath("../../CombatGauges")

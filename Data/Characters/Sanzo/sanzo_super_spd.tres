@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SuperMoveData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/SuperMoveData.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+AttackName = "SANZOU SUPER SPD"
+StartupFrames = 5
+ActiveFrames = 3
+RecoveryFrames = 30
+ActivationFreezeFrames = 45
+BackdropFrames = 240
+HitCount = 1
+HitstunFrames = 30
+HitstopFrames = 18
+AddsGlobalHitstopBonus = false
+Pushback = 0.0
+ShakeStrength = 24.0
+HitboxLocal = Rect2(8, -108, 96, 118)
+FinalHitKnocksDown = true
+FinalKnockdownType = 3
+FinalKnockdownFrames = 150

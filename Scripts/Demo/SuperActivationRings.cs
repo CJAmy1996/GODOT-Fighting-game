@@ -22,16 +22,10 @@ public partial class SuperActivationRings : Node2D
 		Color blue = new Color(0.18f, 0.7f, 1f, pulse);
 		Color white = new Color(1f, 1f, 1f, Mathf.Clamp(pulse + 0.14f, 0f, 1f));
 
-		// The activation wave collapses toward the fighter in front of the portrait.
-		float startRadius = Mathf.Max(CameraRect.Size.X, CameraRect.Size.Y) * 0.48f;
-		float radius = Mathf.Lerp(startRadius, 42f, 1f - Mathf.Pow(1f - progress, 2.4f));
-		DrawArc(FocusPosition, radius * 1.12f, 0f, Mathf.Tau, 128, new Color(0.35f, 0.86f, 1f, pulse * 0.5f), 18f, true);
-		DrawArc(FocusPosition, radius, 0f, Mathf.Tau, 128, blue, 12f, true);
-		DrawArc(FocusPosition, radius * 0.82f, 0f, Mathf.Tau, 128, white, 3.5f, true);
-
 		// MVC1-style portrait panel: the circle is deliberately much taller than
 		// the camera. Only its inward-facing curved edge can be seen; there is no
 		// visible top or bottom edge that reads as a separate circular badge.
+		// Draw this first so the animated activation energy remains in front.
 		Vector2 portraitCenter = PortraitSprite.Position;
 		float panelCenterX = portraitCenter.X + (PortraitEntersFromLeft ? -CameraRect.Size.X * 0.25f : CameraRect.Size.X * 0.25f);
 		Vector2 panelCenter = new(panelCenterX, CameraRect.GetCenter().Y);
@@ -40,5 +34,13 @@ public partial class SuperActivationRings : Node2D
 		float endAngle = startAngle + Mathf.Pi;
 		DrawArc(panelCenter, panelRadius + 4f, startAngle, endAngle, 96, Colors.Black, 24f, true);
 		DrawArc(panelCenter, panelRadius - 7f, startAngle, endAngle, 96, new Color(0.78f, 0.82f, 0.88f, 0.95f), 5f, true);
+
+		// The activation wave collapses toward the fighter over both the portrait
+		// and its container border.
+		float startRadius = Mathf.Max(CameraRect.Size.X, CameraRect.Size.Y) * 0.48f;
+		float radius = Mathf.Lerp(startRadius, 42f, 1f - Mathf.Pow(1f - progress, 2.4f));
+		DrawArc(FocusPosition, radius * 1.12f, 0f, Mathf.Tau, 128, new Color(0.35f, 0.86f, 1f, pulse * 0.5f), 18f, true);
+		DrawArc(FocusPosition, radius, 0f, Mathf.Tau, 128, blue, 12f, true);
+		DrawArc(FocusPosition, radius * 0.82f, 0f, Mathf.Tau, 128, white, 3.5f, true);
 	}
 }

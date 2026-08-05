@@ -12,6 +12,7 @@ public partial class KungFuManBoxPreview : Control
 	private SpriteFrames _spriteFrames;
 	private StringName _animation = "idle";
 	private int _frame;
+	private int _spriteFrame;
 	private NormalMoveData _move;
 	private int _selectedBox = -1;
 	private bool _drawing;
@@ -42,9 +43,10 @@ public partial class KungFuManBoxPreview : Control
 		QueueRedraw();
 	}
 
-	public void SetFrame(int frame)
+	public void SetFrame(int frame, int spriteFrame = -1)
 	{
 		_frame = Mathf.Max(0, frame);
+		_spriteFrame = spriteFrame < 0 ? _frame : Mathf.Max(0, spriteFrame);
 		QueueRedraw();
 	}
 
@@ -137,7 +139,7 @@ public partial class KungFuManBoxPreview : Control
 	{
 		if (_spriteFrames == null || !_spriteFrames.HasAnimation(_animation)) return null;
 		int count = _spriteFrames.GetFrameCount(_animation);
-		return count > 0 ? _spriteFrames.GetFrameTexture(_animation, Mathf.Clamp(_frame, 0, count - 1)) : null;
+		return count > 0 ? _spriteFrames.GetFrameTexture(_animation, Mathf.Clamp(_spriteFrame, 0, count - 1)) : null;
 	}
 
 	private void DrawCombatRect(Rect2 localRect, FighterBoxKind kind, bool selected, bool active)
@@ -164,6 +166,7 @@ public partial class KungFuManBoxPreview : Control
 		FighterBoxKind.Throwbox => new Color(1f, 0.78f, 0.12f, 0.95f),
 		FighterBoxKind.ThrowHurtbox => new Color(0.72f, 0.45f, 1f, 0.95f),
 		FighterBoxKind.Clashbox => new Color(1f, 0.3f, 0.75f, 0.95f),
+		FighterBoxKind.ThrowVictimAnchor => new Color(0.2f, 1f, 0.95f, 0.95f),
 		_ => new Color(0.2f, 1f, 0.9f, 0.95f)
 	};
 }

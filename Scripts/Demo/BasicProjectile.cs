@@ -26,6 +26,7 @@ public partial class BasicProjectile : Node2D
 	public bool FinalHitKnocksDown { get; private set; }
 	public KnockdownType FinalKnockdownType { get; private set; } = KnockdownType.SoftKnockdown;
 	public int FinalKnockdownFrames { get; private set; }
+	public bool LatchOnMultiHit { get; private set; } = true;
 	public Rect2 WorldHitbox => new(GlobalPosition + HitboxLocal.Position, HitboxLocal.Size);
 	private int _hitCooldownFramesLeft;
 	private FighterController _latchedDefender;
@@ -38,7 +39,8 @@ public partial class BasicProjectile : Node2D
 
 	public void Initialize(FighterController owner, int direction, float speed, int hitstunFrames, float pushback, int hitstopFrames, float shakeStrength, bool heavy,
 		int hits = 1, int hitCooldownFrames = 4, bool super = false, bool finalHitKnocksDown = false,
-		KnockdownType finalKnockdownType = KnockdownType.SoftKnockdown, int finalKnockdownFrames = 0)
+		KnockdownType finalKnockdownType = KnockdownType.SoftKnockdown, int finalKnockdownFrames = 0,
+		bool latchOnMultiHit = true)
 	{
 		OwnerFighter = owner;
 		Direction = direction >= 0 ? 1 : -1;
@@ -54,6 +56,7 @@ public partial class BasicProjectile : Node2D
 		FinalHitKnocksDown = finalHitKnocksDown;
 		FinalKnockdownType = finalKnockdownType;
 		FinalKnockdownFrames = finalKnockdownFrames;
+		LatchOnMultiHit = latchOnMultiHit;
 		if (Super) HitboxLocal = new Rect2(-36f, -34f, 72f, 68f);
 	}
 
@@ -77,12 +80,22 @@ public partial class BasicProjectile : Node2D
 			QueueFree();
 			return;
 		}
-		if (Super && defender != null)
+		if (Super && LatchOnMultiHit && defender != null)
 		{
 			_latchedDefender = defender;
 			_latchedDefenderOffset = GlobalPosition - defender.GlobalPosition;
 		}
 		_hitCooldownFramesLeft = HitCooldownFrames;
+	}
+
+	public void Despawn() => QueueFree();
+
+	public void Reflect(FighterController newOwner, int newDirection)
+	{
+		OwnerFighter = newOwner;
+		Direction = newDirection >= 0 ? 1 : -1;
+		_latchedDefender = null;
+		_hitCooldownFramesLeft = 2;
 	}
 
 	public override void _Draw()

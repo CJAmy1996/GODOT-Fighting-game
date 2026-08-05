@@ -1,0 +1,129 @@
+[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=10 format=3 uid="uid://bvvc0enhy8tem"]
+
+[ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="1_box"]
+[ext_resource type="Script" uid="uid://br48dic8s6gkm" path="res://Scripts/Core/NormalMoveData.cs" id="2_move"]
+[ext_resource type="Script" uid="uid://br5l43bdiww0l" path="res://Scripts/Core/NormalMoveSet.cs" id="3_set"]
+
+[sub_resource type="Resource" id="IdleHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-55, -129, 127, 147)
+Tag = "idle-hurtbox"
+
+[sub_resource type="Resource" id="IdlePushbox"]
+script = ExtResource("1_box")
+Kind = 2
+LocalRect = Rect2(-34, -92, 68, 110)
+Tag = "idle-pushbox"
+
+[sub_resource type="Resource" id="IdleState"]
+script = ExtResource("2_move")
+AttackName = "STATE IDLE"
+AnimationName = "idle"
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("IdleHurtbox"), SubResource("IdlePushbox")]
+
+[sub_resource type="Resource" id="Resource_d73vk"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-62, -110, 143, 119)
+Tag = "full-crouch-hurtbox"
+
+[sub_resource type="Resource" id="Resource_ecegr"]
+script = ExtResource("1_box")
+Kind = 2
+LocalRect = Rect2(-50, -98, 106, 93)
+Tag = "full-crouch-pushbox"
+
+[sub_resource type="Resource" id="CrouchState"]
+script = ExtResource("2_move")
+AttackName = "STATE CROUCH"
+AnimationName = "crouch_hold"
+StartupFrames = 0
+ActiveFrames = 40
+RecoveryFrames = 0
+BoxTimeline = [SubResource("Resource_d73vk"), SubResource("Resource_ecegr")]
+
+[sub_resource type="Resource" id="WalkForwardHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-55, -129, 127, 147)
+Tag = "walk-forward-hurtbox"
+
+[sub_resource type="Resource" id="WalkForwardPushbox"]
+script = ExtResource("1_box")
+Kind = 2
+LocalRect = Rect2(-36, -94, 72, 112)
+Tag = "walk-forward-pushbox"
+
+[sub_resource type="Resource" id="WalkForwardState"]
+script = ExtResource("2_move")
+AttackName = "STATE WALK FORWARD"
+AnimationName = "walk"
+StartupFrames = 0
+ActiveFrames = 96
+RecoveryFrames = 0
+BoxTimeline = [SubResource("WalkForwardHurtbox"), SubResource("WalkForwardPushbox")]
+
+[sub_resource type="Resource" id="WalkBackHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-55, -129, 127, 147)
+Tag = "walk-back-hurtbox"
+
+[sub_resource type="Resource" id="WalkBackPushbox"]
+script = ExtResource("1_box")
+Kind = 2
+LocalRect = Rect2(-36, -94, 72, 112)
+Tag = "walk-back-pushbox"
+
+[sub_resource type="Resource" id="WalkBackState"]
+script = ExtResource("2_move")
+AttackName = "STATE WALK BACK"
+AnimationName = "walk_back"
+StartupFrames = 0
+ActiveFrames = 96
+RecoveryFrames = 0
+BoxTimeline = [SubResource("WalkBackHurtbox"), SubResource("WalkBackPushbox")]
+
+[sub_resource type="Resource" id="JumpRiseHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-42, -112, 84, 122)
+Tag = "jump-rise-hurtbox"
+
+[sub_resource type="Resource" id="JumpRisePushbox"]
+script = ExtResource("1_box")
+Kind = 2
+LocalRect = Rect2(-28, -88, 56, 92)
+Tag = "jump-rise-pushbox"
+
+[sub_resource type="Resource" id="JumpRiseState"]
+script = ExtResource("2_move")
+AttackName = "STATE JUMP RISE"
+AnimationName = "neutral_jump"
+StartupFrames = 0
+ActiveFrames = 54
+RecoveryFrames = 0
+BoxTimeline = [SubResource("JumpRiseHurtbox"), SubResource("JumpRisePushbox")]
+
+[sub_resource type="Resource" id="FallHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-42, -112, 84, 122)
+Tag = "fall-hurtbox"
+
+[sub_resource type="Resource" id="FallPushbox"]
+script = ExtResource("1_box")
+Kind = 2
+LocalRect = Rect2(-28, -88, 56, 92)
+Tag = "fall-pushbox"
+
+[sub_resource type="Resource" id="FallState"]
+script = ExtResource("2_move")
+AttackName = "STATE FALL"
+AnimationName = "fall"
+StartupFrames = 0
+ActiveFrames = 30
+RecoveryFrames = 0
+BoxTimeline = [SubResource("FallHurtbox"), SubResource("FallPushbox")]
+
+[resource]
+script = ExtResource("3_set")
+Rules = [SubResource("IdleState"), SubResource("CrouchState"), SubResource("WalkForwardState"), SubResource("WalkBackState"), SubResource("JumpRiseState"), SubResource("FallState")]

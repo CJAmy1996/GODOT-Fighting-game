@@ -11,7 +11,9 @@ public enum FighterBoxKind
 	Throwbox,
 	ThrowHurtbox,
 	Clashbox,
-	ProximityBlockbox
+	ProximityBlockbox,
+	/// <summary>Editor-authored position used to carry an opponent through a throw animation.</summary>
+	ThrowVictimAnchor
 }
 
 [Flags]
@@ -47,6 +49,8 @@ public partial class FighterBoxFrame : Resource
 	[Export] public Rect2 LocalRect { get; set; } = new(-24f, -72f, 48f, 96f);
 	[Export] public bool MirrorWithFacing { get; set; } = true;
 	[Export] public string Tag { get; set; } = "";
+	/// <summary>Zero uses the move's normal single-hit lock. Positive values may each connect once per attack.</summary>
+	[Export] public int HitGroup { get; set; }
 	[Export] public bool ReplacesSameKindWhileActive { get; set; }
 
 	[ExportGroup("Interaction")]
@@ -69,6 +73,8 @@ public partial class FighterBoxFrame : Resource
 	[Export] public bool KnocksDown { get; set; }
 	[Export] public int KnockdownFrames { get; set; } = UseMoveDefaultInt;
 	[Export] public bool CanHitGroundedKnockdown { get; set; }
+	/// <summary>Applies wall-bounce knockdown only when this hitbox strikes an airborne target.</summary>
+	[Export] public bool AirborneTargetWallSplat { get; set; }
 
 	[ExportGroup("Launcher Overrides")]
 	[Export] public bool Launches { get; set; }

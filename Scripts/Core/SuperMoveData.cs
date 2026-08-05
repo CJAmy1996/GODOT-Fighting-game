@@ -28,8 +28,13 @@ public partial class SuperMoveData : Resource
 	[Export] public KnockdownType FinalKnockdownType { get; set; } = KnockdownType.SoftKnockdown;
 	[Export] public int FinalKnockdownFrames { get; set; } = 42;
 	[Export] public bool Projectile { get; set; }
+	[Export] public PackedScene ProjectileScene { get; set; }
+	[Export] public Vector2 ProjectileSpawnOffset { get; set; } = new(78f, -62f);
 	[Export] public float ProjectileSpeed { get; set; } = 620f;
 	[Export] public int ProjectileHitCooldownFrames { get; set; } = 5;
+	[ExportGroup("Parry")]
+	[Export] public bool Parry { get; set; }
+	[Export] public int ParrySuccessPresentationFrames { get; set; } = 18;
 	[Export] public bool RushesForward { get; set; }
 	[Export] public float RushSpeed { get; set; } = 1200f;
 	[Export] public bool StopRushOnFirstHit { get; set; } = true;

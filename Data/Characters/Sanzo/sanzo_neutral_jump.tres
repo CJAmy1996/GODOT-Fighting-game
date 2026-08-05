@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="JumpAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/JumpAbility.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Id = "neutral_jump"
+Priority = 20
+Direction = 0
+InitialSpeed = 990.0
+AirJumpInitialSpeed = 946.0
+MaxAirJumps = 1
+HeldFrames = 10
+JumpSquatFrames = 5
+HeldGravityMultiplier = 1.0
+ReleaseVelocityMultiplier = 0.48

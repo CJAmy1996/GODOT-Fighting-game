@@ -76,7 +76,12 @@ public partial class StageCamera : Camera2D
 		float highestFighterY = Mathf.Min(_fighterOne.GlobalPosition.Y, _fighterTwo.GlobalPosition.Y);
 		float highJumpAmount = Mathf.Max(0f, CameraHeight - highestFighterY - SuperJumpFollowHeight);
 		float targetY = CameraHeight - highJumpAmount * SuperJumpFollowWeight;
-		targetY = Mathf.Clamp(targetY, StageTopY + halfHeight, StageHeight - halfHeight);
+		bool superSpdFlight = _fighterOne.IsPerformingSuperSpdGrab || _fighterTwo.IsPerformingSuperSpdGrab;
+		// Super SPD deliberately travels several screens above the normal stage.
+		// Keep the bottom clamp, but release the ordinary top clamp for its flight.
+		targetY = superSpdFlight
+			? Mathf.Min(targetY, StageHeight - halfHeight)
+			: Mathf.Clamp(targetY, StageTopY + halfHeight, StageHeight - halfHeight);
 		GlobalPosition = new Vector2(Mathf.Lerp(GlobalPosition.X, targetX, weight), Mathf.Lerp(GlobalPosition.Y, targetY, weight));
 		UpdateShake();
 		UpdateCurrentFightBox();

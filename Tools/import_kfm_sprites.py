@@ -24,6 +24,38 @@ CANVAS_SIZE = (160, 128)
 BOTTOM_MARGIN = 4
 TIMELINE_FPS = 60.0
 
+# Lines 33 and 34 are each composed of two tightly packed, staggered rows.
+# Treating either area as one horizontal band causes adjacent cells to merge.
+# These inclusive source rectangles preserve each authored sprite as one frame.
+SPECIAL_LINE_RECTS = {
+    33: [
+        (5, 3409, 79, 3508), (85, 3409, 183, 3494),
+        (189, 3409, 240, 3484), (246, 3409, 305, 3482),
+        (311, 3409, 382, 3470), (388, 3409, 495, 3470),
+        (497, 3409, 595, 3460), (601, 3409, 711, 3461),
+        (717, 3409, 827, 3461), (833, 3409, 929, 3489),
+        (935, 3409, 1007, 3516),
+        (5, 3514, 57, 3619), (63, 3514, 125, 3618),
+        (131, 3514, 200, 3608), (206, 3514, 288, 3602),
+        (294, 3514, 376, 3603), (388, 3514, 495, 3555),
+        (501, 3514, 574, 3588), (580, 3514, 637, 3610),
+        (643, 3514, 700, 3601), (706, 3514, 758, 3594),
+        (764, 3514, 816, 3595),
+    ],
+    34: [
+        (5, 3625, 77, 3732), (83, 3625, 179, 3705),
+        (185, 3625, 295, 3669), (301, 3625, 355, 3731),
+        (361, 3625, 415, 3731), (421, 3625, 454, 3739),
+        (460, 3625, 542, 3693), (548, 3625, 615, 3708),
+        (621, 3625, 689, 3707), (695, 3625, 764, 3705),
+        (770, 3625, 840, 3704),
+        (5, 3738, 39, 3847), (45, 3738, 71, 3852),
+        (77, 3738, 101, 3852), (107, 3738, 144, 3851),
+        (150, 3738, 200, 3843), (206, 3738, 268, 3828),
+        (274, 3738, 337, 3824),
+    ],
+}
+
 # animation: (inclusive y start, inclusive y end, maximum source x, fps, loop)
 SEQUENCES = {
     "idle": (5, 110, 400, 8.0, True),
@@ -65,6 +97,15 @@ ANIMATION_SETTINGS = {
     "super_one_finisher": (60.0, False),
     "super_fireball": (60.0, False),
     "fireball": (60.0, False),
+    "stand_block": (60.0, False),
+    "crouch_block": (60.0, False),
+    "hitstun_light": (60.0, False),
+    "hitstun_medium": (60.0, False),
+    "hitstun_heavy_air": (60.0, False),
+    "hitstun_heavy": (60.0, False),
+    "air_hitstun": (60.0, False),
+    "knockdown": (60.0, False),
+    "tumble": (60.0, True),
 }
 
 
@@ -219,9 +260,12 @@ def export_all_lines(source: Image.Image):
         output_root.mkdir(parents=True, exist_ok=True)
         frame_paths = []
         preview_frames = []
-        runs = find_magenta_runs(source, y0, y1, source.width, min_width=3)
-        for frame_index, (x0, x1) in enumerate(runs):
-            raw_frame = source.crop((x0, y0, x1 + 1, y1 + 1))
+        frame_rects = SPECIAL_LINE_RECTS.get(line_index)
+        if frame_rects is None:
+            runs = find_magenta_runs(source, y0, y1, source.width, min_width=3)
+            frame_rects = [(x0, y0, x1, y1) for x0, x1 in runs]
+        for frame_index, (x0, frame_y0, x1, frame_y1) in enumerate(frame_rects):
+            raw_frame = source.crop((x0, frame_y0, x1 + 1, frame_y1 + 1))
             normalized = color_key_and_align(raw_frame)
             output_path = output_root / f"{line_name}_{frame_index:02d}.png"
             normalized.save(output_path)
@@ -328,6 +372,10 @@ def main():
     crouching_light_kick_source = line_records[24]["frames"]
     crouching_heavy_kick_source = line_records[25]["frames"]
     super_one_finisher_source = line_records[26]["frames"]
+    stand_block_source = line_records[30]["frames"]
+    crouch_block_source = line_records[31]["frames"]
+    reaction_source = line_records[32]["frames"]
+    tumble_source = line_records[33]["frames"]
     if len(crouch_source) != 4 or len(heavy_punch_source) != 6 or len(crouching_heavy_punch_source) != 10 or len(fireball_source) != 8 or len(light_punch_forward) != 3 or len(air_light_punch_source) != 5 or len(crouching_light_punch_source) != 2 or len(crouching_medium_punch_source) != 6 or len(throw_source) != 13 or len(forward_heavy_punch_source) != 7 or len(standing_light_kick_source) != 3 or len(forward_light_kick_source) != 6 or len(standing_heavy_kick_source) != 8 or len(air_up_heavy_kick_source) != 8 or len(air_dash_source) != 4 or len(air_light_kick_source) != 2 or len(air_heavy_kick_source) != 3 or len(crouching_light_kick_source) != 4 or len(crouching_heavy_kick_source) != 7 or len(super_one_finisher_source) != 9:
         raise RuntimeError("Crouch, heavy-punch, or light-punch source frames are incomplete.")
     crouch_transition = [crouch_source[0], crouch_source[1], crouch_source[3], crouch_source[2]]
@@ -482,6 +530,44 @@ def main():
         *[crouching_heavy_kick_source[0]] * 2,
     ]
     frames_by_animation["super_one_finisher"] = super_one_finisher_source
+    frames_by_animation["stand_block"] = [
+        *[stand_block_source[0]] * 3,
+        *[stand_block_source[1]] * 3,
+        stand_block_source[2],
+    ]
+    frames_by_animation["crouch_block"] = [
+        *[crouch_block_source[0]] * 3,
+        crouch_block_source[1],
+    ]
+    frames_by_animation["hitstun_light"] = [
+        *[reaction_source[11]] * 2,
+        *[reaction_source[12]] * 4,
+    ]
+    frames_by_animation["hitstun_medium"] = [reaction_source[12]]
+    frames_by_animation["hitstun_heavy_air"] = [
+        *[reaction_source[14]] * 3,
+        *[reaction_source[15]] * 5,
+    ]
+    frames_by_animation["hitstun_heavy"] = [
+        *[reaction_source[18]] * 2,
+        *[reaction_source[19]] * 2,
+        *[reaction_source[20]] * 2,
+        *[reaction_source[21]] * 2,
+    ]
+    frames_by_animation["air_hitstun"] = [tumble_source[3]]
+    frames_by_animation["knockdown"] = [
+        *[reaction_source[5]] * 2,
+        *[reaction_source[6]] * 2,
+        *[reaction_source[7]] * 2,
+        *[reaction_source[8]] * 2,
+        *[reaction_source[16]] * 5,
+    ]
+    frames_by_animation["tumble"] = [
+        *[tumble_source[3]] * 2,
+        *[tumble_source[4]] * 2,
+        *[tumble_source[5]] * 2,
+        *[tumble_source[4]] * 2,
+    ]
     write_sprite_frames(frames_by_animation)
     print(f"animation lines: {len(line_records)}")
     print(f"Wrote assets to {OUTPUT_ROOT}")

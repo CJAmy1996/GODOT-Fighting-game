@@ -1,0 +1,340 @@
+[gd_resource type="Resource" script_class="SpecialMoveSet" load_steps=15 format=3 uid="uid://564wyp23f63v"]
+
+[ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="1_xhsmf"]
+[ext_resource type="Script" uid="uid://cvrl3b6rdaomb" path="res://Scripts/Core/SpecialMoveData.cs" id="2_i2gei"]
+[ext_resource type="Script" uid="uid://b0wbufr78dysp" path="res://Scripts/Core/SpecialMoveSet.cs" id="3_2q7q2"]
+[ext_resource type="PackedScene" path="res://Assets/TestFighter/Sanzo/sanzo_reflector.tscn" id="4_reflector"]
+
+[sub_resource type="Resource" id="Resource_sohdx"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="Resource_sanzo_qcf_lp_hit"]
+script = ExtResource("1_xhsmf")
+Kind = 1
+StartFrame = 15
+EndFrame = 22
+LocalRect = Rect2(20, -82, 108, 54)
+Tag = "qcf-power-punch-lp"
+
+[sub_resource type="Resource" id="Resource_eoa3e"]
+script = ExtResource("2_i2gei")
+AttackName = "QCF POWER PUNCH LIGHT"
+AnimationName = "qcf_power_punch"
+StartupFrames = 15
+ActiveFrames = 8
+RecoveryFrames = 15
+SuppressFallbackHitbox = true
+HitstunFrames = 10
+HitstopFrames = 5
+Pushback = 390.0
+ShakeStrength = 2.5
+BoxTimeline = [SubResource("Resource_sohdx"), SubResource("Resource_sanzo_qcf_lp_hit")]
+
+[sub_resource type="Resource" id="Resource_28l6n"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="Resource_sanzo_qcf_hp_hit"]
+script = ExtResource("1_xhsmf")
+Kind = 1
+StartFrame = 15
+EndFrame = 22
+LocalRect = Rect2(20, -82, 108, 54)
+Tag = "qcf-power-punch-hp"
+
+[sub_resource type="Resource" id="Resource_8briv"]
+script = ExtResource("2_i2gei")
+AttackName = "QCF POWER PUNCH HEAVY"
+AnimationName = "qcf_power_punch"
+StartupFrames = 15
+ActiveFrames = 8
+RecoveryFrames = 15
+SuppressFallbackHitbox = true
+HitstunFrames = 14
+HitstopFrames = 11
+Pushback = 682.0
+ShakeStrength = 5.85
+BoxTimeline = [SubResource("Resource_28l6n"), SubResource("Resource_sanzo_qcf_hp_hit")]
+
+[sub_resource type="Resource" id="Resource_rew4f"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="Resource_noyx7"]
+script = ExtResource("1_xhsmf")
+Kind = 1
+StartFrame = 7
+EndFrame = 96
+LocalRect = Rect2(20, -70, 76, 52)
+Tag = "super-rush"
+
+[sub_resource type="Resource" id="Resource_jiads"]
+script = ExtResource("2_i2gei")
+AttackName = "SANZOU PARRY"
+AnimationName = "stand_block"
+Stance = 1
+StartupFrames = 0
+ActiveFrames = 30
+RecoveryFrames = 18
+SuppressFallbackHitbox = true
+Parry = true
+ParrySuccessPresentationFrames = 18
+BoxTimeline = [SubResource("Resource_rew4f")]
+
+[sub_resource type="Resource" id="Resource_u4u6u"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="Resource_hoke5"]
+script = ExtResource("2_i2gei")
+AttackName = "SUPER REFLECTOR"
+AnimationName = "reflector_cast"
+StartupFrames = 7
+ActiveFrames = 2
+RecoveryFrames = 24
+SuppressFallbackHitbox = true
+BoxTimeline = [SubResource("Resource_u4u6u")]
+
+[sub_resource type="Resource" id="Resource_sanzo_rekka_body"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-36, -96, 72, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="Resource_sanzo_rekka_hit"]
+script = ExtResource("1_xhsmf")
+Kind = 1
+StartFrame = 8
+EndFrame = 11
+LocalRect = Rect2(16, -86, 110, 56)
+Tag = "qcf-power-punch-rekka"
+
+[sub_resource type="Resource" id="Resource_sanzo_rekka"]
+script = ExtResource("2_i2gei")
+AttackName = "QCF POWER PUNCH REKKA"
+AnimationName = "qcf_power_punch_rekka"
+Stance = 1
+StartupFrames = 8
+ActiveFrames = 4
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+HitstunFrames = 18
+HitstopFrames = 10
+Pushback = 720.0
+ShakeStrength = 6.5
+BoxTimeline = [SubResource("Resource_sanzo_rekka_body"), SubResource("Resource_sanzo_rekka_hit")]
+
+[sub_resource type="Resource" id="Resource_sanzo_block_reflector_body"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-42, -74, 84, 110)
+Tag = "reflector-cast-body"
+
+[sub_resource type="Resource" id="Resource_sanzo_block_reflector"]
+script = ExtResource("2_i2gei")
+AttackName = "BLOCK REFLECTOR"
+AnimationName = "reflector_cast"
+Stance = 1
+StartupFrames = 7
+ActiveFrames = 2
+RecoveryFrames = 5
+SuppressFallbackHitbox = true
+ReflectorScene = ExtResource("4_reflector")
+ReflectorSpawnOffset = Vector2(78, -62)
+BoxTimeline = [SubResource("Resource_sanzo_block_reflector_body")]
+
+[sub_resource type="Resource" id="Resource_sanzo_stomp_body"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-40, -112, 80, 120)
+Tag = "stomp-body"
+
+[sub_resource type="Resource" id="Resource_sanzo_stomp_rise"]
+script = ExtResource("1_xhsmf")
+Kind = 1
+StartFrame = 3
+EndFrame = 4
+LocalRect = Rect2(-42, -118, 84, 94)
+Tag = "stomp-rising-hit"
+HitGroup = 1
+Launches = true
+LaunchSpeed = 460.0
+LaunchPushback = 55.0
+LaunchHitstunFrames = 18
+JumpCancelWindowFrames = 0
+
+[sub_resource type="Resource" id="Resource_sanzo_stomp_down"]
+script = ExtResource("1_xhsmf")
+Kind = 1
+StartFrame = 7
+EndFrame = 9
+LocalRect = Rect2(-48, -58, 96, 72)
+Tag = "stomp-finisher"
+HitGroup = 2
+HitReaction = 2
+KnockdownType = 3
+KnocksDown = true
+KnockdownFrames = 52
+
+[sub_resource type="Resource" id="Resource_sanzo_stomp"]
+script = ExtResource("2_i2gei")
+AttackName = "STOMP SPECIAL"
+AnimationName = "stomp_special"
+Stance = 1
+StartupFrames = 3
+ActiveFrames = 7
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+SelfLaunch = true
+SelfLaunchSpeed = 560.0
+SelfHorizontalSpeed = 135.0
+ForceDownwardStartFrame = 7
+ForceDownwardSpeed = 725.0
+HoldUntilLanding = true
+HitstunFrames = 16
+HitstopFrames = 7
+Pushback = 180.0
+ShakeStrength = 5.5
+BoxTimeline = [SubResource("Resource_sanzo_stomp_body"), SubResource("Resource_sanzo_stomp_rise"), SubResource("Resource_sanzo_stomp_down")]
+
+[sub_resource type="Resource" id="Resource_sanzo_command_run_body"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-40, -104, 80, 142)
+Tag = "command-run-body"
+
+[sub_resource type="Resource" id="Resource_sanzo_command_run_light"]
+script = ExtResource("2_i2gei")
+AttackName = "COMMAND RUN LIGHT"
+AnimationName = "command_run"
+Stance = 1
+StartupFrames = 1
+ActiveFrames = 17
+RecoveryFrames = 1
+SuppressFallbackHitbox = true
+SelfDrive = true
+SelfDriveSpeed = 577.5
+BoxTimeline = [SubResource("Resource_sanzo_command_run_body")]
+
+[sub_resource type="Resource" id="Resource_sanzo_command_run_heavy"]
+script = ExtResource("2_i2gei")
+AttackName = "COMMAND RUN HEAVY"
+AnimationName = "command_run"
+Stance = 1
+StartupFrames = 1
+ActiveFrames = 29
+RecoveryFrames = 1
+SuppressFallbackHitbox = true
+SelfDrive = true
+SelfDriveSpeed = 577.5
+BoxTimeline = [SubResource("Resource_sanzo_command_run_body")]
+
+[sub_resource type="Resource" id="Resource_sanzo_command_hop"]
+script = ExtResource("2_i2gei")
+AttackName = "COMMAND RUN HOP"
+AnimationName = "forward_dash"
+Stance = 1
+StartupFrames = 1
+ActiveFrames = 7
+RecoveryFrames = 2
+SuppressFallbackHitbox = true
+SelfLaunch = true
+SelfLaunchSpeed = 430.0
+SelfHorizontalSpeed = 760.0
+BoxTimeline = [SubResource("Resource_sanzo_command_run_body")]
+
+[sub_resource type="Resource" id="Resource_sanzo_command_punch_hit"]
+script = ExtResource("1_xhsmf")
+Kind = 1
+StartFrame = 6
+EndFrame = 8
+LocalRect = Rect2(22, -92, 122, 66)
+Tag = "command-run-punch"
+AttackLevel = 4
+
+[sub_resource type="Resource" id="Resource_sanzo_command_punch"]
+script = ExtResource("2_i2gei")
+AttackName = "COMMAND RUN PUNCH"
+AnimationName = "command_run_punch"
+Stance = 1
+StartupFrames = 6
+ActiveFrames = 3
+RecoveryFrames = 20
+SuppressFallbackHitbox = true
+HitstunFrames = 22
+HitstopFrames = 11
+Pushback = 760.0
+ShakeStrength = 7.0
+BoxTimeline = [SubResource("Resource_sanzo_command_run_body"), SubResource("Resource_sanzo_command_punch_hit")]
+
+[sub_resource type="Resource" id="Resource_sanzo_spd_body"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-42, -112, 84, 132)
+Tag = "spd-body"
+
+[sub_resource type="Resource" id="Resource_sanzo_spd_grab"]
+script = ExtResource("1_xhsmf")
+Kind = 1
+StartFrame = 5
+EndFrame = 7
+LocalRect = Rect2(8, -108, 96, 118)
+Tag = "spd-grab"
+
+[sub_resource type="Resource" id="Resource_sanzo_spd_victim_anchor"]
+script = ExtResource("1_xhsmf")
+Kind = 7
+StartFrame = 5
+EndFrame = 120
+LocalRect = Rect2(-38, -210, 76, 92)
+Tag = "spd-victim-anchor"
+
+[sub_resource type="Resource" id="Resource_sanzo_spd"]
+script = ExtResource("2_i2gei")
+AttackName = "SANZOU SPD"
+AnimationName = "spd_grab"
+Stance = 1
+StartupFrames = 5
+ActiveFrames = 3
+RecoveryFrames = 24
+SuppressFallbackHitbox = true
+Damage = 260
+HitstunFrames = 24
+HitstopFrames = 10
+ShakeStrength = 18.0
+KnockdownType = 4
+KnocksDown = true
+KnockdownFrames = 90
+HoldUntilLanding = true
+BoxTimeline = [SubResource("Resource_sanzo_spd_body"), SubResource("Resource_sanzo_spd_grab"), SubResource("Resource_sanzo_spd_victim_anchor")]
+
+[sub_resource type="Resource" id="Resource_sanzo_super_spd_victim_anchor"]
+script = ExtResource("1_xhsmf")
+Kind = 7
+StartFrame = 5
+EndFrame = 300
+LocalRect = Rect2(-38, -210, 76, 92)
+Tag = "super-spd-victim-anchor"
+
+[sub_resource type="Resource" id="Resource_sanzo_super_spd"]
+script = ExtResource("2_i2gei")
+AttackName = "SANZOU SUPER SPD"
+AnimationName = "spd_grab"
+Stance = 1
+StartupFrames = 5
+ActiveFrames = 3
+RecoveryFrames = 30
+SuppressFallbackHitbox = true
+Damage = 600
+HitstunFrames = 30
+HitstopFrames = 18
+ShakeStrength = 24.0
+KnockdownType = 4
+KnocksDown = true
+KnockdownFrames = 150
+HoldUntilLanding = true
+BoxTimeline = [SubResource("Resource_sanzo_spd_body"), SubResource("Resource_sanzo_spd_grab"), SubResource("Resource_sanzo_super_spd_victim_anchor")]
+
+[resource]
+script = ExtResource("3_2q7q2")
+Moves = [SubResource("Resource_eoa3e"), SubResource("Resource_8briv"), SubResource("Resource_sanzo_rekka"), SubResource("Resource_sanzo_block_reflector"), SubResource("Resource_sanzo_stomp"), SubResource("Resource_sanzo_command_run_light"), SubResource("Resource_sanzo_command_run_heavy"), SubResource("Resource_sanzo_command_hop"), SubResource("Resource_sanzo_command_punch"), SubResource("Resource_sanzo_spd"), SubResource("Resource_sanzo_super_spd"), SubResource("Resource_jiads"), SubResource("Resource_hoke5")]

@@ -10,6 +10,8 @@ public enum FighterHitState
 	Hitstun,
 	Blockstun,
 	CounterHit,
+	Juggle,
+	WallSplat,
 	Tumble,
 	Knockdown,
 	GroundedKnockdown,
@@ -52,6 +54,7 @@ public partial class FighterController : CharacterBody2D
 	[Export] public float RunStopSlideFriction { get; set; } = 4200f;
 	[Export] public int RunStopSlideFrames { get; set; } = 8;
 	[Export] public int RunCrouchSlideFrames { get; set; } = 12;
+	[Export] public bool ReverseAttackRecoveryToNeutral { get; set; }
 	[Export] public int LightAttackStartupFrames { get; set; } = 5;
 	[Export] public int GroundLightAttackStartupFrames { get; set; } = 4;
 	[Export] public int LightPunchActiveFrames { get; set; } = 3;
@@ -80,12 +83,14 @@ public partial class FighterController : CharacterBody2D
 	[Export] public int GlobalHitstopBonusFrames { get; set; } = 6;
 	[Export] public int BlockHitstopBonusFrames { get; set; } = 2;
 	[Export(PropertyHint.Range, "0.0,2.0,0.01")] public float BlockPushbackMultiplier { get; set; } = 1.2f;
+	[Export(PropertyHint.Range, "0.0,1.0,0.01")] public float HeavyNormalBlockPushbackScale { get; set; } = 1f;
 	[Export] public float BlockShakeStrength { get; set; } = 1.25f;
 	[Export] public int GroundedAttackHitstopBonusFrames { get; set; } = 4;
-	[Export] public int AirAttackHitstopBonusFrames { get; set; } = 2;
-	[Export] public int LightAirToGroundAttackerHitstopFrames { get; set; } = 4;
-	[Export] public int HeavyAirToGroundAttackerHitstopFrames { get; set; } = 7;
-	[Export] public int SpecialAirToGroundAttackerHitstopFrames { get; set; } = 5;
+	[Export] public int AirAttackHitstopBonusFrames { get; set; } = 3;
+	[Export] public int JumpInInitialFullFreezeFrames { get; set; } = 5;
+	[Export] public int JumpInHitstopBonusFrames { get; set; } = 1;
+	[Export(PropertyHint.Range, "0.0,1.0,0.01")] public float AirToGroundHitstopMomentumScale { get; set; } = 0.85f;
+	[Export] public float AirToGroundShakeMultiplier { get; set; } = 1.25f;
 	[Export] public float LightAttackShakeStrength { get; set; } = 2.5f;
 	[Export] public float HeavyAttackShakeStrength { get; set; } = 9f;
 	[Export] public float SpecialAttackShakeStrength { get; set; } = 5f;
@@ -102,8 +107,19 @@ public partial class FighterController : CharacterBody2D
 	[Export] public int AirLightHitJumpCancelWindowFrames { get; set; } = 20;
 	[Export] public float ComboGravityScalePerHit { get; set; } = 0.12f;
 	[Export] public float MaxComboGravityScale { get; set; } = 2.2f;
+	[Export] public float JuggleGravityScalePerHit { get; set; } = 0.20f;
+	[Export] public float MaxJuggleGravityScale { get; set; } = 2.75f;
+	[Export] public float JuggleDistanceScalePerHit { get; set; } = 0.09f;
+	[Export] public float MaxJuggleDistanceScale { get; set; } = 1.55f;
+	[Export(PropertyHint.Range, "0.0,1.0,0.01")] public float GroundNormalJugglePushbackMultiplier { get; set; } = 0.65f;
+	[Export(PropertyHint.Range, "0.0,1.0,0.01")] public float GroundJabJugglePopLossPerHit { get; set; } = 0.22f;
+	[Export] public int WallSplatHitstunFrames { get; set; } = 28;
+	[Export] public float WallSplatSlideSpeed { get; set; } = 105f;
 	[Export] public int CounterHitExtraHitstunFrames { get; set; } = 4;
 	[Export] public float GroundBounceSpeed { get; set; } = 900f;
+	[Export] public float SweepPopUpSpeed { get; set; } = 220f;
+	[Export] public int GroundedKnockdownHoldFrames { get; set; } = 30;
+	[Export] public int WakeupFrames { get; set; }
 	[Export] public float WallBounceHorizontalSpeed { get; set; } = 850f;
 	[ExportGroup("Move Rules")]
 	[Export] public float DefaultLauncherSpeed { get; set; } = 1265f;
@@ -182,38 +198,76 @@ public partial class FighterController : CharacterBody2D
 	public bool IsInDoubleJumpState { get; private set; }
 	public bool IsInSuperJumpRoute { get; private set; }
 	public bool IsAttacking => _attackStartupFramesLeft > 0 || _attackActiveFramesLeft > 0 || _attackRecoveryFramesLeft > 0;
-	public bool IsAttackActive => _attackActiveFramesLeft > 0;
-	public bool IsAttackRecovering => _attackRecoveryFramesLeft > 0;
+	public bool IsAttackActive => IsAttacking && CurrentAttackFrame >= _currentAttackStartupFrames &&
+		CurrentAttackFrame < _currentAttackStartupFrames + _currentAttackActiveFrames;
+	public bool IsAttackRecovering => IsAttacking &&
+		CurrentAttackFrame >= _currentAttackStartupFrames + _currentAttackActiveFrames;
 	public bool CurrentAttackHasHit => _attackHasHit;
 	public int CurrentAttackHitsRemaining => _currentAttackHitsRemaining;
 	public bool IsCurrentSuperConfirmed => _currentSuperConfirmed;
 	public int CurrentSuperConfirmedFrame => _currentSuperConfirmedFrame;
-	public bool IsPerformingThrow => IsAttacking && CurrentAttackName == ThrowAttackName;
+	public bool IsPerformingSuperMove => IsAttacking && _currentSuperMove != null;
+	public bool IsPerformingThrow => IsAttacking && (CurrentAttackName == ThrowAttackName || IsSpdGrabAttackName(CurrentAttackName));
+	public bool IsPerformingSpdGrab => IsAttacking && IsSpdGrabAttackName(CurrentAttackName);
+	public bool IsPerformingSuperSpdGrab => IsAttacking && CurrentAttackName == SanzoSuperSpdName;
+	public bool SpdGrabConnected => _spdGrabConnected;
 	public bool IsCrouchAttackLocked => IsAttacking && _currentAttackStartedCrouching;
 	public bool CurrentAttackStartedAirborne => _currentAttackStartedAirborne;
-	public int CurrentAirToGroundAttackerHitstopFrames => GetAirToGroundAttackerHitstopFrames(CurrentAttackName);
+	public bool CurrentAttackIsGroundedNormal => !_currentAttackStartedAirborne &&
+		_currentSpecialMove == null && _currentSuperMove == null && IsNormalAttackName(CurrentAttackName);
 	public bool IsInHitstun => HitstunFramesLeft > 0;
 	public bool IsInBlockstun => HitState == FighterHitState.Blockstun && HitstunFramesLeft > 0;
+	public bool IsCrouchBlocking { get; private set; }
 	public bool LastContactWasBlocked { get; private set; }
+	public bool LastContactWasParried { get; private set; }
+	public bool IsParryWindowActive =>
+		(_currentSuperMove?.Parry == true || _currentSpecialMove?.Parry == true) &&
+		_attackActiveFramesLeft > 0 && IsAttackActive;
+	public bool IsParrySuccessPresentationActive => _parrySuccessPresentationFramesLeft > 0;
+	public ulong ParrySuccessSerial { get; private set; }
 	public bool IsKnockedDown => (HitState == FighterHitState.Knockdown || HitState == FighterHitState.GroundedKnockdown ||
 		HitState == FighterHitState.WallBounce || HitState == FighterHitState.GroundBounce || HitState == FighterHitState.Crumple) && HitstunFramesLeft > 0;
 	public bool IsGroundedKnockdown => HitState == FighterHitState.GroundedKnockdown && HitstunFramesLeft > 0;
+	public bool IsWakingUp => _wakeupFramesLeft > 0;
+	public bool IsMovementInvulnerable => _movementInvulnerabilityFramesLeft > 0;
+	public int WakeupFramesLeft => _wakeupFramesLeft;
+	public int CurrentWakeupFrame => IsWakingUp ? Mathf.Max(0, WakeupFrames - _wakeupFramesLeft) : 0;
+	public bool IsWallSplatSliding => _pendingWallSplatKnockdown && !WasGrounded;
 	public FighterHitState HitState { get; private set; } = FighterHitState.None;
+	public int LastHitReactionLevel { get; private set; }
+	public bool LastHitCameFromAir { get; private set; }
+	public ulong HitReactionSerial { get; private set; }
+	public ulong BlockReactionSerial { get; private set; }
+	public int JuggleHitCount { get; private set; }
+	public int GroundNormalJuggleHitCount { get; private set; }
 	public KnockdownType CurrentKnockdownType { get; private set; } = KnockdownType.None;
 	public bool IsInHitstop => HitstopFramesLeft > 0;
 	public int HitstunFramesLeft { get; private set; }
 	public int HitstopFramesLeft { get; private set; }
 	public int ComboCount { get; private set; }
 	public int ComboDisplayFramesLeft { get; private set; }
+	public float PlaceholderLife { get; private set; }
+	public float PlaceholderSpecialMeter { get; private set; }
 	public string CurrentAttackName { get; private set; } = "";
 	public string CurrentAttackAnimationName { get; private set; } = "";
 	public int CurrentAttackFrame { get; private set; }
+	public int CurrentAttackStartupFrames => _currentAttackStartupFrames;
+	public int CurrentAttackActiveFrames => _currentAttackActiveFrames;
+	public int CurrentAttackRecoveryFrames => _currentAttackRecoveryFrames;
 	public bool SuperActivationFreezeRequested { get; private set; }
 	public int SuperActivationFreezeFramesRequested { get; private set; }
 	public int SuperBackdropFramesRequested { get; private set; }
 	private bool _superBackdropCancelRequested;
+	private bool _stateImpactPending;
+	private FighterHitState _stateImpactState;
+	private Vector2 _stateImpactPosition;
+	private int _stateImpactDirection;
+	private bool _stateImpactIsFollowup;
+	private bool _pendingWallSplatKnockdown;
+	private int _wallSplatDirection;
 	public IReadOnlyList<FighterHitLogEntry> HitLog => _hitLog;
 	public int CurrentAttackDamage => _currentAttackDamage;
+	public int CurrentAttackHitstunFrames => _currentAttackHitstunFrames;
 	public int CurrentAttackBlockstunFrames => _currentAttackBlockstunFrames;
 	public bool CurrentAttackKnocksDown => _currentAttackKnocksDown;
 	public int CurrentAttackKnockdownFrames => _currentAttackKnockdownFrames;
@@ -222,11 +276,39 @@ public partial class FighterController : CharacterBody2D
 	public Vector2 VisualCorrectionOffset { get; private set; }
 	public readonly Dictionary<string, AbilityRuntime> Runtime = new();
 	private readonly MotionInputBuffer _motionInputBuffer = new();
+	private string _currentBoxStateName = "";
+	private int _currentBoxStateFrame;
+	public string CurrentBoxStateName => _currentBoxStateName;
+	public int CurrentBoxStateFrame => _currentBoxStateFrame;
+
+	public void ResetPlaceholderGauges()
+	{
+		FighterGaugeData gauges = Definition?.Gauges;
+		PlaceholderLife = gauges?.StartingLife ?? 0f;
+		PlaceholderSpecialMeter = gauges?.StartingSpecialMeter ?? 0f;
+	}
+
+	public void ApplyPlaceholderLifeDrain(float amount, bool allowEmpty = true)
+	{
+		FighterGaugeData gauges = Definition?.Gauges;
+		if (gauges == null || amount <= 0f) return;
+		float minimumLife = allowEmpty ? 0f : Mathf.Min(1f, gauges.MaxLife);
+		PlaceholderLife = Mathf.Clamp(PlaceholderLife - amount, minimumLife, gauges.MaxLife);
+	}
+
+	public void RecoverPlaceholderLife(float amount)
+	{
+		FighterGaugeData gauges = Definition?.Gauges;
+		if (gauges == null || amount <= 0f) return;
+		PlaceholderLife = Mathf.MoveToward(PlaceholderLife, gauges.MaxLife, amount);
+	}
 	private readonly List<FighterHitLogEntry> _hitLog = new();
 	private readonly Dictionary<string, int> _airJumpUses = new();
 	private readonly Dictionary<string, int> _normalUsesThisChain = new();
 	private bool _groundedLastFrame;
 	private int _pendingLandingLagFrames;
+	private bool _continueVerticalPhysicsDuringHitstop;
+	private int _verticalHitstopFreezeFramesLeft;
 	private float _lastGroundedY;
 	private int _lightPunchBufferFramesLeft;
 	private int _lightKickBufferFramesLeft;
@@ -241,12 +323,24 @@ public partial class FighterController : CharacterBody2D
 	private int _attackActiveFramesLeft;
 	private int _attackRecoveryFramesLeft;
 	private bool _attackHasHit;
+	private readonly HashSet<int> _attackHitGroups = new();
 	private bool _projectileSpawnedThisAttack;
+	private bool _startingBlockReflector;
+	private int _parrySuccessPresentationFramesLeft;
 	private int _currentAttackHitsRemaining;
 	private int _currentAttackHitCooldownFramesLeft;
 	private bool _currentSuperConfirmed;
 	private int _currentSuperConfirmedFrame = -1;
 	private FighterController _currentSuperLockedDefender;
+	private FighterController _capturedThrowVictim;
+	private FighterController _throwCaptor;
+	private bool _spdGrabConnected;
+	private bool _spdHasLeftGround;
+	private bool _spdSlamImpactPending;
+	private FighterController _spdSlamVictim;
+	private Vector2 _spdSlamImpactPosition;
+	private int _spdSlamDamage;
+	private bool _spdSlamImpactWasSuper;
 	private Vector2 _currentSuperLockedDefenderPosition;
 	private Vector2 _currentSuperLockedAttackerOffset;
 	private bool _currentAttackStartedAirborne;
@@ -256,6 +350,8 @@ public partial class FighterController : CharacterBody2D
 	private int _currentAttackStartupFrames;
 	private int _currentAttackActiveFrames;
 	private int _currentAttackRecoveryFrames;
+	private int _wakeupFramesLeft;
+	private int _movementInvulnerabilityFramesLeft;
 	private int _currentAttackHitstunFrames;
 	private float _currentAttackPushback;
 	private int _currentAttackHitstopFrames;
@@ -275,14 +371,17 @@ public partial class FighterController : CharacterBody2D
 	private int _airLightJumpCancelFramesLeft;
 	private NormalMoveRule _currentMoveRule;
 	private const int DoubleTapDashWindowFrames = 12;
-	private const int QuarterCircleForwardWindowFrames = 20;
-	private const int QuarterCircleForwardLatchFrames = 18;
+	// SFII-like timing: the motion must be completed deliberately, and the attack
+	// button must follow soon after forward rather than recalling an old motion.
+	private const int QuarterCircleForwardWindowFrames = 16;
+	private const int QuarterCircleForwardLatchFrames = 10;
 	private const int SuperChordGraceFrames = 2;
 	private const int UpInputMotionSpecialStrictWindowFrames = 4;
 	private const int BackDashInputLockoutWindowFrames = 18;
 	private const string ElectricWindGodFistName = "ELECTRIC WIND GOD FIST";
 	private const string LightProjectileName = "LIGHT PROJECTILE";
-	public const string CrouchingMediumJabName = "MEDIUM CROUCHING JAB";
+	public const string CrouchingMediumJabName = "CROUCHING MEDIUM";
+	public const string DownForwardHeavyPunchName = "HEAVY PUNCH DOWN FORWARD";
 	public const string ThrowAttackName = "THROW";
 	public const string ForwardHeavyPunchName = "HEAVY PUNCH FORWARD";
 	public const string ForwardLightKickName = "LIGHT KICK FORWARD";
@@ -290,11 +389,34 @@ public partial class FighterController : CharacterBody2D
 	public const string CrouchingHeavyKickName = "HEAVY KICK CROUCHING";
 	public const string CrouchingHeavyPunchName = "HEAVY PUNCH CROUCHING";
 	public const string AirHeavyPunchName = "HEAVY PUNCH AIR";
+	public const string BackLightPunchName = "MEDIUM PUNCH BACK";
+	public const string QcfPowerPunchRekkaName = "QCF POWER PUNCH REKKA";
+	public const string QcfPowerPunchLightName = "QCF POWER PUNCH LIGHT";
+	public const string QcfPowerPunchHeavyName = "QCF POWER PUNCH HEAVY";
+	public const string BlockReflectorName = "BLOCK REFLECTOR";
+	public const string SanzoParryName = "SANZOU PARRY";
+	public const string SanzoSuperReflectorName = "SUPER REFLECTOR";
+	public const string SanzoSpdName = "SANZOU SPD";
+	public const string SanzoSuperSpdName = "SANZOU SUPER SPD";
+	public const string StompSpecialName = "STOMP SPECIAL";
+	public const string CommandRunLightName = "COMMAND RUN LIGHT";
+	public const string CommandRunHeavyName = "COMMAND RUN HEAVY";
+	public const string CommandRunHopName = "COMMAND RUN HOP";
+	public const string CommandRunPunchName = "COMMAND RUN PUNCH";
+	private const int ChargeButtonLenienceFrames = 6; // Set before the same-frame tick: five full follow-up frames remain.
 	private const string HeavyProjectileName = "HEAVY PROJECTILE";
 	private const string SuperFireballName = "SUPER FIREBALL";
 	private const string SuperRushName = "SUPER RUSH";
 	[Export] public float DirectionalThrowRange { get; set; } = 90f;
 	[Export] public float ThrowLaunchSpeed { get; set; } = 760f;
+	[ExportGroup("Sanzou SPD")]
+	[Export] public float SpdRiseSpeed { get; set; } = 1450f;
+	[Export] public int SpdSlamKnockdownFrames { get; set; } = 90;
+	[Export] public int SpdLandingRecoveryFrames { get; set; } = 18;
+	[Export] public float SuperSpdRiseSpeed { get; set; } = 3600f;
+	[Export] public float SuperSpdDescentSpeed { get; set; } = 4200f;
+	[Export] public int SuperSpdSlamKnockdownFrames { get; set; } = 150;
+	[Export] public int SuperSpdLandingRecoveryFrames { get; set; } = 30;
 	private FighterController _opponent;
 
 	public void SetOpponent(FighterController opponent) => _opponent = opponent;
@@ -410,6 +532,17 @@ public partial class FighterController : CharacterBody2D
 
 	public void SetExternalInput(FighterInput input) => CurrentInput = input;
 	public void SetFacing(int direction) => Facing = direction >= 0 ? 1 : -1;
+	public bool TryBeginCloneCall()
+	{
+		if (string.Equals(Definition?.FighterName, "Sanzou Kongoumaru", System.StringComparison.OrdinalIgnoreCase))
+			return false;
+		if (HitState != FighterHitState.None || !WasGrounded || ActiveAbility != null) return false;
+		if (!IsAttacking) return true;
+		if (!IsNormalAttackName(CurrentAttackName) || !_attackHasHit ||
+			!CanCancelCurrentMove(CancelKind.Special, "CLONE ASSIST")) return false;
+		ClearAttackState();
+		return true;
+	}
 
 	public void Simulate(FighterInput input, float delta)
 	{
@@ -417,18 +550,55 @@ public partial class FighterController : CharacterBody2D
 		JustLanded = false;
 		PreviousGlobalPosition = GlobalPosition;
 		CurrentInput = input;
+		if (input.JumpPressed) _motionInputBuffer.PressJump(Mathf.Max(ChargeButtonLenienceFrames, Definition?.Tuning?.InputBufferFrames ?? 3));
+		_motionInputBuffer.UpdateDownCharge(input.Vertical > 0.5f);
+		_motionInputBuffer.UpdateBackForwardCharge(input.Horizontal, Facing,
+			Mathf.Max(ChargeButtonLenienceFrames, Definition?.Tuning?.InputBufferFrames ?? 3));
+		if (GodotObject.IsInstanceValid(_throwCaptor))
+		{
+			Velocity = Vector2.Zero;
+			return;
+		}
+		_throwCaptor = null;
 		WasGrounded = IsOnFloor();
+		if (_spdGrabConnected && !WasGrounded) _spdHasLeftGround = true;
+		UpdateStateBoxTimeline(input);
 		if (HitstopFramesLeft > 0)
 		{
-			_motionInputBuffer.TickQuarterCircleForwardCommand();
+			// Pause motion-command decay alongside attack buttons. This lets a QCF
+			// completed during contact freeze survive long enough to super cancel.
 			UpdateInputBuffer(input, true);
 			HitstopFramesLeft--;
+			if (_continueVerticalPhysicsDuringHitstop && !WasGrounded)
+			{
+				if (_verticalHitstopFreezeFramesLeft > 0)
+					_verticalHitstopFreezeFramesLeft--;
+				else
+					AdvanceVerticalPhysicsDuringHitstop(delta);
+			}
+			if (HitstopFramesLeft <= 0)
+			{
+				_continueVerticalPhysicsDuringHitstop = false;
+				_verticalHitstopFreezeFramesLeft = 0;
+			}
 			return;
 		}
 		_motionInputBuffer.Tick();
+		if (_parrySuccessPresentationFramesLeft > 0) _parrySuccessPresentationFramesLeft--;
+		if (_movementInvulnerabilityFramesLeft > 0) _movementInvulnerabilityFramesLeft--;
 		if (WasGrounded && LandingLagFramesLeft > 0) LandingLagFramesLeft--;
 		if (FaceWithMovement && input.Horizontal != 0) Facing = input.Horizontal > 0 ? 1 : -1;
 		UpdateInputBuffer(input, false);
+		if (IsInBlockstun && _motionInputBuffer.HasDragonPunchCommand &&
+			(input.LightPunchPressed || input.HeavyPunchPressed))
+		{
+			HitstunFramesLeft = 0;
+			HitState = FighterHitState.None;
+			_startingBlockReflector = true;
+			TryStartBasicAttack();
+			_startingBlockReflector = false;
+			_motionInputBuffer.ConsumeDragonPunchCommand();
+		}
 
 		if (WasGrounded)
 		{
@@ -451,12 +621,27 @@ public partial class FighterController : CharacterBody2D
 			{
 				if (ShouldPersistAirReactionUntilLanding())
 					HitstunFramesLeft = 1;
+				else if (HitState == FighterHitState.GroundedKnockdown && WakeupFrames > 0)
+				{
+					_wakeupFramesLeft = WakeupFrames;
+					HitState = FighterHitState.None;
+					CurrentKnockdownType = KnockdownType.None;
+					Velocity = new Vector2(0f, Velocity.Y);
+				}
 				else
 				{
 					HitState = FighterHitState.None;
 					CurrentKnockdownType = KnockdownType.None;
+					JuggleHitCount = 0;
+					GroundNormalJuggleHitCount = 0;
 				}
 			}
+		}
+		else if (_wakeupFramesLeft > 0)
+		{
+			_wakeupFramesLeft--;
+			Velocity = new Vector2(0f, Velocity.Y);
+			ClearAttackState();
 		}
 		else
 		{
@@ -468,6 +653,7 @@ public partial class FighterController : CharacterBody2D
 				if (!IsAttacking) TryStartAbility();
 			}
 			TickBasicAttack();
+			UpdateCapturedThrowVictim();
 			if (!IsAttacking && ActiveAbility != null && !ActiveAbility.Tick(this, GetRuntime(ActiveAbility), delta))
 				StopActiveAbility();
 		}
@@ -479,14 +665,25 @@ public partial class FighterController : CharacterBody2D
 		}
 
 		ApplyBaseMotion(delta);
+		if (_spdGrabConnected && CurrentAttackName == SanzoSuperSpdName && _spdHasLeftGround && Velocity.Y >= 0f)
+			Velocity = new Vector2(Velocity.X, Mathf.Max(Velocity.Y, SuperSpdDescentSpeed));
 		TickComboDisplay();
 		MoveAndSlide();
 		if (!WasGrounded && HitstunFramesLeft > 0 && HitState == FighterHitState.Tumble && Velocity.Y >= 0f)
 			RecoverFromComboHitstun();
 		JustLanded = !WasGrounded && IsOnFloor();
+		if (JustLanded && _spdGrabConnected && _spdHasLeftGround)
+			ResolveSpdSlamLanding();
 		if (JustLanded && HitstunFramesLeft > 0 && HitState == FighterHitState.GroundBounce)
 			ResolveGroundBounceLanding();
+		else if (JustLanded && HitstunFramesLeft > 0 && _pendingWallSplatKnockdown)
+			EnterGroundedKnockdown();
 		else if (JustLanded && HitstunFramesLeft > 0 && HitState == FighterHitState.Knockdown)
+			EnterGroundedKnockdown();
+		else if (JustLanded && HitstunFramesLeft > 0 && HitState == FighterHitState.Juggle &&
+			CurrentKnockdownType != KnockdownType.None)
+			EnterGroundedKnockdown();
+		else if (JustLanded && HitstunFramesLeft > 0 && HitState == FighterHitState.WallSplat)
 			EnterGroundedKnockdown();
 		else if (JustLanded && HitstunFramesLeft > 0 && HitState != FighterHitState.GroundedKnockdown)
 			RecoverFromComboHitstun();
@@ -510,6 +707,9 @@ public partial class FighterController : CharacterBody2D
 			Runtime[ability.Id] = runtime = new AbilityRuntime();
 		return runtime;
 	}
+
+	public void BeginMovementInvulnerability(int frames) =>
+		_movementInvulnerabilityFramesLeft = Mathf.Max(_movementInvulnerabilityFramesLeft, frames);
 
 	public bool StartAbility(MovementAbility ability)
 	{
@@ -611,14 +811,16 @@ public partial class FighterController : CharacterBody2D
 		hitPoint = Vector2.Zero;
 		heavySpark = false;
 		LastContactWasBlocked = false;
-		if (!IsAttackActive || IsProjectileAttackName(CurrentAttackName) || defender == null || defender == this || IsSameTeam(defender)) return false;
-		if (_currentSuperMove == null && _attackHasHit) return false;
+		LastContactWasParried = false;
+		if (!IsAttackActive || IsProjectileAttackName(CurrentAttackName) || defender == null || defender == this || IsSameTeam(defender) || defender.IsWakingUp || defender.IsMovementInvulnerable) return false;
 		if (_currentSuperMove != null && (_currentAttackHitsRemaining <= 0 || _currentAttackHitCooldownFramesLeft > 0)) return false;
 		if (!TryFindBoxContact(GetActiveWorldBoxInstances(FighterBoxKind.Hitbox), defender.GetActiveWorldBoxInstances(FighterBoxKind.Hurtbox),
 			out hitPoint, out ActiveFighterBox hitbox, out ActiveFighterBox hurtbox)) return false;
-		if (CurrentAttackName == ThrowAttackName)
+		bool defenderWasWallSliding = defender._pendingWallSplatKnockdown;
+		if (CurrentAttackName == ThrowAttackName || IsSpdGrabAttackName(CurrentAttackName))
 		{
-			if (defender.IsInHitstun || defender.IsKnockedDown) return false;
+			if (defender.IsInHitstun || defender.IsKnockedDown ||
+				(IsSpdGrabAttackName(CurrentAttackName) && !defender.WasGrounded)) return false;
 			_attackHasHit = true;
 			// Throws have no strike spark. Release the defender during the middle of line 16
 			// and guarantee a knockdown instead of resolving this contact as a normal hit.
@@ -626,11 +828,29 @@ public partial class FighterController : CharacterBody2D
 			hitstopFrames = 0;
 			shakeStrength = HeavyAttackShakeStrength;
 			hitPushback = HeavyAttackPushback;
-			defender.ApplyThrowLaunch(HeavyAttackHitstunFrames + 24, Facing * HeavyAttackPushback, ThrowLaunchSpeed);
+			CaptureThrowVictim(defender);
 			return true;
 		}
 		FighterBoxFrame hitboxData = hitbox.Source;
 		if (defender.IsGroundedKnockdown && !CanCurrentHitboxHitGroundedKnockdown(hitboxData)) return false;
+		if (_currentSuperMove == null)
+		{
+			int hitGroup = hitboxData?.HitGroup ?? 0;
+			if (hitGroup > 0)
+			{
+				if (!_attackHitGroups.Add(hitGroup)) return false;
+			}
+			else if (_attackHasHit) return false;
+		}
+		if (defender.TryParryIncomingHit(this, hitPoint))
+		{
+			_attackHasHit = true;
+			if (_currentSuperMove != null) _currentAttackHitsRemaining = 0;
+			LastContactWasParried = true;
+			hitstopFrames = 12;
+			shakeStrength = 4.5f;
+			return true;
+		}
 		_attackHasHit = true;
 		heavySpark = UsesHeavyHitSpark(CurrentAttackName);
 		bool superHit = _currentSuperMove != null;
@@ -646,8 +866,19 @@ public partial class FighterController : CharacterBody2D
 		float appliedPushback = isLauncher
 			? ResolveFloatOverride(hitboxData?.LaunchPushback, _currentMoveRule.LaunchPushback)
 			: basePushback * (_currentAttackStartedAirborne ? AirAttackPushbackMultiplier : 1f);
+		if (defender.HitState == FighterHitState.Juggle && !defender.WasGrounded)
+			appliedPushback *= Mathf.Min(MaxJuggleDistanceScale,
+				1f + Mathf.Max(0, defender.JuggleHitCount) * JuggleDistanceScalePerHit);
 		if (!_currentAttackStartedAirborne && !defender.WasGrounded)
 			appliedPushback *= GroundToAirPushbackMultiplier;
+		bool groundedNormalContinuingJuggle = defender.HitState == FighterHitState.Juggle &&
+			!defender.WasGrounded && !_currentAttackStartedAirborne &&
+			_currentSpecialMove == null && _currentSuperMove == null && IsNormalAttackName(CurrentAttackName);
+		if (groundedNormalContinuingJuggle)
+		{
+			appliedPushback *= GroundNormalJugglePushbackMultiplier;
+			defender.GroundNormalJuggleHitCount++;
+		}
 		bool counterHit = defender.IsAttacking;
 		int appliedHitstun = baseHitstun + (counterHit ? CounterHitExtraHitstunFrames : 0);
 		if (_currentAttackStartedAirborne && !defender.WasGrounded)
@@ -657,10 +888,16 @@ public partial class FighterController : CharacterBody2D
 			int authoredBlockstun = ResolveIntOverride(hitboxData?.BlockstunFrames, _currentAttackBlockstunFrames);
 			int appliedBlockstun = authoredBlockstun > 0 ? authoredBlockstun : Mathf.Max(1, baseHitstun - 4);
 			float blockPushback = appliedPushback * BlockPushbackMultiplier;
+			if (IsCurrentAttackHeavyNormal())
+				blockPushback *= Mathf.Clamp(HeavyNormalBlockPushbackScale, 0f, 1f);
 			defender.ApplyBlockstun(appliedBlockstun, Facing * blockPushback);
 			LastContactWasBlocked = true;
 			hitstopFrames = ResolveIntOverride(hitboxData?.HitstopFrames, _currentAttackHitstopFrames);
-			hitstopFrames += GlobalHitstopBonusFrames + (_currentAttackStartedAirborne ? AirAttackHitstopBonusFrames : GroundedAttackHitstopBonusFrames);
+			bool useGroundedNormalHitstop = !_currentAttackStartedAirborne || defender.WasGrounded;
+			hitstopFrames += GlobalHitstopBonusFrames +
+				(useGroundedNormalHitstop ? GroundedAttackHitstopBonusFrames : AirAttackHitstopBonusFrames);
+			if (_currentAttackStartedAirborne && defender.WasGrounded)
+				hitstopFrames += JumpInHitstopBonusFrames;
 			hitstopFrames = Mathf.Max(1, hitstopFrames + BlockHitstopBonusFrames);
 			shakeStrength = BlockShakeStrength;
 			hitPushback = blockPushback;
@@ -671,20 +908,31 @@ public partial class FighterController : CharacterBody2D
 			}
 			return true;
 		}
+		defender.LastHitReactionLevel = CurrentAttackName.Contains("HEAVY")
+			? 2
+			: CurrentAttackName.Contains("MEDIUM") ? 1 : 0;
+		defender.LastHitCameFromAir = _currentAttackStartedAirborne;
 		if (isLauncher)
 		{
 			int launchHitstun = ResolveIntOverride(hitboxData?.LaunchHitstunFrames, _currentMoveRule.LaunchHitstunFrames) + (counterHit ? CounterHitExtraHitstunFrames : 0);
 			if (_currentAttackStartedAirborne && !defender.WasGrounded)
 				launchHitstun += AirToAirHitstunBonusFrames;
 			float launchSpeed = ResolveFloatOverride(hitboxData?.LaunchSpeed, _currentMoveRule.LaunchSpeed);
-			defender.ApplyLaunchHitstun(launchHitstun, Facing * appliedPushback, launchSpeed, counterHit);
+			if (CurrentAttackName == CrouchingMediumJabName)
+				defender.ApplyJuggleHitstun(launchHitstun, Facing * appliedPushback, -launchSpeed, true);
+			else
+				defender.ApplyLaunchHitstun(launchHitstun, Facing * appliedPushback, launchSpeed, counterHit);
 			_launcherJumpCancelFramesLeft = ResolveIntOverride(hitboxData?.JumpCancelWindowFrames, _currentMoveRule.JumpCancelWindowFrames);
 		}
-		else if (CurrentHitboxRequestsKnockdown(hitboxData))
+		else if (CurrentHitboxRequestsKnockdown(hitboxData) || (hitboxData?.AirborneTargetWallSplat == true && !defender.WasGrounded))
 		{
 			int overrideKnockdownFrames = ResolveIntOverride(hitboxData?.KnockdownFrames, _currentAttackKnockdownFrames);
 			int knockdownFrames = overrideKnockdownFrames > 0 ? overrideKnockdownFrames : appliedHitstun;
-			KnockdownType knockdownType = ResolveCurrentAttackKnockdownType(defender, hitboxData);
+			KnockdownType knockdownType = hitboxData?.AirborneTargetWallSplat == true && !defender.WasGrounded
+				? KnockdownType.WallBounce
+				: ResolveCurrentAttackKnockdownType(defender, hitboxData);
+			if (knockdownType == KnockdownType.Sweep)
+				appliedPushback = 0f;
 			float downwardSpeed = !defender.WasGrounded ? HeavyAirAttackSpikeSpeed : 0f;
 			defender.ApplyKnockdown(knockdownFrames, Facing * appliedPushback, downwardSpeed, knockdownType, counterHit);
 		}
@@ -703,14 +951,27 @@ public partial class FighterController : CharacterBody2D
 		}
 		else if (CurrentAttackName == AirUpHeavyKickName)
 		{
-			defender.ApplyAirPopHitstun(appliedHitstun, Facing * appliedPushback, AirHitPopUpSpeed, counterHit);
+			defender.ApplyJuggleHitstun(appliedHitstun, Facing * appliedPushback, -AirHitPopUpSpeed, true);
 		}
 		else
 		{
 			if (!defender.WasGrounded)
 			{
 				if (_currentAttackStartedAirborne && CurrentAttackName.StartsWith("HEAVY"))
-					defender.ApplyKnockdown(appliedHitstun, Facing * appliedPushback, HeavyAirAttackSpikeSpeed, KnockdownType.AirKnockdown, counterHit);
+					defender.ApplyJuggleHitstun(appliedHitstun, Facing * appliedPushback, HeavyAirAttackSpikeSpeed, true);
+				else if (defender.HitState == FighterHitState.Juggle)
+				{
+					float verticalVelocity = -AirHitPopUpSpeed;
+					if (!_currentAttackStartedAirborne && CurrentAttackName == "LIGHT PUNCH")
+					{
+						float popScale = Mathf.Max(0f,
+							1f - defender.GroundNormalJuggleHitCount * GroundJabJugglePopLossPerHit);
+						verticalVelocity = popScale > 0f
+							? -AirHitPopUpSpeed * popScale
+							: Mathf.Max(0f, defender.Velocity.Y);
+					}
+					defender.ApplyJuggleHitstun(appliedHitstun, Facing * appliedPushback, verticalVelocity, true);
+				}
 				else
 					defender.ApplyAirPopHitstun(appliedHitstun, Facing * appliedPushback, AirHitPopUpSpeed, counterHit || hitReaction == HitReactionKind.Tumble);
 			}
@@ -721,8 +982,16 @@ public partial class FighterController : CharacterBody2D
 		}
 		hitstopFrames = finalSuperHit ? _currentSuperMove.FinalHitstopFrames : ResolveIntOverride(hitboxData?.HitstopFrames, _currentAttackHitstopFrames);
 		if (!superHit || _currentSuperMove.AddsGlobalHitstopBonus)
-			hitstopFrames += GlobalHitstopBonusFrames + (_currentAttackStartedAirborne ? AirAttackHitstopBonusFrames : GroundedAttackHitstopBonusFrames);
+		{
+			bool useGroundedNormalHitstop = !_currentAttackStartedAirborne || defender.WasGrounded;
+			hitstopFrames += GlobalHitstopBonusFrames +
+				(useGroundedNormalHitstop ? GroundedAttackHitstopBonusFrames : AirAttackHitstopBonusFrames);
+			if (_currentAttackStartedAirborne && defender.WasGrounded)
+				hitstopFrames += JumpInHitstopBonusFrames;
+		}
 		shakeStrength = finalSuperHit ? _currentSuperMove.FinalShakeStrength : ResolveFloatOverride(hitboxData?.ShakeStrength, _currentAttackShakeStrength);
+		if (_currentAttackStartedAirborne && defender.WasGrounded && !superHit)
+			shakeStrength *= AirToGroundShakeMultiplier;
 		hitPushback = appliedPushback;
 		if (superHit)
 		{
@@ -753,6 +1022,8 @@ public partial class FighterController : CharacterBody2D
 			Pushback = appliedPushback,
 			CounterHit = counterHit
 		});
+		if (defenderWasWallSliding)
+			defender.QueueStateImpact(FighterHitState.WallSplat, defender._wallSplatDirection, true);
 		return true;
 	}
 
@@ -766,10 +1037,19 @@ public partial class FighterController : CharacterBody2D
 		hitPoint = Vector2.Zero;
 		heavySpark = false;
 		LastContactWasBlocked = false;
-		if (defender == null || defender == this || IsSameTeam(defender)) return false;
+		LastContactWasParried = false;
+		if (defender == null || defender == this || IsSameTeam(defender) || defender.IsWakingUp || defender.IsMovementInvulnerable) return false;
 		if (defender.IsGroundedKnockdown) return false;
 		if (!TryFindBoxContact(new[] { new ActiveFighterBox(projectileHitbox) }, defender.GetActiveWorldBoxInstances(FighterBoxKind.Hurtbox),
 			out hitPoint, out ActiveFighterBox hitbox, out ActiveFighterBox hurtbox)) return false;
+		bool defenderWasWallSliding = defender._pendingWallSplatKnockdown;
+		if (defender.TryParryIncomingHit(this, hitPoint))
+		{
+			LastContactWasParried = true;
+			appliedHitstopFrames = 12;
+			appliedShakeStrength = 4.5f;
+			return true;
+		}
 
 		float appliedPushback = Facing * pushback;
 		if (defender.CanTrainingBlockStrike())
@@ -818,11 +1098,35 @@ public partial class FighterController : CharacterBody2D
 			Pushback = pushback,
 			Projectile = true
 		});
+		if (defenderWasWallSliding)
+			defender.QueueStateImpact(FighterHitState.WallSplat, defender._wallSplatDirection, true);
 		return true;
 	}
-	public void RequestHitstop(int frames)
+	public void RequestHitstop(int frames, bool continueVerticalPhysics = false)
 	{
-		if (frames > HitstopFramesLeft) HitstopFramesLeft = frames;
+		if (frames > HitstopFramesLeft)
+		{
+			HitstopFramesLeft = frames;
+			_continueVerticalPhysicsDuringHitstop = continueVerticalPhysics;
+			_verticalHitstopFreezeFramesLeft = continueVerticalPhysics
+				? Mathf.Max(0, JumpInInitialFullFreezeFrames)
+				: 0;
+		}
+		else if (frames == HitstopFramesLeft && continueVerticalPhysics)
+		{
+			_continueVerticalPhysicsDuringHitstop = true;
+			_verticalHitstopFreezeFramesLeft = Mathf.Max(
+				_verticalHitstopFreezeFramesLeft,
+				Mathf.Max(0, JumpInInitialFullFreezeFrames));
+		}
+	}
+
+	public void AddHitstop(int frames)
+	{
+		if (frames <= 0) return;
+		HitstopFramesLeft += frames;
+		_continueVerticalPhysicsDuringHitstop = false;
+		_verticalHitstopFreezeFramesLeft = 0;
 	}
 
 	public void StopActiveAbility()
@@ -835,7 +1139,7 @@ public partial class FighterController : CharacterBody2D
 	private void ApplyHitstun(int frames, float horizontalPushback, bool counterHit = false)
 	{
 		ApplyHitReaction(frames, counterHit ? FighterHitState.CounterHit : FighterHitState.Hitstun);
-		Velocity = new Vector2(horizontalPushback, Velocity.Y);
+		Velocity = ResolveWallSplatFollowupVelocity(new Vector2(horizontalPushback, Velocity.Y));
 	}
 
 	private bool CanTrainingBlockStrike() =>
@@ -843,30 +1147,70 @@ public partial class FighterController : CharacterBody2D
 
 	private void ApplyBlockstun(int frames, float horizontalPushback)
 	{
+		BlockReactionSerial++;
 		HitstunFramesLeft = Mathf.Max(1, frames);
 		HitState = FighterHitState.Blockstun;
+		IsCrouchBlocking = WasGrounded && CurrentInput.Vertical > 0.5f;
 		CurrentKnockdownType = KnockdownType.None;
 		Velocity = new Vector2(horizontalPushback, Velocity.Y);
 		StopActiveAbility();
 		ClearAttackState();
 	}
 
+	private bool TryParryIncomingHit(FighterController attacker, Vector2 hitPoint)
+	{
+		if (!IsParryWindowActive) return false;
+		_attackActiveFramesLeft = 0;
+		_attackRecoveryFramesLeft = Mathf.Max(_attackRecoveryFramesLeft, _currentAttackRecoveryFrames + 1);
+		int presentationFrames = _currentSpecialMove?.Parry == true
+			? _currentSpecialMove.ParrySuccessPresentationFrames
+			: _currentSuperMove?.ParrySuccessPresentationFrames ?? 18;
+		_parrySuccessPresentationFramesLeft = Mathf.Max(_parrySuccessPresentationFramesLeft,
+			Mathf.Max(1, presentationFrames));
+		ParrySuccessSerial++;
+		RequestHitstop(12);
+		attacker?.RequestHitstop(12);
+		OnParrySuccessVisual(hitPoint);
+		return true;
+	}
+
+	protected virtual void OnParrySuccessVisual(Vector2 hitPoint) { }
+
 	private void ApplyLaunchHitstun(int frames, float horizontalPushback, float verticalLaunchSpeed, bool counterHit = false)
 	{
 		ApplyHitReaction(frames, counterHit ? FighterHitState.CounterHit : FighterHitState.Tumble);
-		Velocity = new Vector2(horizontalPushback, -verticalLaunchSpeed);
+		Velocity = ResolveWallSplatFollowupVelocity(new Vector2(horizontalPushback, -verticalLaunchSpeed));
+	}
+
+	private void ApplyJuggleHitstun(int frames, float horizontalPushback, float verticalVelocity, bool knockdownOnLanding)
+	{
+		JuggleHitCount = HitState == FighterHitState.Juggle ? JuggleHitCount + 1 : 1;
+		ApplyHitReaction(frames, FighterHitState.Juggle);
+		if (knockdownOnLanding)
+			CurrentKnockdownType = KnockdownType.AirKnockdown;
+		Velocity = ResolveWallSplatFollowupVelocity(new Vector2(horizontalPushback, verticalVelocity));
+	}
+
+	public void ApplyWallSplat(int wallDirection)
+	{
+		ApplyHitReaction(Mathf.Max(1, WallSplatHitstunFrames), FighterHitState.WallSplat);
+		_pendingWallSplatKnockdown = true;
+		_wallSplatDirection = wallDirection >= 0 ? 1 : -1;
+		CurrentKnockdownType = KnockdownType.SoftKnockdown;
+		Velocity = new Vector2(0f, Mathf.Max(0f, WallSplatSlideSpeed));
+		QueueStateImpact(FighterHitState.WallSplat, _wallSplatDirection);
 	}
 
 	private void ApplyAirPopHitstun(int frames, float horizontalPushback, float popUpSpeed, bool tumble = false)
 	{
 		ApplyHitReaction(frames, tumble ? FighterHitState.Tumble : FighterHitState.Hitstun);
-		Velocity = new Vector2(horizontalPushback, Mathf.Min(Velocity.Y, -popUpSpeed));
+		Velocity = ResolveWallSplatFollowupVelocity(new Vector2(horizontalPushback, Mathf.Min(Velocity.Y, -popUpSpeed)));
 	}
 
 	private void ApplyAirSpikeHitstun(int frames, float horizontalPushback, float spikeSpeed, bool counterHit = false)
 	{
 		ApplyHitReaction(frames, counterHit ? FighterHitState.CounterHit : FighterHitState.Tumble);
-		Velocity = new Vector2(horizontalPushback, Mathf.Max(Velocity.Y, spikeSpeed));
+		Velocity = ResolveWallSplatFollowupVelocity(new Vector2(horizontalPushback, Mathf.Max(Velocity.Y, spikeSpeed)));
 	}
 
 	private void ApplyKnockdown(int frames, float horizontalPushback, float downwardSpeed, KnockdownType knockdownType, bool counterHit = false)
@@ -874,33 +1218,165 @@ public partial class FighterController : CharacterBody2D
 		CurrentKnockdownType = knockdownType == KnockdownType.None ? KnockdownType.AirKnockdown : knockdownType;
 		FighterHitState state = GetInitialKnockdownState(CurrentKnockdownType);
 		ApplyHitReaction(frames, state);
+		if (CurrentKnockdownType == KnockdownType.Sweep && IsOnFloor())
+		{
+			// Classic low sweep reaction: briefly lift the victim into the
+			// knockdown animation, then ground them when the arc lands.
+			Velocity = ResolveWallSplatFollowupVelocity(new Vector2(horizontalPushback, -Mathf.Abs(SweepPopUpSpeed)));
+			return;
+		}
 		if (CurrentKnockdownType == KnockdownType.WallBounce)
 		{
-			float direction = Mathf.Abs(horizontalPushback) > 1f ? -Mathf.Sign(horizontalPushback) : -Facing;
-			Velocity = new Vector2(direction * WallBounceHorizontalSpeed, Mathf.Min(Velocity.Y, -GroundBounceSpeed * 0.35f));
+			float direction = Mathf.Abs(horizontalPushback) > 1f ? Mathf.Sign(horizontalPushback) : Facing;
+			Velocity = ResolveWallSplatFollowupVelocity(new Vector2(direction * WallBounceHorizontalSpeed, Mathf.Min(Velocity.Y, -GroundBounceSpeed * 0.35f)));
 			return;
 		}
 
 		if (CurrentKnockdownType == KnockdownType.GroundBounce)
 		{
 			float verticalBounce = IsOnFloor() ? -GroundBounceSpeed : Mathf.Max(Velocity.Y, downwardSpeed);
-			Velocity = new Vector2(horizontalPushback, verticalBounce);
+			Velocity = ResolveWallSplatFollowupVelocity(new Vector2(horizontalPushback, verticalBounce));
 			return;
 		}
 
 		float vertical = downwardSpeed > 0f ? Mathf.Max(Velocity.Y, downwardSpeed) : Velocity.Y;
-		Velocity = new Vector2(horizontalPushback, vertical);
+		Velocity = ResolveWallSplatFollowupVelocity(new Vector2(horizontalPushback, vertical));
+	}
+
+	private void CaptureThrowVictim(FighterController defender)
+	{
+		if (defender == null) return;
+		_capturedThrowVictim = defender;
+		defender._throwCaptor = this;
+		defender.ClearAttackState();
+		defender.Velocity = Vector2.Zero;
+		if (IsSpdGrabAttackName(CurrentAttackName))
+		{
+			bool superSpd = CurrentAttackName == SanzoSuperSpdName;
+			_spdGrabConnected = true;
+			_spdHasLeftGround = false;
+			CurrentAttackAnimationName = "spd_air_grab";
+			Velocity = new Vector2(Velocity.X * 0.2f,
+				-Mathf.Abs(superSpd ? SuperSpdRiseSpeed : SpdRiseSpeed));
+			// A connected SPD owns the timeline until landing. Whiffs retain the
+			// authored short recovery from the move resource.
+			_attackStartupFramesLeft = 0;
+			_attackActiveFramesLeft = 0;
+			_attackRecoveryFramesLeft = superSpd ? 360 : 180;
+			_currentAttackRecoveryFrames = _attackRecoveryFramesLeft;
+		}
+		UpdateCapturedThrowVictim();
+	}
+
+	private void UpdateCapturedThrowVictim()
+	{
+		if (!GodotObject.IsInstanceValid(_capturedThrowVictim))
+		{
+			_capturedThrowVictim = null;
+			return;
+		}
+
+		bool foundAnchor = false;
+		foreach (ActiveFighterBox anchor in GetActiveWorldBoxInstances(FighterBoxKind.ThrowVictimAnchor))
+		{
+			_capturedThrowVictim.GlobalPosition = anchor.Rect.GetCenter();
+			_capturedThrowVictim.Velocity = Vector2.Zero;
+			foundAnchor = true;
+			break;
+		}
+
+		// Moves without authored anchors retain the legacy immediate-release behavior.
+		if (!foundAnchor && !HasFutureThrowVictimAnchor()) ReleaseCapturedThrowVictim();
+	}
+
+	private bool HasFutureThrowVictimAnchor()
+	{
+		if (_currentMoveRule.BoxTimeline == null) return false;
+		foreach (FighterBoxFrame box in _currentMoveRule.BoxTimeline)
+			if (box?.Kind == FighterBoxKind.ThrowVictimAnchor && box.EndFrame >= CurrentAttackFrame)
+				return true;
+		return false;
+	}
+
+	private void ReleaseCapturedThrowVictim()
+	{
+		FighterController victim = _capturedThrowVictim;
+		_capturedThrowVictim = null;
+		_spdGrabConnected = false;
+		_spdHasLeftGround = false;
+		if (!GodotObject.IsInstanceValid(victim)) return;
+		victim._throwCaptor = null;
+		victim.ApplyThrowLaunch(HeavyAttackHitstunFrames + 24, Facing * HeavyAttackPushback, ThrowLaunchSpeed);
+	}
+
+	private void ResolveSpdSlamLanding()
+	{
+		bool superSpd = CurrentAttackName == SanzoSuperSpdName;
+		FighterController victim = _capturedThrowVictim;
+		_capturedThrowVictim = null;
+		_spdGrabConnected = false;
+		_spdHasLeftGround = false;
+		Velocity = new Vector2(Velocity.X * 0.2f, Velocity.Y);
+		if (GodotObject.IsInstanceValid(victim))
+		{
+			victim._throwCaptor = null;
+			victim.GlobalPosition = GlobalPosition + new Vector2(Facing * 18f, 0f);
+			victim.ApplySpdSlamKnockdown(superSpd ? SuperSpdSlamKnockdownFrames : SpdSlamKnockdownFrames);
+			_spdSlamVictim = victim;
+			_spdSlamImpactPosition = victim.GlobalPosition;
+			_spdSlamDamage = Mathf.Max(0, _currentAttackDamage);
+			_spdSlamImpactWasSuper = superSpd;
+			_spdSlamImpactPending = true;
+		}
+		CurrentAttackAnimationName = "heavy_punch";
+		_attackStartupFramesLeft = 0;
+		_attackActiveFramesLeft = 0;
+		int landingRecovery = superSpd ? SuperSpdLandingRecoveryFrames : SpdLandingRecoveryFrames;
+		_attackRecoveryFramesLeft = Mathf.Max(1, landingRecovery);
+		_currentAttackRecoveryFrames = Mathf.Max(1, landingRecovery);
+	}
+
+	private void ApplySpdSlamKnockdown(int frames)
+	{
+		CurrentKnockdownType = KnockdownType.HardKnockdown;
+		ApplyHitReaction(Mathf.Max(1, frames), FighterHitState.GroundedKnockdown);
+		Velocity = Vector2.Zero;
+		QueueStateImpact(FighterHitState.GroundedKnockdown);
+	}
+
+	public bool TryConsumeSpdSlamImpact(out FighterController victim, out Vector2 position, out int damage)
+	{
+		return TryConsumeSpdSlamImpact(out victim, out position, out damage, out _);
+	}
+
+	public bool TryConsumeSpdSlamImpact(out FighterController victim, out Vector2 position, out int damage, out bool wasSuper)
+	{
+		victim = _spdSlamVictim;
+		position = _spdSlamImpactPosition;
+		damage = _spdSlamDamage;
+		wasSuper = _spdSlamImpactWasSuper;
+		if (!_spdSlamImpactPending) return false;
+		_spdSlamImpactPending = false;
+		_spdSlamVictim = null;
+		_spdSlamImpactWasSuper = false;
+		return true;
 	}
 
 	private void ApplyThrowLaunch(int frames, float horizontalPushback, float launchSpeed)
 	{
 		CurrentKnockdownType = KnockdownType.HardKnockdown;
 		ApplyHitReaction(frames, FighterHitState.Knockdown);
-		Velocity = new Vector2(horizontalPushback, -Mathf.Abs(launchSpeed));
+		Velocity = ResolveWallSplatFollowupVelocity(new Vector2(horizontalPushback, -Mathf.Abs(launchSpeed)));
 	}
+
+	private Vector2 ResolveWallSplatFollowupVelocity(Vector2 requestedVelocity) =>
+		_pendingWallSplatKnockdown
+			? new Vector2(0f, Mathf.Max(WallSplatSlideSpeed, requestedVelocity.Y))
+			: requestedVelocity;
 
 	private void ApplyHitReaction(int frames, FighterHitState state)
 	{
+		HitReactionSerial++;
 		ComboCount = HitstunFramesLeft > 0 ? ComboCount + 1 : 1;
 		ComboDisplayFramesLeft = ComboDisplayFrames;
 		HitstunFramesLeft = frames;
@@ -917,6 +1393,10 @@ public partial class FighterController : CharacterBody2D
 		HitstunFramesLeft = 0;
 		HitState = FighterHitState.None;
 		CurrentKnockdownType = KnockdownType.None;
+		_pendingWallSplatKnockdown = false;
+		_wallSplatDirection = 0;
+		JuggleHitCount = 0;
+		GroundNormalJuggleHitCount = 0;
 		ComboDisplayFramesLeft = ComboDisplayFrames;
 		Velocity = new Vector2(Velocity.X, 0f);
 	}
@@ -924,8 +1404,13 @@ public partial class FighterController : CharacterBody2D
 	private void EnterGroundedKnockdown()
 	{
 		HitState = FighterHitState.GroundedKnockdown;
+		HitReactionSerial++;
+		HitstunFramesLeft = Mathf.Max(HitstunFramesLeft, GroundedKnockdownHoldFrames);
+		if (_pendingWallSplatKnockdown) CurrentKnockdownType = KnockdownType.SoftKnockdown;
 		if (CurrentKnockdownType == KnockdownType.None) CurrentKnockdownType = KnockdownType.AirKnockdown;
+		_pendingWallSplatKnockdown = false;
 		Velocity = new Vector2(Velocity.X, 0f);
+		QueueStateImpact(FighterHitState.GroundedKnockdown);
 	}
 
 	private void ResolveGroundBounceLanding()
@@ -936,13 +1421,35 @@ public partial class FighterController : CharacterBody2D
 	}
 
 	private bool ShouldPersistAirReactionUntilLanding() =>
-		!WasGrounded && (HitState == FighterHitState.Knockdown || HitState == FighterHitState.GroundBounce);
+		!WasGrounded && (_pendingWallSplatKnockdown || HitState == FighterHitState.Knockdown || HitState == FighterHitState.GroundBounce ||
+			HitState == FighterHitState.WallSplat ||
+			(HitState == FighterHitState.Juggle && CurrentKnockdownType != KnockdownType.None));
+
+	private void QueueStateImpact(FighterHitState state, int direction = 0, bool followup = false)
+	{
+		_stateImpactPending = true;
+		_stateImpactState = state;
+		_stateImpactPosition = GlobalPosition;
+		_stateImpactDirection = direction;
+		_stateImpactIsFollowup = followup;
+	}
+
+	public bool TryConsumeStateImpact(out FighterHitState state, out Vector2 position, out int direction, out bool followup)
+	{
+		state = _stateImpactState;
+		position = _stateImpactPosition;
+		direction = _stateImpactDirection;
+		followup = _stateImpactIsFollowup;
+		if (!_stateImpactPending) return false;
+		_stateImpactPending = false;
+		return true;
+	}
 
 	private FighterHitState GetInitialKnockdownState(KnockdownType knockdownType)
 	{
 		return knockdownType switch
 		{
-			KnockdownType.Sweep => FighterHitState.GroundedKnockdown,
+			KnockdownType.Sweep => FighterHitState.Knockdown,
 			KnockdownType.WallBounce => FighterHitState.WallBounce,
 			KnockdownType.GroundBounce => FighterHitState.GroundBounce,
 			KnockdownType.Crumple => FighterHitState.Crumple,
@@ -1090,6 +1597,12 @@ public partial class FighterController : CharacterBody2D
 				if (elapsedDashFrames < AirDashAttackCancelDelayFrames) return;
 				attackStartedFromAirDash = true;
 			}
+			else if (ActiveAbility is JumpAbility jumpAbility &&
+				GetRuntime(jumpAbility).IntValue > 0 && IsSpecialAttackName(attackName))
+			{
+				// Grounded jump squat is special-cancelable. Once takeoff occurs,
+				// the same buffered command can no longer cancel the jump.
+			}
 			else if (ActiveAbility is JumpAbility && IsInDoubleJumpState)
 			{
 				// Double-jump attacks should be immediate; the jump launch has already happened.
@@ -1121,11 +1634,17 @@ public partial class FighterController : CharacterBody2D
 		_currentAttackShakeStrength = GetBasicAttackShakeStrength(attackName);
 		ApplyMoveDataCombatOverrides();
 		_currentAttackHitboxLocal = GetBasicAttackHitboxLocal(attackName);
-		CurrentAttackFrame = 0;
+		// TickBasicAttack runs later in this same physics step. Starting at -1
+		// makes the first evaluated/displayed gameplay frame truly frame zero.
+		CurrentAttackFrame = -1;
 		_attackStartupFramesLeft = _currentAttackStartupFrames;
-		_attackActiveFramesLeft = 0;
+		// Zero-startup authored moves (notably Sanzou's S1 parry) must enter
+		// their active timeline immediately instead of creating an attack state
+		// with all three counters at zero.
+		_attackActiveFramesLeft = _currentAttackStartupFrames <= 0 ? _currentAttackActiveFrames : 0;
 		_attackRecoveryFramesLeft = 0;
 		_attackHasHit = false;
+		_attackHitGroups.Clear();
 		_projectileSpawnedThisAttack = false;
 		_currentAttackHitsRemaining = _currentSuperMove?.HitCount ?? 1;
 		_currentAttackHitCooldownFramesLeft = 0;
@@ -1141,8 +1660,23 @@ public partial class FighterController : CharacterBody2D
 					_currentAttackStartupFrames + _currentAttackActiveFrames + _currentAttackRecoveryFrames + _currentSuperMove.ActivationFreezeFrames);
 			if (_currentSuperMove.RushesForward) Velocity = new Vector2(Facing * _currentSuperMove.RushSpeed, Velocity.Y);
 		}
-		if (attackName == ElectricWindGodFistName || IsProjectileAttackName(attackName) || _currentSuperMove != null)
+		if (_currentSpecialMove?.SelfLaunch == true)
+		{
+			float horizontal = attackName == CommandRunHopName
+				? Facing * _currentSpecialMove.SelfHorizontalSpeed
+				: Mathf.Abs(ActionInput.Horizontal) > 0.5f
+				? Mathf.Sign(ActionInput.Horizontal) * _currentSpecialMove.SelfHorizontalSpeed
+				: 0f;
+			Velocity = new Vector2(horizontal, -_currentSpecialMove.SelfLaunchSpeed);
+		}
+		if (_currentSpecialMove?.SelfDrive == true)
+			Velocity = new Vector2(Facing * _currentSpecialMove.SelfDriveSpeed, Velocity.Y);
+		if (attackName == ElectricWindGodFistName || IsProjectileAttackName(attackName) || _currentSuperMove != null ||
+			(_currentSpecialMove == null && IsNormalAttackName(attackName)))
 			ConsumeQuarterCircleForwardCommand();
+		if (attackName == StompSpecialName) _motionInputBuffer.ConsumeChargedDownUpCommand();
+		if (attackName == CommandRunLightName || attackName == CommandRunHeavyName)
+			_motionInputBuffer.ConsumeChargedBackForwardCommand();
 		ConsumeDashBuffer();
 		ClearAttackInputBuffers();
 		ApplyAirAttackMomentum(attackName);
@@ -1150,6 +1684,34 @@ public partial class FighterController : CharacterBody2D
 
 	private void TrySpawnProjectileForCurrentAttack()
 	{
+		if (!_projectileSpawnedThisAttack && _currentSpecialMove?.ReflectorScene != null && _attackStartupFramesLeft <= 0)
+		{
+			_projectileSpawnedThisAttack = true;
+			Node reflectorNode = _currentSpecialMove.ReflectorScene.Instantiate();
+			if (reflectorNode is ProjectileReflector reflector)
+			{
+				Vector2 reflectorOffset = _currentSpecialMove.ReflectorSpawnOffset;
+				reflector.GlobalPosition = GlobalPosition + new Vector2(reflectorOffset.X * Facing, reflectorOffset.Y);
+				reflector.Initialize(this);
+				GetParent()?.AddChild(reflector);
+			}
+			else reflectorNode?.QueueFree();
+			return;
+		}
+		if (!_projectileSpawnedThisAttack && _currentSuperMove?.ProjectileScene != null && _attackStartupFramesLeft <= 0)
+		{
+			_projectileSpawnedThisAttack = true;
+			Node projectileNode = _currentSuperMove.ProjectileScene.Instantiate();
+			if (projectileNode is ProjectileReflector reflector)
+			{
+				Vector2 superReflectorOffset = _currentSuperMove.ProjectileSpawnOffset;
+				reflector.GlobalPosition = GlobalPosition + new Vector2(superReflectorOffset.X * Facing, superReflectorOffset.Y);
+				reflector.Initialize(this, Facing, true);
+				GetParent()?.AddChild(reflector);
+			}
+			else projectileNode?.QueueFree();
+			return;
+		}
 		if (_projectileSpawnedThisAttack || !IsProjectileAttackName(CurrentAttackName) || _attackStartupFramesLeft > 0) return;
 		_projectileSpawnedThisAttack = true;
 
@@ -1327,6 +1889,13 @@ public partial class FighterController : CharacterBody2D
 		bool nextStartedAirborne = !WasGrounded;
 		NormalMoveRule nextRule = GetNormalMoveRule(nextAttackName, nextStartedCrouching, nextStartedAirborne);
 		if (nextRule.MaxUsesPerCombo > 0 && GetNormalUseCount(nextAttackName) >= nextRule.MaxUsesPerCombo) return false;
+		if (nextAttackName == QcfPowerPunchRekkaName &&
+			(CurrentAttackName == LightProjectileName || CurrentAttackName == HeavyProjectileName ||
+			 CurrentAttackName == QcfPowerPunchLightName || CurrentAttackName == QcfPowerPunchHeavyName))
+			return CurrentAttackFrame >= _currentAttackStartupFrames;
+		if ((CurrentAttackName == CommandRunLightName || CurrentAttackName == CommandRunHeavyName) &&
+			(nextAttackName == CommandRunHopName || nextAttackName == CommandRunPunchName))
+			return true;
 		if (IsSpecialAttackName(nextAttackName))
 		{
 			return CanCancelCurrentMove(CancelKind.Special, nextAttackName);
@@ -1465,6 +2034,15 @@ public partial class FighterController : CharacterBody2D
 	private void TickBasicAttack()
 	{
 		if (!IsAttacking) return;
+		if (_currentSpecialMove?.SelfDrive == true && WasGrounded)
+			Velocity = new Vector2(Facing * _currentSpecialMove.SelfDriveSpeed, Velocity.Y);
+		if (_currentSpecialMove is { ForceDownwardStartFrame: >= 0 } descentMove &&
+			CurrentAttackFrame >= descentMove.ForceDownwardStartFrame && !WasGrounded)
+		{
+			// The stomp phase is a committed dive, not ordinary jump gravity.
+			// Reassert its minimum downward speed every tick until floor contact.
+			Velocity = new Vector2(Velocity.X, Mathf.Max(Velocity.Y, descentMove.ForceDownwardSpeed));
+		}
 		if (_attackStartupFramesLeft > 0)
 		{
 			_attackStartupFramesLeft--;
@@ -1477,12 +2055,17 @@ public partial class FighterController : CharacterBody2D
 			if (!holdWhiffedAirLightActive)
 			{
 				_attackActiveFramesLeft--;
-				if (_attackActiveFramesLeft == 0) _attackRecoveryFramesLeft = _currentAttackRecoveryFrames;
+				// Keep the final authored recovery frame visible for a full tick.
+				// The extra counter step clears on the following tick without adding
+				// another displayed gameplay frame.
+				if (_attackActiveFramesLeft == 0) _attackRecoveryFramesLeft = _currentAttackRecoveryFrames + 1;
 			}
 		}
 		else if (_attackRecoveryFramesLeft > 0)
 		{
-			_attackRecoveryFramesLeft--;
+			bool waitingForForcedDescentLanding = _attackRecoveryFramesLeft == 1 &&
+				_currentSpecialMove?.HoldUntilLanding == true && !WasGrounded;
+			if (!waitingForForcedDescentLanding) _attackRecoveryFramesLeft--;
 			if (_attackRecoveryFramesLeft == 0) ClearAttackState();
 		}
 		if (_currentAttackHitCooldownFramesLeft > 0) _currentAttackHitCooldownFramesLeft--;
@@ -1491,11 +2074,13 @@ public partial class FighterController : CharacterBody2D
 
 	private void ClearAttackState()
 	{
+		ReleaseCapturedThrowVictim();
 		_attackStartupFramesLeft = 0;
 		_attackActiveFramesLeft = 0;
 		_attackRecoveryFramesLeft = 0;
 		CurrentAttackFrame = 0;
 		_attackHasHit = false;
+		_attackHitGroups.Clear();
 		_projectileSpawnedThisAttack = false;
 		_currentAttackHitsRemaining = 0;
 		_currentAttackHitCooldownFramesLeft = 0;
@@ -1536,17 +2121,79 @@ public partial class FighterController : CharacterBody2D
 		_currentMoveRule = NormalMoveRule.None;
 	}
 
+	private void UpdateStateBoxTimeline(FighterInput input)
+	{
+		string nextState = "";
+		if (!IsAttacking && HitstunFramesLeft <= 0 && _wakeupFramesLeft <= 0)
+		{
+			if (!WasGrounded)
+				nextState = Velocity.Y < 0f ? "STATE JUMP RISE" : "STATE FALL";
+			else if (input.Vertical > 0.5f)
+				nextState = "STATE CROUCH";
+			else
+			{
+				float movementDirection = Mathf.Abs(input.Horizontal) > 0.1f ? input.Horizontal : Velocity.X;
+				if (Mathf.Abs(movementDirection) > 0.1f)
+					nextState = movementDirection * Facing < 0f ? "STATE WALK BACK" : "STATE WALK FORWARD";
+				else if (ActiveAbility == null)
+					nextState = "STATE IDLE";
+			}
+		}
+		if (nextState != _currentBoxStateName)
+		{
+			_currentBoxStateName = nextState;
+			_currentBoxStateFrame = 0;
+			return;
+		}
+		if (nextState == "") return;
+		NormalMoveData state = Definition?.StateBoxes?.FindRule(nextState, false, false);
+		int total = state == null ? 1 : Mathf.Max(1,
+			Mathf.Max(0, state.StartupFrames) + Mathf.Max(0, state.ActiveFrames) + Mathf.Max(0, state.RecoveryFrames));
+		_currentBoxStateFrame = (_currentBoxStateFrame + 1) % total;
+	}
+
 	private string GetPressedBasicAttackName(FighterInput input)
 	{
+		if (_startingBlockReflector) return BlockReflectorName;
+		// Sanzou's character buttons are isolated from the arena clone prototype:
+		// O is his regular SPD and L is his standing-block parry.
+		if (input.Special2Pressed && WasGrounded &&
+			Definition?.SpecialMoves?.FindMove(SanzoParryName, false, false)?.Parry == true)
+			return SanzoParryName;
+		if (input.Special1Pressed && WasGrounded &&
+			Definition?.SpecialMoves?.FindMove(SanzoSpdName, false, false) != null)
+			return SanzoSpdName;
+		if (IsAttacking && (CurrentAttackName == CommandRunLightName || CurrentAttackName == CommandRunHeavyName))
+		{
+			if (CurrentInput.HeavyPunchPressed) return CommandRunPunchName;
+			if (CurrentInput.LightPunchPressed) return CommandRunHopName;
+		}
+		if (_motionInputBuffer.HasChargedBackForwardCommand && WasGrounded)
+		{
+			if (input.HeavyPunchPressed) return CommandRunHeavyName;
+			if (input.LightPunchPressed) return CommandRunLightName;
+		}
+		if (_motionInputBuffer.HasChargedDownUpCommand && (input.LightKickPressed || input.HeavyKickPressed))
+			return StompSpecialName;
 		// Throw is temporarily assigned to a fresh LP+LK chord. Buffered normals from
 		// a previous attack cannot turn into a throw after recovery ends.
 		if (CurrentInput.LightPunchPressed && CurrentInput.LightKickPressed && CanAttemptDirectionalThrow())
 			return ThrowAttackName;
+		if (IsAttacking && (CurrentAttackName == LightProjectileName || CurrentAttackName == HeavyProjectileName ||
+			CurrentAttackName == QcfPowerPunchLightName || CurrentAttackName == QcfPowerPunchHeavyName) &&
+			(CurrentInput.LightPunchPressed || CurrentInput.HeavyPunchPressed))
+			return QcfPowerPunchRekkaName;
 		bool hasQuarterCircleForward = _motionInputBuffer.HasQuarterCircleForwardCommand;
 		bool punchSuperChord = input.LightPunchPressed && input.HeavyPunchPressed;
 		bool kickSuperChord = input.LightKickPressed && input.HeavyKickPressed;
-		if (hasQuarterCircleForward && punchSuperChord && IsOnFloor()) return SuperRushName;
-		if (hasQuarterCircleForward && kickSuperChord) return SuperFireballName;
+		if (hasQuarterCircleForward && punchSuperChord && IsOnFloor())
+			return GetSuperMoveData(SanzoSuperSpdName) != null ? SanzoSuperSpdName : SuperRushName;
+		if (hasQuarterCircleForward && kickSuperChord)
+			return GetSuperMoveData(SanzoSuperReflectorName) != null ? SanzoSuperReflectorName : SuperFireballName;
+		// Down-forward LP is an authored low launcher. Resolve it before the
+		// QCF chord grace period so the diagonal cannot be stolen by the latch.
+		if (input.LightPunchPressed && WasGrounded && input.Vertical > 0.5f && input.Horizontal * Facing > 0.5f)
+			return CrouchingMediumJabName;
 		// Give near-simultaneous attack buttons a brief chance to become a super
 		// chord before resolving QCF+LP/HP as a projectile or a kick as a normal.
 		if (hasQuarterCircleForward && _motionInputBuffer.QuarterCircleForwardCommandAgeFrames < SuperChordGraceFrames &&
@@ -1555,14 +2202,20 @@ public partial class FighterController : CharacterBody2D
 		// Command moves outrank directional normals. QCF commonly ends while the
 		// player is still holding forward or down-forward, which must not turn
 		// QCF+HP into forward HP/crouching HP.
-		if (input.LightPunchPressed && CanUseMotionSpecialCommand()) return LightProjectileName;
-		if (input.HeavyPunchPressed && CanUseMotionSpecialCommand()) return HeavyProjectileName;
+		if (input.LightPunchPressed && CanUseMotionSpecialCommand())
+			return Definition?.SpecialMoves?.FindMove(QcfPowerPunchLightName, false, false) != null
+				? QcfPowerPunchLightName : LightProjectileName;
+		if (input.HeavyPunchPressed && CanUseMotionSpecialCommand())
+			return Definition?.SpecialMoves?.FindMove(QcfPowerPunchHeavyName, false, false) != null
+				? QcfPowerPunchHeavyName : HeavyProjectileName;
+		if (input.HeavyPunchPressed && WasGrounded && input.Vertical > 0.5f && input.Horizontal * Facing > 0.5f)
+			return DownForwardHeavyPunchName;
 		if (input.HeavyPunchPressed && WasGrounded && input.Vertical > 0.5f)
 			return CrouchingHeavyPunchName;
-		if (input.HeavyPunchPressed && WasGrounded && input.Horizontal * Facing > 0.5f)
+		if (input.HeavyPunchPressed && WasGrounded && input.Horizontal * Facing > 0.5f &&
+			Definition?.NormalMoves?.FindRule(ForwardHeavyPunchName, true, false) != null)
 			return ForwardHeavyPunchName;
-		if (input.LightPunchPressed && WasGrounded && input.Vertical > 0.5f && input.Horizontal * Facing > 0.5f)
-			return CrouchingMediumJabName;
+		if (input.LightPunchPressed && WasGrounded && input.Horizontal * Facing < -0.5f) return BackLightPunchName;
 		if (input.LightPunchPressed) return "LIGHT PUNCH";
 		if (input.LightKickPressed && WasGrounded && input.Horizontal * Facing > 0.5f) return ForwardLightKickName;
 		if (input.LightKickPressed) return "LIGHT KICK";
@@ -1662,20 +2315,34 @@ public partial class FighterController : CharacterBody2D
 	}
 
 	private static bool IsSpecialAttackName(string attackName) =>
-		attackName.StartsWith("SPECIAL") || attackName == ElectricWindGodFistName || IsSuperAttackName(attackName) || IsProjectileAttackName(attackName);
+		attackName.StartsWith("SPECIAL") || attackName == ElectricWindGodFistName || attackName == QcfPowerPunchRekkaName ||
+		attackName == QcfPowerPunchLightName || attackName == QcfPowerPunchHeavyName ||
+		attackName == BlockReflectorName || attackName == SanzoParryName || attackName == StompSpecialName || IsSpdGrabAttackName(attackName) ||
+		attackName == CommandRunLightName || attackName == CommandRunHeavyName ||
+		attackName == CommandRunHopName || attackName == CommandRunPunchName ||
+		IsSuperAttackName(attackName) || IsProjectileAttackName(attackName);
 
 	private static bool IsProjectileAttackName(string attackName) =>
-		attackName == LightProjectileName || attackName == HeavyProjectileName || attackName == SuperFireballName;
+		attackName == LightProjectileName || attackName == HeavyProjectileName || attackName == SuperFireballName ||
+		attackName == SanzoSuperReflectorName;
 
 	private static bool IsSuperAttackName(string attackName) =>
-		attackName == SuperFireballName || attackName == SuperRushName;
+		attackName == SuperFireballName || attackName == SuperRushName ||
+		attackName == SanzoSuperReflectorName || attackName == SanzoSuperSpdName;
+
+	private static bool IsSpdGrabAttackName(string attackName) =>
+		attackName == SanzoSpdName || attackName == SanzoSuperSpdName;
 
 	private static bool IsNormalAttackName(string attackName) =>
 		attackName == "LIGHT PUNCH" || attackName == "LIGHT KICK" ||
-		attackName == "HEAVY PUNCH" || attackName == "HEAVY KICK" || attackName == CrouchingMediumJabName ||
-		attackName == ThrowAttackName || attackName == ForwardHeavyPunchName || attackName == ForwardLightKickName ||
+		attackName == "HEAVY PUNCH" || attackName == "HEAVY KICK" || attackName == CrouchingMediumJabName || attackName == DownForwardHeavyPunchName ||
+		attackName == ThrowAttackName || attackName == ForwardHeavyPunchName || attackName == ForwardLightKickName || attackName == BackLightPunchName ||
 		attackName == AirUpHeavyKickName || attackName == CrouchingHeavyKickName || attackName == CrouchingHeavyPunchName ||
 		attackName == AirHeavyPunchName;
+
+	private bool IsCurrentAttackHeavyNormal() =>
+		_currentSpecialMove == null && _currentSuperMove == null &&
+		IsNormalAttackName(CurrentAttackName) && CurrentAttackName.Contains("HEAVY");
 
 	private bool CanAttemptDirectionalThrow()
 	{
@@ -1791,13 +2458,6 @@ public partial class FighterController : CharacterBody2D
 	}
 
 	private int ScaleNormalHitstop(int frames) => Mathf.Max(1, Mathf.RoundToInt(frames * NormalAttackHitstopMultiplier));
-
-	private int GetAirToGroundAttackerHitstopFrames(string attackName)
-	{
-		if (attackName.StartsWith("LIGHT")) return LightAirToGroundAttackerHitstopFrames;
-		if (attackName.StartsWith("HEAVY")) return HeavyAirToGroundAttackerHitstopFrames;
-		return SpecialAirToGroundAttackerHitstopFrames;
-	}
 
 	private float GetBasicAttackShakeStrength(string attackName)
 	{
@@ -1959,6 +2619,18 @@ public partial class FighterController : CharacterBody2D
 
 	private void ApplyBaseMotion(float delta)
 	{
+		if (IsWakingUp)
+		{
+			Velocity = new Vector2(0f, Velocity.Y);
+			return;
+		}
+		if (_pendingWallSplatKnockdown && !WasGrounded)
+		{
+			Velocity = new Vector2(0f, WallSplatSlideSpeed);
+			if (!VisualCorrectionOffset.IsZeroApprox())
+				VisualCorrectionOffset = VisualCorrectionOffset.MoveToward(Vector2.Zero, VisualCorrectionSlideSpeed * delta);
+			return;
+		}
 		// An active ability can opt out of any of these rules by setting its flags.
 		bool ownsHorizontal = ActiveAbility?.OwnsHorizontalVelocity ?? false;
 		bool ownsGravity = ActiveAbility?.OwnsGravity ?? false;
@@ -2002,13 +2674,33 @@ public partial class FighterController : CharacterBody2D
 		}
 		if (!WasGrounded && !ownsGravity)
 		{
-			float gravityScale = HitstunFramesLeft > 0
-				? Mathf.Min(MaxComboGravityScale, 1f + Mathf.Max(0, ComboCount - 1) * ComboGravityScalePerHit)
-				: 1f;
+			float gravityScale = HitState == FighterHitState.Juggle
+				? Mathf.Min(MaxJuggleGravityScale, 1f + Mathf.Max(0, JuggleHitCount - 1) * JuggleGravityScalePerHit)
+				: HitstunFramesLeft > 0
+					? Mathf.Min(MaxComboGravityScale, 1f + Mathf.Max(0, ComboCount - 1) * ComboGravityScalePerHit)
+					: 1f;
 			Velocity = new Vector2(Velocity.X, Mathf.Min(Velocity.Y + Definition.Tuning.Gravity * gravityScale * delta, Definition.Tuning.TerminalFallSpeed));
 		}
 		if (!VisualCorrectionOffset.IsZeroApprox())
 			VisualCorrectionOffset = VisualCorrectionOffset.MoveToward(Vector2.Zero, VisualCorrectionSlideSpeed * delta);
+	}
+
+	private void AdvanceVerticalPhysicsDuringHitstop(float delta)
+	{
+		float preservedHorizontalVelocity = Velocity.X;
+		// A jump-in connecting with a grounded opponent should not erase the
+		// attacker's arc. Carry most horizontal travel through contact freeze,
+		// then restore the original velocity for the remaining descent.
+		Velocity = new Vector2(preservedHorizontalVelocity * AirToGroundHitstopMomentumScale, Mathf.Min(
+			Velocity.Y + Definition.Tuning.Gravity * delta,
+			Definition.Tuning.TerminalFallSpeed));
+		MoveAndSlide();
+		Velocity = new Vector2(preservedHorizontalVelocity, Velocity.Y);
+		if (!IsOnFloor()) return;
+
+		JustLanded = true;
+		if (IsAttacking && _currentAttackStartedAirborne)
+			ClearAttackState();
 	}
 
 	private void ResetAirResources()
@@ -2046,8 +2738,11 @@ public partial class FighterController : CharacterBody2D
 	{
 		if (!ParticipatesInPointCollision && (kind == FighterBoxKind.Hurtbox || kind == FighterBoxKind.Pushbox))
 			yield break;
-		bool hasActiveTimelineBox = HasActiveTimelineBox(kind);
-		bool hasReplacingBox = HasActiveReplacingTimelineBox(kind);
+		if (kind == FighterBoxKind.Hitbox && !IsAttackActive) yield break;
+		NormalMoveData stateData = GetCurrentStateBoxData();
+		bool hasActiveStateBox = HasActiveStateBox(stateData, kind);
+		bool hasActiveTimelineBox = HasActiveTimelineBox(kind) || hasActiveStateBox;
+		bool hasReplacingBox = HasActiveReplacingTimelineBox(kind) || HasActiveReplacingStateBox(stateData, kind);
 		if (!hasActiveTimelineBox)
 		{
 			if (kind == FighterBoxKind.Hurtbox)
@@ -2067,6 +2762,15 @@ public partial class FighterController : CharacterBody2D
 					yield return new ActiveFighterBox(GetFacingLocalBox(box.LocalRect, box.MirrorWithFacing), box);
 			}
 		}
+		if (!IsAttacking && stateData?.BoxTimeline != null)
+		{
+			foreach (FighterBoxFrame box in stateData.BoxTimeline)
+			{
+				if (box == null || box.Kind != kind || !box.IsActiveOnFrame(_currentBoxStateFrame)) continue;
+				if (!hasReplacingBox || box.ReplacesSameKindWhileActive)
+					yield return new ActiveFighterBox(GetFacingLocalBox(box.LocalRect, box.MirrorWithFacing), box);
+			}
+		}
 	}
 
 	public IEnumerable<Rect2> GetActiveWorldBoxes(FighterBoxKind kind)
@@ -2079,8 +2783,11 @@ public partial class FighterController : CharacterBody2D
 	{
 		if (!ParticipatesInPointCollision && (kind == FighterBoxKind.Hurtbox || kind == FighterBoxKind.Pushbox))
 			yield break;
-		bool hasActiveTimelineBox = HasActiveTimelineBox(kind);
-		bool hasReplacingBox = HasActiveReplacingTimelineBox(kind);
+		if (kind == FighterBoxKind.Hitbox && !IsAttackActive) yield break;
+		NormalMoveData stateData = GetCurrentStateBoxData();
+		bool hasActiveStateBox = HasActiveStateBox(stateData, kind);
+		bool hasActiveTimelineBox = HasActiveTimelineBox(kind) || hasActiveStateBox;
+		bool hasReplacingBox = HasActiveReplacingTimelineBox(kind) || HasActiveReplacingStateBox(stateData, kind);
 		if (!hasActiveTimelineBox)
 		{
 			if (kind == FighterBoxKind.Hurtbox)
@@ -2100,6 +2807,34 @@ public partial class FighterController : CharacterBody2D
 					yield return new ActiveFighterBox(GetWorldFacingBox(box.LocalRect, box.MirrorWithFacing), box);
 			}
 		}
+		if (!IsAttacking && stateData?.BoxTimeline != null)
+		{
+			foreach (FighterBoxFrame box in stateData.BoxTimeline)
+			{
+				if (box == null || box.Kind != kind || !box.IsActiveOnFrame(_currentBoxStateFrame)) continue;
+				if (!hasReplacingBox || box.ReplacesSameKindWhileActive)
+					yield return new ActiveFighterBox(GetWorldFacingBox(box.LocalRect, box.MirrorWithFacing), box);
+			}
+		}
+	}
+
+	private NormalMoveData GetCurrentStateBoxData() => string.IsNullOrEmpty(_currentBoxStateName)
+		? null : Definition?.StateBoxes?.FindRule(_currentBoxStateName, false, false);
+
+	private bool HasActiveStateBox(NormalMoveData state, FighterBoxKind kind)
+	{
+		if (IsAttacking || state?.BoxTimeline == null) return false;
+		foreach (FighterBoxFrame box in state.BoxTimeline)
+			if (box != null && box.Kind == kind && box.IsActiveOnFrame(_currentBoxStateFrame)) return true;
+		return false;
+	}
+
+	private bool HasActiveReplacingStateBox(NormalMoveData state, FighterBoxKind kind)
+	{
+		if (IsAttacking || state?.BoxTimeline == null) return false;
+		foreach (FighterBoxFrame box in state.BoxTimeline)
+			if (box != null && box.Kind == kind && box.ReplacesSameKindWhileActive && box.IsActiveOnFrame(_currentBoxStateFrame)) return true;
+		return false;
 	}
 
 	private bool HasActiveReplacingTimelineBox(FighterBoxKind kind)

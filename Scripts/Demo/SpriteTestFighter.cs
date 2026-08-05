@@ -9,6 +9,14 @@ namespace ModularFighter.Demo;
 public partial class SpriteTestFighter : FighterController
 {
 	[Export] public AnimatedSprite2D CharacterSprite { get; set; }
+	[ExportGroup("Heavy Walk Presentation")]
+	[Export] public bool HeavyWalkFootstepShake { get; set; }
+	[Export] public float HeavyWalkShakeStrength { get; set; } = 1.1f;
+	[Export] public int HeavyWalkShakeFrames { get; set; } = 3;
+	[ExportGroup("Selected Move Presentation")]
+	[Export(PropertyHint.Range, "0.1,1.0,0.01")]
+	public float SweepAndSpdVisualScale { get; set; } = 1f;
+	[Export] public float AuthoredSpriteFloorOffset { get; set; } = 58f;
 	private bool _forwardJumpIntroStarted;
 	private bool _crouchIntroStarted;
 	private bool _crouchExitStarted;
@@ -16,7 +24,14 @@ public partial class SpriteTestFighter : FighterController
 	private string _lastVisualAttackName = "";
 	private int _lastVisualAttackFrame = -1;
 	private bool _superOneVisualActive;
-	private static readonly int[] SuperAfterimageDelays = { 3, 6, 9, 12 };
+	private ulong _lastVisualHitReactionSerial;
+	private ulong _lastVisualBlockReactionSerial;
+	private StringName _lastFootstepAnimation;
+	private int _lastFootstepDrawing = -1;
+	private Vector2 _baseCharacterSpritePosition;
+	private Vector2 _baseCharacterSpriteScale = Vector2.One;
+	private bool _capturedCharacterSpriteTransform;
+	private static readonly int[] SuperAfterimageDelays = { 5, 10, 15, 20 };
 	private readonly List<SuperShadowSample> _superShadowHistory = new();
 	private readonly List<Sprite2D> _superAfterimages = new();
 	private static readonly StringName[] SuperOneAttackCycle =
@@ -28,25 +43,72 @@ public partial class SpriteTestFighter : FighterController
 	public override void _Ready()
 	{
 		CharacterSprite ??= GetNodeOrNull<AnimatedSprite2D>("CharacterSprite");
+		if (CharacterSprite != null)
+		{
+			_baseCharacterSpritePosition = CharacterSprite.Position;
+			_baseCharacterSpriteScale = CharacterSprite.Scale;
+			_capturedCharacterSpriteTransform = true;
+		}
 		UpdateAnimation();
+		ApplySelectedMoveVisualScale();
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
 		base._PhysicsProcess(delta);
 		UpdateAnimation();
+		ApplySelectedMoveVisualScale();
+		UpdateHeavyWalkFootsteps();
 		UpdateSuperShadows();
+	}
+
+	private void ApplySelectedMoveVisualScale()
+	{
+		if (CharacterSprite == null || !_capturedCharacterSpriteTransform) return;
+		bool selectedMove = CurrentAttackName == CrouchingHeavyKickName ||
+			CurrentAttackName == SanzoSpdName || CurrentAttackName == SanzoSuperSpdName;
+		bool selectedAnimation = CharacterSprite.Animation == "crouching_heavy_kick" ||
+			CharacterSprite.Animation == "spd_grab" || CharacterSprite.Animation == "spd_air_grab";
+		float factor = selectedMove || selectedAnimation
+			? Mathf.Clamp(SweepAndSpdVisualScale, 0.1f, 1f)
+			: 1f;
+		CharacterSprite.Scale = _baseCharacterSpriteScale * factor;
+		float floorCompensation = AuthoredSpriteFloorOffset * (1f - factor) * Mathf.Abs(_baseCharacterSpriteScale.Y);
+		CharacterSprite.Position = _baseCharacterSpritePosition + Vector2.Down * floorCompensation;
+	}
+
+	private void UpdateHeavyWalkFootsteps()
+	{
+		if (!HeavyWalkFootstepShake || CharacterSprite == null) return;
+		StringName animation = CharacterSprite.Animation;
+		int drawing = CharacterSprite.Frame;
+		bool walking = animation == "walk" || animation == "walk_back";
+		if (!walking)
+		{
+			_lastFootstepAnimation = animation;
+			_lastFootstepDrawing = -1;
+			return;
+		}
+		if (animation == _lastFootstepAnimation && drawing == _lastFootstepDrawing) return;
+		_lastFootstepAnimation = animation;
+		_lastFootstepDrawing = drawing;
+		if (drawing != 3 && drawing != 9) return;
+		if (GetViewport().GetCamera2D() is StageCamera camera)
+			camera.Shake(HeavyWalkShakeStrength, HeavyWalkShakeFrames);
 	}
 
 	private void UpdateAnimation()
 	{
 		if (CharacterSprite?.SpriteFrames == null) return;
 		// SpeedScale freezes the exact displayed sprite frame without resetting animation state.
-		CharacterSprite.SpeedScale = IsInHitstop ? 0f : 1f;
+		// Attack drawings are selected manually from the deterministic combat
+		// frame below; AnimatedSprite must not independently advance between ticks.
+		CharacterSprite.SpeedScale = IsInHitstop || IsAttacking ? 0f : 1f;
 		CharacterSprite.FlipH = Facing < 0;
 		bool restartAttackAnimation = IsAttacking &&
 			(!_wasVisuallyAttacking || CurrentAttackName != _lastVisualAttackName || CurrentAttackFrame < _lastVisualAttackFrame);
 		bool backdashing = ActiveAbility?.Id == "backdash";
+		bool forwardShortHopping = ActiveAbility?.Id == "forward_short_hop";
 		bool airDashing = ActiveAbility?.Id == "air_dash";
 		bool holdingCrouch = WasGrounded && CurrentInput.Vertical > 0.5f;
 		bool leavingCrouchForAnotherAction = !holdingCrouch &&
@@ -80,17 +142,70 @@ public partial class SpriteTestFighter : FighterController
 			return;
 		}
 		_superOneVisualActive = false;
+		if (IsParrySuccessPresentationActive)
+		{
+			if (CharacterSprite.Animation != "stand_block") CharacterSprite.Play("stand_block");
+			CharacterSprite.SetFrameAndProgress(0, 0f);
+			return;
+		}
+		if (IsWakingUp)
+		{
+			if (CharacterSprite.Animation != "get_up") CharacterSprite.Play("get_up");
+			return;
+		}
+		if (IsInBlockstun)
+		{
+			StringName blockAnimation = !WasGrounded ? "air_block" : IsCrouchBlocking ? "crouch_block" : "stand_block";
+			StringName impactAnimation = !WasGrounded ? "air_block_impact" : IsCrouchBlocking ? "crouch_block_impact" : "stand_block_impact";
+			if (_lastVisualBlockReactionSerial != BlockReactionSerial)
+			{
+				_lastVisualBlockReactionSerial = BlockReactionSerial;
+				CharacterSprite.Play(impactAnimation);
+				return;
+			}
+			if (CharacterSprite.Animation == impactAnimation && CharacterSprite.IsPlaying()) return;
+			if (CharacterSprite.Animation != blockAnimation) CharacterSprite.Play(blockAnimation);
+			return;
+		}
+		if (IsInHitstun)
+		{
+			StringName reactionAnimation;
+			if (IsGroundedKnockdown)
+				reactionAnimation = "knockdown";
+			else if (HitState == FighterHitState.Juggle || HitState == FighterHitState.WallSplat || HitState == FighterHitState.Tumble || HitState == FighterHitState.Knockdown ||
+				HitState == FighterHitState.WallBounce || HitState == FighterHitState.GroundBounce)
+				reactionAnimation = "tumble";
+			else if (!WasGrounded)
+				reactionAnimation = "air_hitstun";
+			else if (LastHitReactionLevel >= 2 && LastHitCameFromAir)
+				reactionAnimation = "hitstun_heavy_air";
+			else if (LastHitReactionLevel >= 2)
+				reactionAnimation = "hitstun_heavy";
+			else if (LastHitReactionLevel == 1)
+				reactionAnimation = "hitstun_medium";
+			else
+				reactionAnimation = "hitstun_light";
+			if (CharacterSprite.Animation != reactionAnimation || _lastVisualHitReactionSerial != HitReactionSerial)
+			{
+				CharacterSprite.Play(reactionAnimation);
+				CharacterSprite.SetFrameAndProgress(0, 0f);
+				_lastVisualHitReactionSerial = HitReactionSerial;
+			}
+			return;
+		}
 		if (IsAttackActive && !IsInSuperJumpRoute && !CurrentAttackHasHit && CurrentAttackStartedAirborne &&
 			(CurrentAttackName == "LIGHT PUNCH" || CurrentAttackName == "LIGHT KICK"))
 		{
 			StringName heldAirLightAnimation = CurrentAttackName == "LIGHT PUNCH" ? "air_light_punch" : "air_light_kick";
 			if (CharacterSprite.Animation != heldAirLightAnimation) CharacterSprite.Play(heldAirLightAnimation);
-			CharacterSprite.Frame = 4;
+			int heldFrameCount = CharacterSprite.SpriteFrames.GetFrameCount(heldAirLightAnimation);
+			if (heldFrameCount > 4) CharacterSprite.Frame = 4;
 		}
 		if (IsInHitstop && CurrentAttackName == "LIGHT PUNCH" && CurrentAttackStartedAirborne && !restartAttackAnimation)
 		{
 			if (CharacterSprite.Animation != "air_light_punch") CharacterSprite.Play("air_light_punch");
-			CharacterSprite.Frame = 4; // Source frame 13_04.
+			int jabFrameCount = CharacterSprite.SpriteFrames.GetFrameCount("air_light_punch");
+			if (jabFrameCount > 4) CharacterSprite.Frame = 4;
 		}
 		if (IsInHitstop && ((CurrentAttackName == "LIGHT PUNCH" && !CurrentAttackStartedAirborne) ||
 			CurrentAttackName == CrouchingMediumJabName || CurrentAttackName == AirHeavyPunchName) && !restartAttackAnimation)
@@ -101,8 +216,10 @@ public partial class SpriteTestFighter : FighterController
 				? "crouching_medium_punch"
 				: IsCrouchAttackLocked ? "crouching_light_punch" : "light_punch";
 			if (CharacterSprite.Animation != jabAnimation) CharacterSprite.Play(jabAnimation);
-			// Timeline frame 4 is the active pose for these grounded jab stances.
-			CharacterSprite.Frame = 4;
+			// These Sanzou jab sequences reach their first actual punch drawing
+			// at index 2. Index 4 is recovery (and does not exist for standing LP).
+			int activePose = Mathf.Min(2, CharacterSprite.SpriteFrames.GetFrameCount(jabAnimation) - 1);
+			CharacterSprite.Frame = Mathf.Max(0, activePose);
 		}
 		if (IsInHitstop && CurrentAttackName == "LIGHT KICK" && !IsCrouchAttackLocked &&
 			!CurrentAttackStartedAirborne && !restartAttackAnimation)
@@ -145,8 +262,8 @@ public partial class SpriteTestFighter : FighterController
 		if (IsInHitstop && CurrentAttackName == "LIGHT KICK" && IsCrouchAttackLocked && !restartAttackAnimation)
 		{
 			if (CharacterSprite.Animation != "crouching_light_kick") CharacterSprite.Play("crouching_light_kick");
-			// Timeline frame 4 always displays source frame 25_02.
-			CharacterSprite.Frame = 4;
+			// The first kick drawing begins on gameplay frame 4.
+			CharacterSprite.Frame = 2;
 		}
 		if (IsInHitstop && CurrentAttackName == CrouchingHeavyKickName && !restartAttackAnimation)
 		{
@@ -158,7 +275,7 @@ public partial class SpriteTestFighter : FighterController
 		if (!forwardAirborne) _forwardJumpIntroStarted = false;
 		bool crouching = holdingCrouch;
 
-		if (!IsAttacking && !backdashing && !airDashing && forwardAirborne)
+		if (!IsAttacking && !backdashing && !airDashing && !forwardShortHopping && forwardAirborne)
 		{
 			if (!_forwardJumpIntroStarted)
 			{
@@ -225,6 +342,7 @@ public partial class SpriteTestFighter : FighterController
 		else if (IsAttacking && CurrentAttackName == CrouchingHeavyKickName) nextAnimation = "crouching_heavy_kick";
 		else if (IsAttacking) nextAnimation = "attack";
 		else if (backdashing) nextAnimation = "back_dash";
+		else if (forwardShortHopping) nextAnimation = "forward_dash";
 		else if (airDashing) nextAnimation = "air_dash";
 		else if (!WasGrounded) nextAnimation = Velocity.Y < 0f ? "neutral_jump" : "fall";
 		else if (ActiveAbility is RunAbility) nextAnimation = "run";
@@ -232,8 +350,36 @@ public partial class SpriteTestFighter : FighterController
 			nextAnimation = Velocity.X * Facing < 0f ? "walk_back" : "walk";
 		else nextAnimation = "idle";
 
+		if (IsAttacking && CharacterSprite.SpriteFrames.HasAnimation(nextAnimation))
+		{
+			if (CharacterSprite.Animation != nextAnimation || restartAttackAnimation)
+				CharacterSprite.Play(nextAnimation);
+			SyncAttackDrawingToCombatFrame(nextAnimation);
+			return;
+		}
 		if (CharacterSprite.Animation == nextAnimation && !restartAttackAnimation) return;
 		CharacterSprite.Play(nextAnimation);
+	}
+
+	/// <summary>
+	/// Attack art uses the same deterministic 60 Hz clock as combat boxes. Sprite
+	/// frame durations are authored in gameplay ticks, so rendering can neither
+	/// race ahead of nor lag behind startup/active/recovery state.
+	/// </summary>
+	private void SyncAttackDrawingToCombatFrame(StringName animation)
+	{
+		if ((CurrentAttackName == SanzoSpdName || CurrentAttackName == SanzoSuperSpdName) &&
+			SpdGrabConnected && animation == "spd_air_grab")
+		{
+			int drawings = CharacterSprite.SpriteFrames.GetFrameCount(animation);
+			int flightTick = Mathf.Max(0, CurrentAttackFrame - CurrentAttackStartupFrames);
+			CharacterSprite.SetFrameAndProgress((flightTick / 4) % Mathf.Max(1, drawings), 0f);
+			return;
+		}
+		int drawing = AttackDrawingTimeline.Resolve(CharacterSprite.SpriteFrames, animation, CurrentAttackFrame,
+			CurrentAttackStartupFrames, CurrentAttackActiveFrames, CurrentAttackRecoveryFrames,
+			ReverseAttackRecoveryToNeutral);
+		CharacterSprite.SetFrameAndProgress(drawing, 0f);
 	}
 
 	private void UpdateSuperOneAnimation()
@@ -283,8 +429,7 @@ public partial class SpriteTestFighter : FighterController
 
 	private void UpdateSuperShadows()
 	{
-		bool superAttackAfterimagesActive = IsAttacking &&
-			(CurrentAttackName == "SUPER RUSH" || CurrentAttackName == "SUPER FIREBALL");
+		bool superAttackAfterimagesActive = IsPerformingSuperMove;
 		bool superJumpAfterimagesActive = IsInSuperJumpRoute && !WasGrounded;
 		bool superAfterimagesActive = superAttackAfterimagesActive || superJumpAfterimagesActive;
 		if (!superAfterimagesActive)

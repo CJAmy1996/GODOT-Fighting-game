@@ -14,6 +14,16 @@ public sealed class MotionInputBuffer
 	private int _qcfForwardCommandAgeFrames = int.MaxValue;
 	private int _framesSinceJumpPress = int.MaxValue;
 	private int _backDashInputLockoutFrames;
+	private int _framesSinceForwardTap = int.MaxValue;
+	private int _forwardThenDownFramesLeft;
+	private int _dragonPunchCommandFramesLeft;
+	private int _downChargeFrames;
+	private int _downChargeReleaseGraceFrames;
+	private int _chargedDownUpCommandFramesLeft;
+	private int _backChargeFrames;
+	private int _backChargeReleaseGraceFrames;
+	private int _chargedBackForwardCommandFramesLeft;
+	private int _previousHorizontalDirection;
 
 	public int DashCommandDirection => _dashCommandDirection;
 	public bool HasDashCommand => _dashCommandFramesLeft > 0;
@@ -22,6 +32,9 @@ public sealed class MotionInputBuffer
 	public bool HasMotionSpecialCommand => HasQuarterCircleForwardCommand;
 	public int MotionSpecialCommandAgeFrames => QuarterCircleForwardCommandAgeFrames;
 	public int FramesSinceJumpPress => _framesSinceJumpPress;
+	public bool HasDragonPunchCommand => _dragonPunchCommandFramesLeft > 0;
+	public bool HasChargedDownUpCommand => _chargedDownUpCommandFramesLeft > 0;
+	public bool HasChargedBackForwardCommand => _chargedBackForwardCommandFramesLeft > 0;
 
 	public void Tick()
 	{
@@ -30,6 +43,27 @@ public sealed class MotionInputBuffer
 		if (_framesSinceRightTap < int.MaxValue) _framesSinceRightTap++;
 		if (_framesSinceJumpPress < int.MaxValue) _framesSinceJumpPress++;
 		if (_backDashInputLockoutFrames > 0) _backDashInputLockoutFrames--;
+		if (_framesSinceForwardTap < int.MaxValue) _framesSinceForwardTap++;
+		if (_forwardThenDownFramesLeft > 0) _forwardThenDownFramesLeft--;
+		if (_dragonPunchCommandFramesLeft > 0) _dragonPunchCommandFramesLeft--;
+		if (_chargedDownUpCommandFramesLeft > 0)
+		{
+			_chargedDownUpCommandFramesLeft--;
+			if (_chargedDownUpCommandFramesLeft == 0)
+			{
+				_downChargeFrames = 0;
+				_downChargeReleaseGraceFrames = 0;
+			}
+		}
+		if (_chargedBackForwardCommandFramesLeft > 0)
+		{
+			_chargedBackForwardCommandFramesLeft--;
+			if (_chargedBackForwardCommandFramesLeft == 0)
+			{
+				_backChargeFrames = 0;
+				_backChargeReleaseGraceFrames = 0;
+			}
+		}
 		if (_downThenUpCommandFramesLeft > 0) _downThenUpCommandFramesLeft--;
 		if (_dashCommandFramesLeft > 0) _dashCommandFramesLeft--;
 		TickQuarterCircleForwardCommand();
@@ -48,14 +82,62 @@ public sealed class MotionInputBuffer
 		}
 	}
 
-	public void PressDown() => _framesSinceDown = 0;
+	public void PressDown()
+	{
+		_framesSinceDown = 0;
+		if (_framesSinceForwardTap <= 16) _forwardThenDownFramesLeft = 16;
+	}
 
 	public void PressJump(int inputBufferFrames)
 	{
 		_framesSinceJumpPress = 0;
+		if (_downChargeFrames >= 45) _chargedDownUpCommandFramesLeft = inputBufferFrames;
 		if (_framesSinceDown >= int.MaxValue) return;
 		_downToUpFrames = _framesSinceDown;
 		_downThenUpCommandFramesLeft = inputBufferFrames;
+	}
+
+	public void UpdateDownCharge(bool holdingDown)
+	{
+		if (holdingDown)
+		{
+			_downChargeFrames++;
+			_downChargeReleaseGraceFrames = 5;
+		}
+		else if (_chargedDownUpCommandFramesLeft <= 0)
+		{
+			if (_downChargeReleaseGraceFrames > 0)
+				_downChargeReleaseGraceFrames--;
+			else
+				_downChargeFrames = 0;
+		}
+	}
+
+	public void UpdateBackForwardCharge(float horizontal, int facing, int inputBufferFrames)
+	{
+		int direction = horizontal > 0.5f ? 1 : horizontal < -0.5f ? -1 : 0;
+		int relative = direction * (facing >= 0 ? 1 : -1);
+		if (relative < 0)
+		{
+			_backChargeFrames++;
+			// Back may be released for five sampled frames before Forward.
+			_backChargeReleaseGraceFrames = 5;
+		}
+		else if (relative > 0)
+		{
+			if (_previousHorizontalDirection <= 0 && _backChargeFrames >= 45)
+				_chargedBackForwardCommandFramesLeft = inputBufferFrames;
+			// The completed motion now has only its short button window.
+			if (_backChargeFrames < 45) _backChargeFrames = 0;
+		}
+		else if (_chargedBackForwardCommandFramesLeft <= 0)
+		{
+			if (_backChargeReleaseGraceFrames > 0)
+				_backChargeReleaseGraceFrames--;
+			else
+				_backChargeFrames = 0;
+		}
+		_previousHorizontalDirection = relative;
 	}
 
 	public void PressHorizontalTap(int direction, int facing, int inputBufferFrames, int doubleTapWindowFrames,
@@ -67,6 +149,11 @@ public sealed class MotionInputBuffer
 		{
 			_qcfForwardCommandFramesLeft = quarterCircleForwardLatchFrames;
 			_qcfForwardCommandAgeFrames = 0;
+		}
+		if (normalizedDirection == normalizedFacing)
+		{
+			if (_forwardThenDownFramesLeft > 0) _dragonPunchCommandFramesLeft = quarterCircleForwardLatchFrames;
+			_framesSinceForwardTap = 0;
 		}
 
 		int framesSinceTap = normalizedDirection < 0 ? _framesSinceLeftTap : _framesSinceRightTap;
@@ -102,10 +189,30 @@ public sealed class MotionInputBuffer
 		_qcfForwardCommandAgeFrames = int.MaxValue;
 	}
 
+	public void ConsumeDragonPunchCommand()
+	{
+		_dragonPunchCommandFramesLeft = 0;
+		_forwardThenDownFramesLeft = 0;
+	}
+
 	public void ConsumeDownThenUpCommand()
 	{
 		_framesSinceDown = int.MaxValue;
 		_downToUpFrames = int.MaxValue;
 		_downThenUpCommandFramesLeft = 0;
+	}
+
+	public void ConsumeChargedDownUpCommand()
+	{
+		_chargedDownUpCommandFramesLeft = 0;
+		_downChargeFrames = 0;
+		_downChargeReleaseGraceFrames = 0;
+	}
+
+	public void ConsumeChargedBackForwardCommand()
+	{
+		_chargedBackForwardCommandFramesLeft = 0;
+		_backChargeFrames = 0;
+		_backChargeReleaseGraceFrames = 0;
 	}
 }
