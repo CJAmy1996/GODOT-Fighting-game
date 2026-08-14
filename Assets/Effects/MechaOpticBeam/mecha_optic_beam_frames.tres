@@ -1,0 +1,12 @@
+[gd_resource type="SpriteFrames" load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/MechaOpticBeam/optic_beam_00.png" id="1_beam0"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/MechaOpticBeam/optic_beam_01.png" id="2_beam1"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 1.0, "texture": ExtResource("1_beam0")}, {"duration": 1.0, "texture": ExtResource("2_beam1")}],
+"loop": true,
+"name": &"optic_blast",
+"speed": 15.0
+}]

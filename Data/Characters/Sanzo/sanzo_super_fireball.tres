@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1")
 AttackName = "SUPER REFLECTOR"
-StartupFrames = 7
+StartupFrames = 12
 ActiveFrames = 2
 RecoveryFrames = 24
 ActivationFreezeFrames = 45

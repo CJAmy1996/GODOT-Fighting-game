@@ -1,0 +1,96 @@
+[gd_resource type="SpriteFrames" load_steps=12 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/combo_digits_num01.png" id="1"]
+
+[sub_resource type="AtlasTexture" id="Digit0"]
+atlas = ExtResource("1")
+region = Rect2(0, 0, 8, 16)
+
+[sub_resource type="AtlasTexture" id="Digit1"]
+atlas = ExtResource("1")
+region = Rect2(8, 0, 8, 16)
+
+[sub_resource type="AtlasTexture" id="Digit2"]
+atlas = ExtResource("1")
+region = Rect2(16, 0, 8, 16)
+
+[sub_resource type="AtlasTexture" id="Digit3"]
+atlas = ExtResource("1")
+region = Rect2(24, 0, 8, 16)
+
+[sub_resource type="AtlasTexture" id="Digit4"]
+atlas = ExtResource("1")
+region = Rect2(32, 0, 8, 16)
+
+[sub_resource type="AtlasTexture" id="Digit5"]
+atlas = ExtResource("1")
+region = Rect2(40, 0, 8, 16)
+
+[sub_resource type="AtlasTexture" id="Digit6"]
+atlas = ExtResource("1")
+region = Rect2(48, 0, 8, 16)
+
+[sub_resource type="AtlasTexture" id="Digit7"]
+atlas = ExtResource("1")
+region = Rect2(56, 0, 8, 16)
+
+[sub_resource type="AtlasTexture" id="Digit8"]
+atlas = ExtResource("1")
+region = Rect2(64, 0, 8, 16)
+
+[sub_resource type="AtlasTexture" id="Digit9"]
+atlas = ExtResource("1")
+region = Rect2(72, 0, 8, 16)
+
+[resource]
+animations = [{
+"frames": [{"duration": 1.0, "texture": SubResource("Digit0")}],
+"loop": false,
+"name": &"digit_0",
+"speed": 60.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("Digit1")}],
+"loop": false,
+"name": &"digit_1",
+"speed": 60.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("Digit2")}],
+"loop": false,
+"name": &"digit_2",
+"speed": 60.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("Digit3")}],
+"loop": false,
+"name": &"digit_3",
+"speed": 60.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("Digit4")}],
+"loop": false,
+"name": &"digit_4",
+"speed": 60.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("Digit5")}],
+"loop": false,
+"name": &"digit_5",
+"speed": 60.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("Digit6")}],
+"loop": false,
+"name": &"digit_6",
+"speed": 60.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("Digit7")}],
+"loop": false,
+"name": &"digit_7",
+"speed": 60.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("Digit8")}],
+"loop": false,
+"name": &"digit_8",
+"speed": 60.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("Digit9")}],
+"loop": false,
+"name": &"digit_9",
+"speed": 60.0
+}]

@@ -6,12 +6,18 @@ namespace ModularFighter.Core;
 public static class AttackDrawingTimeline
 {
 	public static int Resolve(SpriteFrames frames, StringName animation, int timelineFrame,
-		int startupFrames, int activeFrames, int recoveryFrames, bool reverseRecovery)
+		int startupFrames, int activeFrames, int recoveryFrames, bool reverseRecovery,
+		int[] animationSourceTimeline = null)
 	{
 		if (frames == null || !frames.HasAnimation(animation)) return 0;
 		int count = frames.GetFrameCount(animation);
 		if (count <= 1) return 0;
 		int frame = Mathf.Max(0, timelineFrame);
+		if (animationSourceTimeline is { Length: > 0 })
+		{
+			int sourceTick = animationSourceTimeline[Mathf.Clamp(frame, 0, animationSourceTimeline.Length - 1)];
+			return ResolveAuthoredDuration(frames, animation, Mathf.Max(0, sourceTick));
+		}
 		if (!reverseRecovery) return ResolveAuthoredDuration(frames, animation, frame);
 
 		int startup = Mathf.Max(0, startupFrames);
@@ -36,6 +42,20 @@ public static class AttackDrawingTimeline
 		if (recovery <= 1) return 0;
 		int reverseOffset = Mathf.RoundToInt(recoveryElapsed * (count - 1) / (float)(recovery - 1));
 		return Mathf.Clamp(count - 1 - reverseOffset, 0, count - 1);
+	}
+
+	/// <summary>Resolves one explicitly requested authored 60 Hz source tick.</summary>
+	public static int ResolveSourceTick(SpriteFrames frames, StringName animation, int sourceTick) =>
+		frames == null || !frames.HasAnimation(animation)
+			? 0
+			: ResolveAuthoredDuration(frames, animation, Mathf.Max(0, sourceTick));
+
+	public static int ResolveSourceCycle(SpriteFrames frames, StringName animation, int[] sourceCycle,
+		int elapsedTicks, int ticksPerSource)
+	{
+		if (sourceCycle is not { Length: > 0 }) return 0;
+		int index = Mathf.Max(0, elapsedTicks) / Mathf.Max(1, ticksPerSource) % sourceCycle.Length;
+		return ResolveSourceTick(frames, animation, sourceCycle[index]);
 	}
 
 	public static int GetAuthoredTicks(SpriteFrames frames, StringName animation)

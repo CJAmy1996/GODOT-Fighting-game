@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=10 format=3 uid="uid://bvvc0enhy8tem"]
+[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=22 format=3 uid="uid://bvvc0enhy8tem"]
 
 [ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="1_box"]
 [ext_resource type="Script" uid="uid://br48dic8s6gkm" path="res://Scripts/Core/NormalMoveData.cs" id="2_move"]

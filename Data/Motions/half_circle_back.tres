@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MotionInputDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/MotionInputDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+MotionName = "Half Circle Back"
+DirectionSequences = PackedStringArray("F,DF,D,DB,B", "F,D,B")
+MotionWindowFrames = 24
+ButtonLeniencyFrames = 5
+MaxSkippedDirections = 1

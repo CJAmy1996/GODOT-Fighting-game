@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://b35ijtyrc4bpm"
+
+[deps]
+
+files=["res://Assets/Effects/BigBangCommon/common_resource_usage.source.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.width.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.height.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.referenced.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.source.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.drawing.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.runtime.translation"]
+
+source_file="res://Assets/Effects/BigBangCommon/common_resource_usage.csv"
+dest_files=["res://Assets/Effects/BigBangCommon/common_resource_usage.source.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.width.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.height.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.referenced.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.source.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.drawing.translation", "res://Assets/Effects/BigBangCommon/common_resource_usage.runtime.translation"]
+
+[params]
+
+compress=true
+delimiter=0

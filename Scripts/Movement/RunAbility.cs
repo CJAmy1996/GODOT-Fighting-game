@@ -10,12 +10,15 @@ public partial class RunAbility : MovementAbility
 	[Export] public float Acceleration { get; set; } = 5200f;
 	[Export] public float StopFriction { get; set; } = 4200f;
 	[Export] public float CrouchCancelFriction { get; set; } = 2600f;
+	[Export] public bool RequireDirectionalDoubleTap { get; set; }
+	[Export] public int StopSlideFrames { get; set; } = 8;
 	public override bool OwnsHorizontalVelocity => true;
 
 	public override bool CanStart(FighterController fighter, AbilityRuntime runtime)
 	{
 		if (!fighter.WasGrounded) return false;
 		if (!fighter.ActionInput.DashPressed) return false;
+		if (RequireDirectionalDoubleTap && !fighter.HasBufferedDashCommand) return false;
 		if (fighter.CurrentInput.Vertical > 0.5f) return false;
 		return fighter.DashInputDirection * fighter.Facing > 0;
 	}
@@ -24,6 +27,7 @@ public partial class RunAbility : MovementAbility
 	{
 		base.Start(fighter, runtime);
 		runtime.IntValue = fighter.DashInputDirection;
+		fighter.QueueRunDustEffect();
 		fighter.ConsumeDashCommand();
 	}
 
@@ -39,7 +43,7 @@ public partial class RunAbility : MovementAbility
 				fighter.BeginRunCrouchSlide();
 				return false;
 			}
-			if (fighter.WasGrounded && !holdingRunDirection) fighter.BeginRunStopSlide();
+			if (fighter.WasGrounded && !holdingRunDirection) fighter.BeginRunStopSlide(StopSlideFrames);
 			return false;
 		}
 

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FighterGaugeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/FighterGaugeData.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+MaxLife = 1000
+StartingLife = 1000
+SpecialMeterName = "SUPER"
+MaxSpecialMeter = 300
+StartingSpecialMeter = 0
+LifeColor = Color(0.28, 0.88, 0.32, 1)
+SpecialMeterColor = Color(0.15, 0.58, 1, 1)

@@ -68,13 +68,32 @@ public partial class FighterBoxFrame : Resource
 	[Export] public int HitstopFrames { get; set; } = UseMoveDefaultInt;
 	[Export] public float Pushback { get; set; } = UseMoveDefaultFloat;
 	[Export] public float ShakeStrength { get; set; } = UseMoveDefaultFloat;
+	/// <summary>Optional contact effect for this hitbox. Falls back to the move's HitSparkScene when unset.</summary>
+	[Export] public PackedScene HitSparkScene { get; set; }
 	[Export] public HitReactionKind HitReaction { get; set; } = HitReactionKind.Normal;
 	[Export] public KnockdownType KnockdownType { get; set; } = KnockdownType.None;
 	[Export] public bool KnocksDown { get; set; }
 	[Export] public int KnockdownFrames { get; set; } = UseMoveDefaultInt;
 	[Export] public bool CanHitGroundedKnockdown { get; set; }
+	[Export] public GuardReactionStrength GuardReactionStrength { get; set; } = GuardReactionStrength.None;
+	[Export] public SpecialReactionKind SpecialReaction { get; set; } = SpecialReactionKind.None;
 	/// <summary>Applies wall-bounce knockdown only when this hitbox strikes an airborne target.</summary>
 	[Export] public bool AirborneTargetWallSplat { get; set; }
+	/// <summary>Optional small character-specific ground-bounce velocity.</summary>
+	[Export] public float GroundBounceSpeed { get; set; } = UseMoveDefaultFloat;
+	/// <summary>Returns the victim directly to a hittable juggle after the floor impact.</summary>
+	[Export] public bool GroundBounceIntoJuggle { get; set; }
+	/// <summary>Selects the weak, medium, or strong authored ground-bounce reaction.</summary>
+	[Export] public GroundBounceReactionStrength GroundBounceStrength { get; set; } = GroundBounceReactionStrength.None;
+
+	[ExportGroup("Blow Away Overrides")]
+	[Export] public BlowAwayDirection BlowAwayDirection { get; set; } = BlowAwayDirection.None;
+	[Export] public BlowAwayStrength BlowAwayStrength { get; set; } = BlowAwayStrength.None;
+	[Export] public float BlowAwaySpeed { get; set; } = UseMoveDefaultFloat;
+	[Export] public bool BlowAwayNoBounce { get; set; }
+
+	[ExportGroup("Wall Bounce Override")]
+	[Export] public WallBounceReactionStrength WallBounceStrength { get; set; } = WallBounceReactionStrength.None;
 
 	[ExportGroup("Launcher Overrides")]
 	[Export] public bool Launches { get; set; }

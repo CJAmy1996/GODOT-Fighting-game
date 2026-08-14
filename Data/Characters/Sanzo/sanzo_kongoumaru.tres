@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="FighterDefinition" load_steps=19 format=3 uid="uid://b0k6g3xnv1h4f"]
+[gd_resource type="Resource" script_class="FighterDefinition" load_steps=18 format=3 uid="uid://b0k6g3xnv1h4f"]
 
 [ext_resource type="Script" uid="uid://p3g6dew2wiky" path="res://Scripts/Core/FighterDefinition.cs" id="1_def"]
 [ext_resource type="Script" uid="uid://s1q2kuukuw7h" path="res://Scripts/Core/MovementTuning.cs" id="2_tuning"]
@@ -14,7 +14,7 @@
 [ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_super_spd.tres" id="14_super_spd"]
 [ext_resource type="Script" uid="uid://ccpi48jqc0xq" path="res://Scripts/Core/CancelRule.cs" id="15_cancel_rule"]
 [ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_gauges.tres" id="16_gauges"]
-[ext_resource type="Resource" path="res://Data/Characters/Sanzo/sanzo_state_boxes.tres" id="17_state_boxes"]
+[ext_resource type="Resource" uid="uid://bvvc0enhy8tem" path="res://Data/Characters/Sanzo/sanzo_state_boxes.tres" id="17_state_boxes"]
 
 [sub_resource type="Resource" id="CancelRule_normal_to_special_on_contact"]
 script = ExtResource("15_cancel_rule")
@@ -22,13 +22,13 @@ AllowedTargets = PackedStringArray("QCF POWER PUNCH LIGHT", "QCF POWER PUNCH HEA
 
 [sub_resource type="Resource" id="MovementTuning_sanzo"]
 script = ExtResource("2_tuning")
-WalkSpeed = 330.0
+WalkSpeed = 165.0
 GroundAcceleration = 4200.0
 GroundDeceleration = 5000.0
 GroundFriction = 5800.0
-Gravity = 2780.0
-TerminalFallSpeed = 2400.0
-AirSpeed = 390.0
+Gravity = 1807.0
+TerminalFallSpeed = 1560.0
+AirSpeed = 253.5
 AirAcceleration = 2400.0
 AirDeceleration = 1650.0
 AllowAirControl = false

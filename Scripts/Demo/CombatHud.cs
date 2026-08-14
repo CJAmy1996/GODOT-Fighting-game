@@ -12,6 +12,8 @@ public partial class CombatHud : Node2D
 	[Export] public NodePath StageRulesPath { get; set; }
 	[Export] public float DamageTrailHoldSeconds { get; set; } = 0.3f;
 	[Export] public float DamageTrailDrainPerSecond { get; set; } = 280f;
+	[Export] public float LifeBarTopOffset { get; set; } = 136f;
+	[Export] public float ComboCounterOffset { get; set; } = 48f;
 	private FighterController _fighterOne;
 	private FighterController _fighterTwo;
 	private StageCamera _stageCamera;
@@ -50,7 +52,7 @@ public partial class CombatHud : Node2D
 		float centerGap = 104f / zoom;
 		float sideMargin = 56f / zoom;
 		float barWidth = (cameraRect.Size.X - centerGap - sideMargin * 2f) * 0.5f;
-		float y = cameraRect.Position.Y + 164f / zoom;
+		float y = cameraRect.Position.Y + LifeBarTopOffset / zoom;
 		float centerX = cameraRect.GetCenter().X;
 		DrawFighterGauge(_fighterOne, new Rect2(centerX - centerGap * 0.5f - barWidth, y, barWidth, barHeight), true, _fighterOneTrailLife, zoom);
 		DrawFighterGauge(_fighterTwo, new Rect2(centerX + centerGap * 0.5f, y, barWidth, barHeight), false, _fighterTwoTrailLife, zoom);
@@ -68,12 +70,23 @@ public partial class CombatHud : Node2D
 		float trailRatio = data.MaxLife <= 0 ? 0f : trailLife / data.MaxLife;
 		DrawBar(lifeRect, trailRatio, new Color(0.85f, 0.08f, 0.08f, 0.48f), reverse, zoom);
 		DrawBarFill(lifeRect, lifeRatio, data.LifeColor, reverse);
-		Rect2 meterRect = new(lifeRect.Position + new Vector2(0f, 30f / zoom), new Vector2(lifeRect.Size.X, 12f / zoom));
+		DrawComboCounter(fighter, lifeRect, reverse, zoom);
+		Rect2 meterRect = new(lifeRect.Position + new Vector2(0f, 58f / zoom), new Vector2(lifeRect.Size.X, 12f / zoom));
 		DrawBar(meterRect, data.MaxSpecialMeter <= 0 ? 0f : fighter.PlaceholderSpecialMeter / data.MaxSpecialMeter,
 			data.SpecialMeterColor, reverse, zoom);
 		float meterTextWidth = 90f / zoom;
 		DrawString(ThemeDB.FallbackFont, meterRect.Position + new Vector2(reverse ? meterRect.Size.X - meterTextWidth : 0f, 27f / zoom),
 			data.SpecialMeterName, HorizontalAlignment.Left, meterTextWidth, Mathf.RoundToInt(13f / zoom), new Color(0.75f, 0.88f, 1f));
+	}
+
+	private void DrawComboCounter(FighterController fighter, Rect2 lifeRect, bool reverse, float zoom)
+	{
+		if (fighter.ComboCount < 2 || fighter.ComboDisplayFramesLeft <= 0) return;
+		string comboText = $"{fighter.ComboCount} HIT COMBO";
+		float width = 170f / zoom;
+		Vector2 position = lifeRect.Position + new Vector2(reverse ? lifeRect.Size.X - width : 0f, ComboCounterOffset / zoom);
+		DrawString(ThemeDB.FallbackFont, position, comboText, reverse ? HorizontalAlignment.Right : HorizontalAlignment.Left,
+			width, Mathf.RoundToInt(18f / zoom), new Color(1f, 0.84f, 0.18f, 1f));
 	}
 
 	private void DrawTimer(float centerX, float y, float zoom)

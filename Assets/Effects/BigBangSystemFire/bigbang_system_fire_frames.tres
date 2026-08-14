@@ -1,0 +1,38 @@
+[gd_resource type="SpriteFrames" load_steps=24 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangMechaExplosion/433.png" id="1_433"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangMechaExplosion/434.png" id="2_434"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangMechaExplosion/435.png" id="3_435"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangMechaExplosion/436.png" id="4_436"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangMechaExplosion/437.png" id="5_437"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangMechaExplosion/438.png" id="6_438"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangMechaExplosion/439.png" id="7_439"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangMechaExplosion/440.png" id="8_440"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangMechaExplosion/441.png" id="9_441"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/034.png" id="10_034"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/035.png" id="11_035"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/036.png" id="12_036"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/037.png" id="13_037"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/040.png" id="14_040"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/041.png" id="15_041"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/042.png" id="16_042"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/044.png" id="17_044"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/045.png" id="18_045"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/046.png" id="19_046"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/047.png" id="20_047"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/048.png" id="21_048"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/049.png" id="22_049"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangSystemFire/050.png" id="23_050"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 2.0, "texture": ExtResource("1_433")}, {"duration": 2.0, "texture": ExtResource("2_434")}, {"duration": 2.0, "texture": ExtResource("3_435")}, {"duration": 2.0, "texture": ExtResource("4_436")}, {"duration": 2.0, "texture": ExtResource("5_437")}, {"duration": 2.0, "texture": ExtResource("6_438")}, {"duration": 2.0, "texture": ExtResource("7_439")}, {"duration": 2.0, "texture": ExtResource("8_440")}, {"duration": 2.0, "texture": ExtResource("9_441")}],
+"loop": false,
+"name": &"system_explosion",
+"speed": 60.0
+}, {
+"frames": [{"duration": 1.0, "texture": ExtResource("10_034")}, {"duration": 1.0, "texture": ExtResource("11_035")}, {"duration": 1.0, "texture": ExtResource("12_036")}, {"duration": 2.0, "texture": ExtResource("13_037")}, {"duration": 2.0, "texture": ExtResource("14_040")}, {"duration": 2.0, "texture": ExtResource("14_040")}, {"duration": 2.0, "texture": ExtResource("15_041")}, {"duration": 2.0, "texture": ExtResource("16_042")}, {"duration": 2.0, "texture": ExtResource("17_044")}, {"duration": 2.0, "texture": ExtResource("18_045")}, {"duration": 2.0, "texture": ExtResource("19_046")}, {"duration": 2.0, "texture": ExtResource("20_047")}, {"duration": 2.0, "texture": ExtResource("21_048")}, {"duration": 2.0, "texture": ExtResource("22_049")}, {"duration": 2.0, "texture": ExtResource("23_050")}],
+"loop": false,
+"name": &"system_burn_flame",
+"speed": 60.0
+}]

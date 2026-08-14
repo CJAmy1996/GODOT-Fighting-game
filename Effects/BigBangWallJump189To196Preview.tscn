@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=3 uid="uid://bqx50exi42di0"]
+
+[ext_resource type="SpriteFrames" path="res://Assets/Effects/BigBangCommon/wall_jump_189_196_frames.tres" id="1_frames"]
+
+[sub_resource type="Shader" id="Shader_additive_black_key"]
+code = "shader_type canvas_item;
+render_mode blend_add;
+
+void fragment() {
+	vec4 texel = texture(TEXTURE, UV);
+	float dominant_green = texel.g - max(texel.r, texel.b);
+	float green_key = step(0.45, texel.g) * step(0.22, dominant_green);
+	float energy = max(texel.r, max(texel.g, texel.b));
+	float black_key_alpha = smoothstep(0.035, 0.12, energy);
+	COLOR = vec4(texel.rgb, texel.a * (1.0 - green_key) * black_key_alpha);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_additive_black_key"]
+shader = SubResource("Shader_additive_black_key")
+
+[node name="BigBangWallJump189To196Preview" type="AnimatedSprite2D"]
+texture_filter = 1
+material = SubResource("ShaderMaterial_additive_black_key")
+position = Vector2(-16, -48)
+sprite_frames = ExtResource("1_frames")
+animation = &"wall_jump_189_196"
+autoplay = "wall_jump_189_196"
+frame_progress = 0.025323443
+centered = false
+offset = Vector2(21.5, -10)

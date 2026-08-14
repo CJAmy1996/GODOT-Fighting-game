@@ -32,8 +32,8 @@ TerminalFallSpeed = 2400.0
 AirSpeed = 420.0
 AirAcceleration = 2600.0
 AirDeceleration = 1700.0
-InputBufferFrames = 4
 AllowAirControl = false
+InputBufferFrames = 4
 
 [resource]
 script = ExtResource("1_def")

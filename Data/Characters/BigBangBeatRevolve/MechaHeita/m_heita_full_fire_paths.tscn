@@ -1,0 +1,114 @@
+[gd_scene load_steps=13 format=3 uid="uid://c3rola7qcu05q"]
+
+[sub_resource type="Curve2D" id="C01"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 3
+
+[sub_resource type="Curve2D" id="C02"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 3
+
+[sub_resource type="Curve2D" id="C03"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 3
+
+[sub_resource type="Curve2D" id="C04"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, -45, 0, 0, 0, 0, 920, -45)
+}
+point_count = 2
+
+[sub_resource type="Curve2D" id="C05"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, -15, 0, 0, 0, 0, 920, -15)
+}
+point_count = 2
+
+[sub_resource type="Curve2D" id="C06"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 920, 15)
+}
+point_count = 2
+
+[sub_resource type="Curve2D" id="C07"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 920, 45)
+}
+point_count = 2
+
+[sub_resource type="Curve2D" id="C08"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 3
+
+[sub_resource type="Curve2D" id="C09"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 3
+
+[sub_resource type="Curve2D" id="C10"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 3
+
+[sub_resource type="Curve2D" id="C11"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 4
+
+[sub_resource type="Curve2D" id="C12"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 918, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 4
+
+[node name="FullFireProjectilePaths" type="Node2D"]
+
+[node name="MissilePath01" type="Path2D" parent="."]
+curve = SubResource("C01")
+
+[node name="MissilePath02" type="Path2D" parent="."]
+curve = SubResource("C02")
+
+[node name="MissilePath03" type="Path2D" parent="."]
+curve = SubResource("C03")
+
+[node name="MissilePath04" type="Path2D" parent="."]
+curve = SubResource("C04")
+
+[node name="MissilePath05" type="Path2D" parent="."]
+curve = SubResource("C05")
+
+[node name="MissilePath06" type="Path2D" parent="."]
+position = Vector2(5, 2)
+curve = SubResource("C06")
+
+[node name="MissilePath07" type="Path2D" parent="."]
+curve = SubResource("C07")
+
+[node name="MissilePath08" type="Path2D" parent="."]
+curve = SubResource("C08")
+
+[node name="MissilePath09" type="Path2D" parent="."]
+curve = SubResource("C09")
+
+[node name="MissilePath10" type="Path2D" parent="."]
+curve = SubResource("C10")
+
+[node name="MissilePath11" type="Path2D" parent="."]
+curve = SubResource("C11")
+
+[node name="MissilePath12" type="Path2D" parent="."]
+position = Vector2(-6, -51)
+scale = Vector2(1.006536, 18)
+curve = SubResource("C12")

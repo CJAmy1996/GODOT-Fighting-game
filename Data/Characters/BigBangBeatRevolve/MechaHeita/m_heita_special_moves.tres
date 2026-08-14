@@ -1,0 +1,935 @@
+[gd_resource type="Resource" script_class="SpecialMoveSet" load_steps=73 format=3 uid="uid://cdf5b0vbftpog"]
+
+[ext_resource type="Script" uid="uid://b0wbufr78dysp" path="res://Scripts/Core/SpecialMoveSet.cs" id="1_set"]
+[ext_resource type="Script" uid="uid://cvrl3b6rdaomb" path="res://Scripts/Core/SpecialMoveData.cs" id="2_move"]
+[ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="3_box"]
+[ext_resource type="Script" uid="uid://b60x15w1xhb6k" path="res://Scripts/Core/MotionInputBinding.cs" id="4_binding"]
+[ext_resource type="Resource" path="res://Data/Motions/quarter_circle_forward.tres" id="5_qcf"]
+[ext_resource type="SpriteFrames" path="res://Assets/Effects/MechaOpticBeam/mecha_optic_beam_frames.tres" id="6_optic_beam"]
+[ext_resource type="Resource" path="res://Data/Motions/shoryuken.tres" id="7_dp"]
+[ext_resource type="PackedScene" path="res://Effects/BigBangBloodHitSpark.tscn" id="8_blood"]
+[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/m_heita_sprite_frames.tres" id="9_mecha_frames"]
+[ext_resource type="Resource" path="res://Data/Motions/mash_five.tres" id="10_mash"]
+[ext_resource type="SpriteFrames" path="res://Assets/Effects/BigBangSystemFire/bigbang_system_fire_frames.tres" id="11_system_fire"]
+
+[sub_resource type="Resource" id="AlphaCounterHurtbox"]
+script = ExtResource("3_box")
+EndFrame = 57
+LocalRect = Rect2(-40, -126, 80, 126)
+Tag = "alpha-counter-hurtbox"
+
+[sub_resource type="Resource" id="AlphaCounterHitbox"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 36
+EndFrame = 43
+LocalRect = Rect2(8, -112, 112, 82)
+Tag = "alpha-counter-hit"
+HitGroup = 1
+Priority = 3
+
+[sub_resource type="Resource" id="AlphaCounterMove"]
+script = ExtResource("2_move")
+GuardCancel = true
+CanStartDuringBlockstun = true
+AttackName = "ALPHA COUNTER"
+AnimationName = "alpha_counter"
+Stance = 1
+StartupFrames = 36
+ActiveFrames = 8
+RecoveryFrames = 14
+SuppressFallbackHitbox = true
+Damage = 110
+HitstunFrames = 24
+BlockstunFrames = 16
+HitstopFrames = 12
+Pushback = 220.0
+ShakeStrength = 6.0
+GuardReactionStrength = 3
+BoxTimeline = [SubResource("AlphaCounterHurtbox"), SubResource("AlphaCounterHitbox")]
+
+[sub_resource type="Resource" id="MechaLaserHurtbox"]
+script = ExtResource("3_box")
+EndFrame = 43
+LocalRect = Rect2(-46, -124, 92, 124)
+Tag = "mecha-laser-body"
+
+[sub_resource type="Resource" id="MechaLaserBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("5_qcf")
+Buttons = 3
+Priority = 20
+
+[sub_resource type="Resource" id="MechaLaserMove"]
+script = ExtResource("2_move")
+CommandInput = SubResource("MechaLaserBinding")
+Projectile = true
+ProjectileSpeed = 0.0
+ProjectileSpawnOffset = Vector2(58, -78)
+ProjectileHitboxLocal = Rect2(0, -30, 620, 60)
+ProjectileSpriteFrames = ExtResource("6_optic_beam")
+ProjectileAnimationName = "optic_blast"
+ProjectileVisualOffset = Vector2(323, 0)
+ProjectileVisualScale = Vector2(2, 2)
+ProjectileVisualAdditiveBlend = true
+ProjectileHitCount = 5
+ProjectileHitCooldownFrames = 3
+ProjectileAnchoredToOwner = true
+ProjectileDirectionalHitbox = true
+ProjectileLifetimeFrames = 18
+AttackName = "LIGHT OPTIC BLAST"
+AnimationName = "anim_129"
+Stance = 1
+StartupFrames = 12
+ActiveFrames = 2
+RecoveryFrames = 26
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+Damage = 16
+HitstunFrames = 10
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+BoxTimeline = [SubResource("MechaLaserHurtbox")]
+
+[sub_resource type="Resource" id="MechaMissileHurtbox"]
+script = ExtResource("3_box")
+EndFrame = 55
+LocalRect = Rect2(-46, -124, 92, 124)
+Tag = "missile-activation-body"
+
+[sub_resource type="Resource" id="MechaMissileBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("5_qcf")
+Buttons = 4
+Priority = 20
+
+[sub_resource type="Resource" id="MechaMissileMove"]
+script = ExtResource("2_move")
+CommandInput = SubResource("MechaMissileBinding")
+CanCancelIntoFromNormals = true
+Projectile = true
+ProjectileSpeed = 660.0
+ProjectileSpawnOffset = Vector2(-22, -92)
+ProjectileHitboxLocal = Rect2(-24, -18, 72, 36)
+ProjectileSpriteFrames = ExtResource("9_mecha_frames")
+ProjectileAnimationName = "anim_134"
+ProjectileVisualOffset = Vector2(16, 0)
+ProjectileImpactSpriteFrames = ExtResource("11_system_fire")
+ProjectileImpactAnimationName = "system_explosion"
+ProjectileImpactAdditiveBlend = true
+ProjectileImpactBlackKey = true
+ProjectileImpactBlackensDefender = true
+ProjectileImpactDefenderFireSpriteFrames = ExtResource("11_system_fire")
+ProjectileImpactDefenderFireAnimationName = "system_burn_flame"
+AttackName = "LIGHT MECHA MISSILE"
+AnimationName = "anim_133"
+Stance = 1
+StartupFrames = 20
+ActiveFrames = 2
+RecoveryFrames = 34
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+Damage = 90
+HitstunFrames = 24
+BlockstunFrames = 16
+HitstopFrames = 12
+Pushback = 320.0
+ShakeStrength = 6.0
+BoxTimeline = [SubResource("MechaMissileHurtbox")]
+
+[sub_resource type="Resource" id="MechaHeavyMissileBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("5_qcf")
+Buttons = 8
+Priority = 20
+
+[sub_resource type="Resource" id="MechaHeavyMissileMove"]
+script = ExtResource("2_move")
+CommandInput = SubResource("MechaHeavyMissileBinding")
+CanCancelIntoFromNormals = true
+Projectile = true
+HeavyProjectile = true
+ProjectileSpawnOffset = Vector2(-28, -72)
+ProjectileHitboxLocal = Rect2(-26, -20, 78, 40)
+ProjectileSpriteFrames = ExtResource("9_mecha_frames")
+ProjectileAnimationName = "anim_135"
+ProjectileVisualOffset = Vector2(16, 0)
+ProjectileVisualScale = Vector2(1.08, 1.08)
+ProjectileImpactSpriteFrames = ExtResource("11_system_fire")
+ProjectileImpactAnimationName = "system_explosion"
+ProjectileImpactAdditiveBlend = true
+ProjectileImpactBlackKey = true
+ProjectileImpactBlackensDefender = true
+ProjectileImpactDefenderFireSpriteFrames = ExtResource("11_system_fire")
+ProjectileImpactDefenderFireAnimationName = "system_burn_flame"
+AttackName = "HEAVY MECHA MISSILE"
+AnimationName = "anim_133"
+Stance = 1
+StartupFrames = 20
+ActiveFrames = 2
+RecoveryFrames = 34
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+Damage = 110
+HitstunFrames = 27
+BlockstunFrames = 18
+HitstopFrames = 13
+Pushback = 360.0
+ShakeStrength = 7.0
+BoxTimeline = [SubResource("MechaMissileHurtbox")]
+
+[sub_resource type="Resource" id="MechaElectricHurtbox"]
+script = ExtResource("3_box")
+EndFrame = 3600
+LocalRect = Rect2(-48, -124, 96, 124)
+Tag = "electricity-body"
+
+[sub_resource type="Resource" id="MechaElectricHitbox"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 12
+EndFrame = 3600
+LocalRect = Rect2(-82, -142, 164, 148)
+Tag = "electricity-field"
+HitGroup = 1
+
+[sub_resource type="Resource" id="MechaElectricMashBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("10_mash")
+Buttons = 15
+Priority = 24
+MashWindowFramesOverride = 30
+
+[sub_resource type="Resource" id="MechaElectricityMove"]
+script = ExtResource("2_move")
+CommandInput = SubResource("MechaElectricMashBinding")
+SustainWithMash = true
+AttackName = "MECHA ELECTRICITY"
+AnimationName = "anim_148"
+Stance = 1
+StartupFrames = 12
+ActiveFrames = 3600
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+ActiveLoopAnimationName = "anim_149"
+Damage = 24
+HitstunFrames = 13
+BlockstunFrames = 10
+HitstopFrames = 8
+Pushback = 55.0
+ShakeStrength = 3.0
+BoxTimeline = [SubResource("MechaElectricHurtbox"), SubResource("MechaElectricHitbox")]
+
+[sub_resource type="Resource" id="MechaShinryukenHurtbox"]
+script = ExtResource("3_box")
+EndFrame = 122
+LocalRect = Rect2(-50, -148, 100, 148)
+Tag = "shinryuken-rising-body"
+
+[sub_resource type="Resource" id="MechaShinryukenHit1"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 9
+EndFrame = 14
+LocalRect = Rect2(-58, -148, 128, 146)
+Tag = "shinryuken-spin-1"
+HitGroup = 1
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit2"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 15
+EndFrame = 20
+LocalRect = Rect2(-66, -156, 142, 152)
+Tag = "shinryuken-spin-2"
+HitGroup = 2
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit3"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 21
+EndFrame = 26
+LocalRect = Rect2(-72, -164, 150, 158)
+Tag = "shinryuken-spin-3"
+HitGroup = 3
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit4"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 27
+EndFrame = 32
+LocalRect = Rect2(-70, -172, 154, 164)
+Tag = "shinryuken-spin-4"
+HitGroup = 4
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit5"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 33
+EndFrame = 38
+LocalRect = Rect2(-64, -180, 158, 170)
+Tag = "shinryuken-spin-5"
+HitGroup = 5
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit6"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 39
+EndFrame = 44
+LocalRect = Rect2(-58, -188, 160, 176)
+Tag = "shinryuken-spin-6"
+HitGroup = 6
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit7"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 45
+EndFrame = 50
+LocalRect = Rect2(-58, -148, 128, 146)
+Tag = "shinryuken-spin-7"
+HitGroup = 7
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit8"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 51
+EndFrame = 56
+LocalRect = Rect2(-66, -156, 142, 152)
+Tag = "shinryuken-spin-8"
+HitGroup = 8
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit9"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 57
+EndFrame = 62
+LocalRect = Rect2(-72, -164, 150, 158)
+Tag = "shinryuken-spin-9"
+HitGroup = 9
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit10"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 63
+EndFrame = 68
+LocalRect = Rect2(-70, -172, 154, 164)
+Tag = "shinryuken-spin-10"
+HitGroup = 10
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit11"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 69
+EndFrame = 74
+LocalRect = Rect2(-64, -180, 158, 170)
+Tag = "shinryuken-spin-11"
+HitGroup = 11
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit12"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 75
+EndFrame = 80
+LocalRect = Rect2(-58, -188, 160, 176)
+Tag = "shinryuken-spin-12"
+HitGroup = 12
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit13"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 81
+EndFrame = 86
+LocalRect = Rect2(-58, -148, 128, 146)
+Tag = "shinryuken-spin-13"
+HitGroup = 13
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit14"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 87
+EndFrame = 92
+LocalRect = Rect2(-66, -156, 142, 152)
+Tag = "shinryuken-spin-14"
+HitGroup = 14
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit15"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 93
+EndFrame = 98
+LocalRect = Rect2(-72, -164, 150, 158)
+Tag = "shinryuken-spin-15"
+HitGroup = 15
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit16"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 99
+EndFrame = 104
+LocalRect = Rect2(-70, -172, 154, 164)
+Tag = "shinryuken-spin-16"
+HitGroup = 16
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaShinryukenHit17"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 105
+EndFrame = 110
+LocalRect = Rect2(-64, -180, 158, 170)
+Tag = "shinryuken-spin-17"
+HitGroup = 17
+Damage = 35
+HitstunFrames = 30
+BlockstunFrames = 19
+HitstopFrames = 10
+Pushback = 220.0
+ShakeStrength = 7.0
+KnockdownType = 2
+KnocksDown = true
+KnockdownFrames = 48
+BlowAwayDirection = 2
+BlowAwayStrength = 2
+
+[sub_resource type="Resource" id="MechaShinryukenBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("5_qcf")
+Buttons = 12
+ButtonMatchMode = 1
+Priority = 50
+
+[sub_resource type="Resource" id="MechaShinryuken"]
+script = ExtResource("2_move")
+CommandInput = SubResource("MechaShinryukenBinding")
+TriggersSuperPresentation = true
+SuperBackdropFrames = 95
+AddsGlobalHitstopBonus = false
+ContactHitstopMultiplier = 0.4
+SelfRiseDuringAttack = true
+SelfRiseSpeed = 290.0
+SelfRiseStartFrame = 9
+SelfRiseEndFrame = 110
+HoldUntilLanding = true
+LandingRecoveryFrames = 11
+LandingAnimationName = "anim_131"
+LandingAnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+AttackName = "MECHA SHINRYUKEN"
+AnimationName = "anim_145"
+Stance = 1
+StartupFrames = 9
+ActiveFrames = 102
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 9, 12, 15, 18, 21, 24, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38)
+Damage = 7
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 2
+Pushback = 25.0
+ShakeStrength = 2.0
+BoxTimeline = [SubResource("MechaShinryukenHurtbox"), SubResource("MechaShinryukenHit1"), SubResource("MechaShinryukenHit2"), SubResource("MechaShinryukenHit3"), SubResource("MechaShinryukenHit4"), SubResource("MechaShinryukenHit5"), SubResource("MechaShinryukenHit6"), SubResource("MechaShinryukenHit7"), SubResource("MechaShinryukenHit8"), SubResource("MechaShinryukenHit9"), SubResource("MechaShinryukenHit10"), SubResource("MechaShinryukenHit11"), SubResource("MechaShinryukenHit12"), SubResource("MechaShinryukenHit13"), SubResource("MechaShinryukenHit14"), SubResource("MechaShinryukenHit15"), SubResource("MechaShinryukenHit16"), SubResource("MechaShinryukenHit17")]
+Launches = true
+LaunchSpeed = 520.0
+LaunchPushback = 25.0
+LaunchHitstunFrames = 15
+
+[sub_resource type="Resource" id="MechaLightHelicopterHurtbox"]
+script = ExtResource("3_box")
+EndFrame = 53
+LocalRect = Rect2(-50, -144, 100, 144)
+Tag = "light-helicopter-dp-body"
+
+[sub_resource type="Resource" id="MechaLightHelicopterHit1"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 9
+EndFrame = 11
+LocalRect = Rect2(4, -116, 108, 76)
+Tag = "light-helicopter-hit-1"
+HitGroup = 1
+Damage = 10
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 3
+Pushback = 35.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaLightHelicopterHit2"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 12
+EndFrame = 14
+LocalRect = Rect2(-10, -138, 122, 86)
+Tag = "light-helicopter-hit-2"
+HitGroup = 2
+Damage = 10
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 3
+Pushback = 35.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaLightHelicopterHit3"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 15
+EndFrame = 17
+LocalRect = Rect2(-20, -156, 126, 96)
+Tag = "light-helicopter-hit-3"
+HitGroup = 3
+Damage = 10
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 3
+Pushback = 35.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaLightHelicopterHit4"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 18
+EndFrame = 20
+LocalRect = Rect2(-28, -170, 128, 104)
+Tag = "light-helicopter-hit-4"
+HitGroup = 4
+Damage = 10
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 3
+Pushback = 35.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaLightHelicopterHit5"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 21
+EndFrame = 23
+LocalRect = Rect2(-34, -182, 130, 110)
+Tag = "light-helicopter-hit-5"
+HitGroup = 5
+Damage = 10
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 3
+Pushback = 35.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaLightHelicopterHit6"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 24
+EndFrame = 26
+LocalRect = Rect2(-28, -192, 132, 116)
+Tag = "light-helicopter-hit-6"
+HitGroup = 6
+Damage = 10
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 3
+Pushback = 35.0
+ShakeStrength = 2.0
+
+[sub_resource type="Resource" id="MechaLightHelicopterHit7"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 27
+EndFrame = 29
+LocalRect = Rect2(-14, -202, 138, 122)
+Tag = "light-helicopter-hit-7"
+HitGroup = 7
+Damage = 25
+HitstunFrames = 22
+BlockstunFrames = 15
+HitstopFrames = 7
+Pushback = 175.0
+ShakeStrength = 5.5
+KnockdownType = 2
+KnocksDown = true
+KnockdownFrames = 36
+BlowAwayDirection = 2
+BlowAwayStrength = 1
+
+[sub_resource type="Resource" id="MechaLightHelicopterBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("7_dp")
+Priority = 30
+GroundOnly = false
+AirOnly = true
+
+[sub_resource type="Resource" id="MechaLightHelicopterDp"]
+script = ExtResource("2_move")
+CommandInput = SubResource("MechaLightHelicopterBinding")
+SelfLaunch = true
+SelfLaunchStartFrame = 9
+SelfLaunchSpeed = 800.0
+SelfHorizontalSpeed = 0.0
+SelfLaunchUsesFacing = true
+LandingRecoveryFrames = 11
+LandingAnimationName = "anim_131"
+LandingAnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+AttackName = "LIGHT HELICOPTER DP"
+AnimationName = "anim_132"
+Stance = 3
+StartupFrames = 9
+ActiveFrames = 21
+RecoveryFrames = 24
+SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11, 11, 12, 12, 12, 13, 13, 13, 14, 14, 14, 15, 15, 15, 16, 16, 16, 17, 17, 17)
+CanChainToSpecial = true
+Damage = 10
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 3
+Pushback = 35.0
+ShakeStrength = 2.0
+BoxTimeline = [SubResource("MechaLightHelicopterHurtbox"), SubResource("MechaLightHelicopterHit1"), SubResource("MechaLightHelicopterHit2"), SubResource("MechaLightHelicopterHit3"), SubResource("MechaLightHelicopterHit4"), SubResource("MechaLightHelicopterHit5"), SubResource("MechaLightHelicopterHit6"), SubResource("MechaLightHelicopterHit7")]
+
+[sub_resource type="Resource" id="MechaHelicopterHurtbox"]
+script = ExtResource("3_box")
+EndFrame = 53
+LocalRect = Rect2(-54, -150, 108, 150)
+Tag = "helicopter-dp-body"
+
+[sub_resource type="Resource" id="MechaHelicopterHit1"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 9
+EndFrame = 11
+LocalRect = Rect2(4, -116, 112, 78)
+Tag = "helicopter-hit-1"
+HitGroup = 1
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+HitSparkScene = ExtResource("8_blood")
+
+[sub_resource type="Resource" id="MechaHelicopterHit2"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 12
+EndFrame = 14
+LocalRect = Rect2(-12, -142, 130, 92)
+Tag = "helicopter-hit-2"
+HitGroup = 2
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+HitSparkScene = ExtResource("8_blood")
+
+[sub_resource type="Resource" id="MechaHelicopterHit3"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 15
+EndFrame = 17
+LocalRect = Rect2(-24, -162, 132, 104)
+Tag = "helicopter-hit-3"
+HitGroup = 3
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+HitSparkScene = ExtResource("8_blood")
+
+[sub_resource type="Resource" id="MechaHelicopterHit4"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 18
+EndFrame = 20
+LocalRect = Rect2(-34, -176, 134, 112)
+Tag = "helicopter-hit-4"
+HitGroup = 4
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+HitSparkScene = ExtResource("8_blood")
+
+[sub_resource type="Resource" id="MechaHelicopterHit5"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 21
+EndFrame = 23
+LocalRect = Rect2(-44, -188, 136, 118)
+Tag = "helicopter-hit-5"
+HitGroup = 5
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+HitSparkScene = ExtResource("8_blood")
+
+[sub_resource type="Resource" id="MechaHelicopterHit6"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 24
+EndFrame = 26
+LocalRect = Rect2(-50, -198, 138, 124)
+Tag = "helicopter-hit-6"
+HitGroup = 6
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+HitSparkScene = ExtResource("8_blood")
+
+[sub_resource type="Resource" id="MechaHelicopterHit7"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 27
+EndFrame = 29
+LocalRect = Rect2(-56, -206, 140, 128)
+Tag = "helicopter-hit-7"
+HitGroup = 7
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+HitSparkScene = ExtResource("8_blood")
+
+[sub_resource type="Resource" id="MechaHelicopterHit8"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 30
+EndFrame = 32
+LocalRect = Rect2(-52, -212, 142, 132)
+Tag = "helicopter-hit-8"
+HitGroup = 8
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+HitSparkScene = ExtResource("8_blood")
+
+[sub_resource type="Resource" id="MechaHelicopterHit9"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 33
+EndFrame = 35
+LocalRect = Rect2(-44, -218, 144, 136)
+Tag = "helicopter-hit-9"
+HitGroup = 9
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+
+[sub_resource type="Resource" id="MechaHelicopterHit10"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 36
+EndFrame = 38
+LocalRect = Rect2(-34, -224, 146, 140)
+Tag = "helicopter-hit-10"
+HitGroup = 10
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+
+[sub_resource type="Resource" id="MechaHelicopterHit11"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 39
+EndFrame = 41
+LocalRect = Rect2(-24, -230, 148, 144)
+Tag = "helicopter-hit-11"
+HitGroup = 11
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+
+[sub_resource type="Resource" id="MechaHelicopterHit12"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 42
+EndFrame = 44
+LocalRect = Rect2(-10, -236, 150, 148)
+Tag = "helicopter-hit-12"
+HitGroup = 12
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+
+[sub_resource type="Resource" id="MechaHelicopterHit13"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 45
+EndFrame = 47
+LocalRect = Rect2(4, -242, 154, 152)
+Tag = "helicopter-hit-13"
+HitGroup = 13
+Damage = 35
+HitstunFrames = 26
+BlockstunFrames = 18
+HitstopFrames = 9
+Pushback = 230.0
+ShakeStrength = 7.0
+KnockdownType = 2
+KnocksDown = true
+KnockdownFrames = 42
+BlowAwayDirection = 2
+BlowAwayStrength = 2
+
+[sub_resource type="Resource" id="MechaHelicopterBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("7_dp")
+Buttons = 2
+Priority = 30
+
+[sub_resource type="Resource" id="MechaHelicopterDp"]
+script = ExtResource("2_move")
+CommandInput = SubResource("MechaHelicopterBinding")
+SelfLaunch = true
+SelfLaunchStartFrame = 9
+SelfLaunchSpeed = 800.0
+SelfHorizontalSpeed = 1000.0
+SelfLaunchUsesFacing = true
+SelfHorizontalDeceleration = 2400.0
+LandingRecoveryFrames = 11
+LandingAnimationName = "anim_131"
+LandingAnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+AttackName = "HELICOPTER DP"
+AnimationName = "anim_130"
+Stance = 1
+StartupFrames = 9
+ActiveFrames = 39
+RecoveryFrames = 6
+SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11, 11, 12, 12, 12, 13, 13, 13, 14, 14, 14, 15, 15, 15, 16, 16, 16, 17, 17, 17)
+CanChainToSpecial = true
+Damage = 12
+HitstunFrames = 12
+BlockstunFrames = 8
+HitstopFrames = 3
+Pushback = 45.0
+ShakeStrength = 2.5
+BoxTimeline = [SubResource("MechaHelicopterHurtbox"), SubResource("MechaHelicopterHit1"), SubResource("MechaHelicopterHit2"), SubResource("MechaHelicopterHit3"), SubResource("MechaHelicopterHit4"), SubResource("MechaHelicopterHit5"), SubResource("MechaHelicopterHit6"), SubResource("MechaHelicopterHit7"), SubResource("MechaHelicopterHit8"), SubResource("MechaHelicopterHit9"), SubResource("MechaHelicopterHit10"), SubResource("MechaHelicopterHit11"), SubResource("MechaHelicopterHit12"), SubResource("MechaHelicopterHit13")]
+
+[resource]
+script = ExtResource("1_set")
+Moves = [SubResource("AlphaCounterMove"), SubResource("MechaLaserMove"), SubResource("MechaMissileMove"), SubResource("MechaHeavyMissileMove"), SubResource("MechaElectricityMove"), SubResource("MechaShinryuken"), SubResource("MechaLightHelicopterDp"), SubResource("MechaHelicopterDp")]

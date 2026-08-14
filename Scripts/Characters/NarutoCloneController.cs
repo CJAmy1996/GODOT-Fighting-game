@@ -20,6 +20,7 @@ public partial class NarutoCloneController : Node
 	[Export] public float SecondCloneRearOffset { get; set; } = 115f;
 	[Export] public float SecondCloneSpawnHeight { get; set; } = 165f;
 	[Export] public float SecondCloneFallSpeed { get; set; } = 430f;
+	[Export(PropertyHint.Range, "0,3,1")] public int LocalPlayerIndex { get; set; }
 
 	private FighterController _original;
 	private FighterController _opponent;
@@ -59,8 +60,9 @@ public partial class NarutoCloneController : Node
 		TickCloneEntrance(0);
 		TickCloneEntrance(1);
 
-		if (Input.IsActionJustPressed("special_1")) ActivateSlot(0);
-		if (Input.IsActionJustPressed("special_2")) ActivateSlot(1);
+		NativeInputFrame input = NativeInputRouter.GetGameplayFrame((long)Engine.GetPhysicsFrames(), LocalPlayerIndex);
+		if (input.WasPressed(NativeInputButtons.Special1)) ActivateSlot(0);
+		if (input.WasPressed(NativeInputButtons.Special2)) ActivateSlot(1);
 
 		// Bodies not controlled by the player stay neutral instead of repeating
 		// the last command they received before a control transfer.

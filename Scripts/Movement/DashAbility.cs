@@ -25,6 +25,7 @@ public partial class DashAbility : MovementAbility
 	[Export] public int LandingLagFrames { get; set; }
 	[Export] public int InvulnerabilityFrames { get; set; }
 	[Export] public float MinimumAirHeight { get; set; }
+	[Export] public bool UsesShortHopNormalRules { get; set; }
 	public override bool OwnsHorizontalVelocity => true;
 	public override bool OwnsGravity => !PreserveGravity;
 	public override bool CanBeInterruptedBy(MovementAbility incoming) => !CommittedUntilComplete && base.CanBeInterruptedBy(incoming);
@@ -48,6 +49,7 @@ public partial class DashAbility : MovementAbility
 	public override void Start(FighterController fighter, AbilityRuntime runtime)
 	{
 		base.Start(fighter, runtime);
+		if (UsesShortHopNormalRules) fighter.MarkShortHopRoute();
 		if (!fighter.WasGrounded)
 		{
 			runtime.UsesThisAirTime++;

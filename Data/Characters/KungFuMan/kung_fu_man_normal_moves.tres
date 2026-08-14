@@ -30,6 +30,8 @@ CanChainToLight = true
 CanChainToHeavy = true
 CanChainToSpecial = true
 ChainEarliestActiveFramesLeft = 3
+HitstunFrames = 14
+BlockstunFrames = 6
 BoxTimeline = [SubResource("slp_hurt"), SubResource("Resource_yund7")]
 
 [sub_resource type="Resource" id="clp_hurt"]
@@ -44,6 +46,7 @@ StartFrame = 4
 EndFrame = 6
 LocalRect = Rect2(20, -66, 33, 33)
 Tag = "crouching jab"
+AttackLevel = 3
 
 [sub_resource type="Resource" id="clp"]
 script = ExtResource("1_move")
@@ -58,6 +61,8 @@ CanChainToLight = true
 CanChainToHeavy = true
 CanChainToSpecial = true
 ChainEarliestActiveFramesLeft = 3
+HitstunFrames = 14
+BlockstunFrames = 6
 BoxTimeline = [SubResource("clp_hurt"), SubResource("Resource_vvk62")]
 
 [sub_resource type="Resource" id="alp_hurt"]
@@ -128,6 +133,7 @@ StartFrame = 4
 EndFrame = 7
 LocalRect = Rect2(18, -20, 70, 22)
 Tag = "crouching-light-kick"
+AttackLevel = 3
 
 [sub_resource type="Resource" id="clk"]
 script = ExtResource("1_move")
@@ -142,6 +148,8 @@ CanChainToLight = true
 CanChainToHeavy = true
 CanChainToSpecial = true
 ChainEarliestActiveFramesLeft = 3
+HitstunFrames = 14
+BlockstunFrames = 6
 BoxTimeline = [SubResource("clk_hurt"), SubResource("clk_hit")]
 
 [sub_resource type="Resource" id="alk_hurt"]
@@ -372,6 +380,7 @@ StartFrame = 4
 EndFrame = 8
 LocalRect = Rect2(16, -20, 112, 42)
 Tag = "sweep"
+AttackLevel = 3
 
 [sub_resource type="Resource" id="chk"]
 script = ExtResource("1_move")
@@ -383,6 +392,8 @@ ActiveFrames = 5
 RecoveryFrames = 12
 SuppressFallbackHitbox = true
 CanChainToSpecial = true
+HitstunFrames = 18
+BlockstunFrames = 10
 KnockdownType = 1
 KnocksDown = true
 KnockdownFrames = 42
@@ -440,13 +451,14 @@ ActiveFrames = 2
 RecoveryFrames = 6
 SuppressFallbackHitbox = true
 CanChainToSpecial = true
+HitstunFrames = 24
+BlockstunFrames = 16
 HitstopFrames = 6
 BoxTimeline = [SubResource("cmj_hurt"), SubResource("cmj_hit")]
 Launches = true
 LaunchSpeed = 760.0
 LaunchPushback = 85.0
-LaunchHitstunFrames = 34
-JumpCancelWindowFrames = 30
+LaunchHitstunFrames = 38
 ChaseJumpSpeed = 760.0
 
 [sub_resource type="Resource" id="throw_hurt"]

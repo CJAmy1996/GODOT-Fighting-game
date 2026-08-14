@@ -23,8 +23,10 @@ public partial class SuperJumpAbility : MovementAbility
 	{
 		base.Start(fighter, runtime);
 		fighter.RefreshAirJumpResourcesForSuperJump();
+		fighter.SetSuperJumpPresentationDirection(fighter.CurrentInput.Horizontal);
 		fighter.ConsumeDownThenUpCommand();
 		fighter.ConsumeJumpBuffer();
+		fighter.QueueGroundJumpStartEffect(isSuperJump: true);
 		fighter.Velocity = new Vector2(fighter.CurrentInput.Horizontal * ForwardSpeed, -InitialSpeed);
 	}
 }

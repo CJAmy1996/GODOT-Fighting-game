@@ -75,6 +75,7 @@ public partial class JumpAbility : MovementAbility
 			// By default this is only legal from a grounded jump, not from an air jump.
 			if (shortHopAllowed && fighter.Velocity.Y < 0)
 			{
+				fighter.MarkShortHopRoute();
 				fighter.Velocity = new Vector2(fighter.Velocity.X, fighter.Velocity.Y * ReleaseVelocityMultiplier);
 				if (runtime.BoolValue && !ShortHopAllowsAirJumps) fighter.DisableAirJumpsThisJump();
 				if (runtime.BoolValue)
@@ -91,6 +92,7 @@ public partial class JumpAbility : MovementAbility
 	private void Launch(FighterController fighter, AbilityRuntime runtime)
 	{
 		runtime.IntValue = -1;
+		if (runtime.BoolValue) fighter.QueueGroundJumpStartEffect();
 		float launchSpeed = runtime.BoolValue || AirJumpInitialSpeed <= 0f
 			? InitialSpeed
 			: AirJumpInitialSpeed;

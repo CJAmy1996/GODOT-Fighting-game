@@ -22,6 +22,48 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 	private const string SanzoSpriteFramesPath = "res://Assets/TestFighter/Sanzo/sanzo_sprite_frames.tres";
 	private const double FrameSeconds = 1.0 / 60.0;
 
+	private sealed class CharacterProfile
+	{
+		public string Name { get; init; }
+		public string DefinitionPath { get; init; }
+		public string NormalSetPath { get; init; }
+		public string SpecialSetPath { get; init; }
+		public string StateSetPath { get; init; } = "";
+		public string SpriteFramesPath { get; init; }
+		public string AnimationCatalogPath { get; init; } = "";
+	}
+
+	private static readonly CharacterProfile[] CharacterProfiles =
+	{
+		new() { Name = "Kung Fu Man", DefinitionPath = KungFuManDefinitionPath, NormalSetPath = KungFuManNormalSetPath, SpecialSetPath = KungFuManSpecialSetPath, SpriteFramesPath = KungFuManSpriteFramesPath },
+		new() { Name = "Sanzou Kongoumaru", DefinitionPath = SanzoDefinitionPath, NormalSetPath = SanzoNormalSetPath, SpecialSetPath = SanzoSpecialSetPath, StateSetPath = SanzoStateSetPath, SpriteFramesPath = SanzoSpriteFramesPath, AnimationCatalogPath = "res://Assets/TestFighter/Sanzo/animation_catalog.csv" },
+		ImportedProfile("Kinako", "Kinako", "kinako"),
+		ImportedProfile("Senna", "Senna", "senna"),
+		ImportedProfile("Mecha Heita", "MechaHeita", "m_heita"),
+		ImportedProfile("Kunagi", "Kunagi", "kunagi"),
+		ImportedProfile("Daigo", "Daigo", "daigo"),
+		ImportedProfile("Rouga", "Rouga", "rouga"),
+		ImportedProfile("Kamui", "Kamui", "kamui"),
+		ImportedProfile("Heita", "Heita", "heita"),
+		ImportedProfile("Agito", "Agito", "agito")
+	};
+
+	private static CharacterProfile ImportedProfile(string name, string directory, string slug)
+	{
+		string dataRoot = $"res://Data/Characters/BigBangBeatRevolve/{directory}/{slug}";
+		string assetRoot = $"res://Assets/TestFighter/BigBangBeatRevolve/{directory}";
+		return new CharacterProfile
+		{
+			Name = name,
+			DefinitionPath = $"{dataRoot}_definition.tres",
+			NormalSetPath = $"{dataRoot}_normal_moves.tres",
+			SpecialSetPath = $"{dataRoot}_special_moves.tres",
+			StateSetPath = $"{dataRoot}_state_boxes.tres",
+			SpriteFramesPath = $"{assetRoot}/{slug}_sprite_frames.tres",
+			AnimationCatalogPath = $"{assetRoot}/animation_catalog.csv"
+		};
+	}
+
 	private ScrollContainer _dock;
 	private VBoxContainer _content;
 	private Label _status;
@@ -71,6 +113,7 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 	private string _stateSetPath = "";
 	private string _spriteFramesPath = KungFuManSpriteFramesPath;
 	private string _characterName = "Kung Fu Man";
+	private readonly Dictionary<string, string> _animationLabels = new(StringComparer.Ordinal);
 
 	private sealed class MoveEntry
 	{
@@ -124,8 +167,8 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 		});
 
 		_characterPicker = new OptionButton { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-		_characterPicker.AddItem("Kung Fu Man");
-		_characterPicker.AddItem("Sanzo Kongoumaru");
+		foreach (CharacterProfile profile in CharacterProfiles)
+			_characterPicker.AddItem(profile.Name);
 		_characterPicker.ItemSelected += _ => LoadSelectedCharacter();
 		AddLabeledControl("Character", _characterPicker);
 
@@ -280,13 +323,14 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 
 	private void LoadSelectedCharacter()
 	{
-		bool sanzo = _characterPicker?.Selected == 1;
-		_characterName = sanzo ? "Sanzo Kongoumaru" : "Kung Fu Man";
-		_definitionPath = sanzo ? SanzoDefinitionPath : KungFuManDefinitionPath;
-		_normalSetPath = sanzo ? SanzoNormalSetPath : KungFuManNormalSetPath;
-		_specialSetPath = sanzo ? SanzoSpecialSetPath : KungFuManSpecialSetPath;
-		_stateSetPath = sanzo ? SanzoStateSetPath : "";
-		_spriteFramesPath = sanzo ? SanzoSpriteFramesPath : KungFuManSpriteFramesPath;
+		int selected = Mathf.Clamp(_characterPicker?.Selected ?? 0, 0, CharacterProfiles.Length - 1);
+		CharacterProfile profile = CharacterProfiles[selected];
+		_characterName = profile.Name;
+		_definitionPath = profile.DefinitionPath;
+		_normalSetPath = profile.NormalSetPath;
+		_specialSetPath = profile.SpecialSetPath;
+		_stateSetPath = profile.StateSetPath;
+		_spriteFramesPath = profile.SpriteFramesPath;
 		_definition = ResourceLoader.Load<FighterDefinition>(_definitionPath, cacheMode: ResourceLoader.CacheMode.Replace);
 		_normalSet = ResourceLoader.Load<NormalMoveSet>(_normalSetPath, cacheMode: ResourceLoader.CacheMode.Replace);
 		_specialSet = ResourceLoader.Load<SpecialMoveSet>(_specialSetPath, cacheMode: ResourceLoader.CacheMode.Replace);
@@ -310,17 +354,48 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 		}
 
 		_preview.SetSpriteFrames(_spriteFrames);
+		LoadAnimationLabels(profile.AnimationCatalogPath);
 		PopulateAnimations();
 		PopulateMoves();
-		if (_moves.Count > 0) SelectMove(Mathf.Clamp(_movePicker.Selected, 0, _moves.Count - 1));
+		_currentMove = null;
+		_currentMoveIsSpecial = false;
+		_currentMoveIsState = false;
+		_preview.SetMove(null);
+		if (_moves.Count > 0)
+			SelectMove(Mathf.Clamp(_movePicker.Selected, 0, _moves.Count - 1));
+		else
+			SelectAnimationByName(_spriteFrames.HasAnimation("anim_000") ? "anim_000" : "idle");
 		_status.Text = $"Loaded {_moves.Count} {_characterName} moves and {_spriteFrames.GetAnimationNames().Length} animations. Changes save only to this character.";
+	}
+
+	private void LoadAnimationLabels(string catalogPath)
+	{
+		_animationLabels.Clear();
+		if (string.IsNullOrEmpty(catalogPath)) return;
+		string systemPath = ProjectSettings.GlobalizePath(catalogPath);
+		if (!File.Exists(systemPath)) return;
+		foreach (string line in File.ReadLines(systemPath).Skip(1))
+		{
+			string[] columns = line.Split(',');
+			if (columns.Length < 7) continue;
+			string animation = columns[0].Trim().TrimStart('\ufeff');
+			string sourceAction = columns[2].Trim().Trim('"');
+			_animationLabels[animation] = $"{sourceAction} | {columns[3]} | {columns[4]} | {columns[6]} ticks";
+		}
 	}
 
 	private void PopulateAnimations()
 	{
 		_animationPicker.Clear();
 		foreach (StringName animation in _spriteFrames.GetAnimationNames().OrderBy(name => name.ToString(), StringComparer.OrdinalIgnoreCase))
-			_animationPicker.AddItem(animation);
+		{
+			string animationName = animation.ToString();
+			string display = _animationLabels.TryGetValue(animationName, out string label)
+				? $"{animationName} | {label}"
+				: animationName;
+			_animationPicker.AddItem(display);
+			_animationPicker.SetItemMetadata(_animationPicker.ItemCount - 1, animationName);
+		}
 	}
 
 	private void PopulateMoves(NormalMoveData select = null)
@@ -398,16 +473,24 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 	private void OnAnimationSelected()
 	{
 		if (_animationPicker.Selected < 0) return;
-		_preview.SetAnimation(_animationPicker.GetItemText(_animationPicker.Selected));
+		_preview.SetAnimation(GetAnimationName(_animationPicker.Selected));
 		UpdateTimelineRange();
 		SetTimelineFrame((int)_timeline.Value);
+	}
+
+	private string GetAnimationName(int pickerIndex)
+	{
+		if (pickerIndex < 0 || pickerIndex >= _animationPicker.ItemCount) return "idle";
+		Variant metadata = _animationPicker.GetItemMetadata(pickerIndex);
+		string animation = metadata.VariantType == Variant.Type.String ? metadata.AsString() : "";
+		return string.IsNullOrEmpty(animation) ? _animationPicker.GetItemText(pickerIndex) : animation;
 	}
 
 	private void SelectAnimationByName(string animationName)
 	{
 		int selected = 0;
 		for (int i = 0; i < _animationPicker.ItemCount; i++)
-			if (string.Equals(_animationPicker.GetItemText(i), animationName, StringComparison.Ordinal))
+			if (string.Equals(GetAnimationName(i), animationName, StringComparison.Ordinal))
 			{
 				selected = i;
 				break;
@@ -421,7 +504,7 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 		int animationFrames = 1;
 		if (_spriteFrames != null && _animationPicker.Selected >= 0)
 		{
-			StringName animation = _animationPicker.GetItemText(_animationPicker.Selected);
+			StringName animation = GetAnimationName(_animationPicker.Selected);
 			if (_spriteFrames.HasAnimation(animation)) animationFrames = GetAnimationTimelineTicks(animation);
 		}
 		int moveFrames = _currentMove == null ? 1 : Mathf.Max(1,
@@ -448,7 +531,7 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 
 	private void UpdateFrameState(int frame)
 	{
-		StringName animation = _animationPicker.Selected >= 0 ? _animationPicker.GetItemText(_animationPicker.Selected) : new StringName();
+		StringName animation = _animationPicker.Selected >= 0 ? GetAnimationName(_animationPicker.Selected) : new StringName();
 		int drawing = GetDrawingAtTimelineFrame(frame);
 		int drawingCount = _spriteFrames != null && _spriteFrames.HasAnimation(animation) ? _spriteFrames.GetFrameCount(animation) : 0;
 		string source = "unknown";
@@ -476,17 +559,34 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 	private int GetDrawingAtTimelineFrame(int timelineFrame)
 	{
 		if (_spriteFrames == null || _animationPicker.Selected < 0) return 0;
-		StringName animation = _animationPicker.GetItemText(_animationPicker.Selected);
+		StringName animation = GetAnimationName(_animationPicker.Selected);
 		if (!_spriteFrames.HasAnimation(animation)) return 0;
+		if (_currentMove is SpecialMoveData special)
+		{
+			int recoveryStart = Mathf.Max(0, special.StartupFrames) + Mathf.Max(0, special.ActiveFrames);
+			if (timelineFrame >= recoveryStart && special.LandingAnimationSourceTimeline is { Length: > 0 } landing)
+			{
+				int sourceTick = landing[Mathf.Clamp(timelineFrame - recoveryStart, 0, landing.Length - 1)];
+				return AttackDrawingTimeline.ResolveSourceTick(_spriteFrames, animation, sourceTick);
+			}
+			if (special.ForceDownwardStartFrame >= 0 && timelineFrame >= special.ForceDownwardStartFrame &&
+				special.DescentAnimationSourceCycle is { Length: > 0 } descent)
+				return AttackDrawingTimeline.ResolveSourceCycle(_spriteFrames, animation, descent,
+					timelineFrame - special.ForceDownwardStartFrame, special.DescentAnimationTicksPerSource);
+			if (special.ForceDownwardStartFrame >= 0 && timelineFrame >= Mathf.Max(0, special.StartupFrames) &&
+				special.RiseAnimationSourceCycle is { Length: > 0 } rise)
+				return AttackDrawingTimeline.ResolveSourceCycle(_spriteFrames, animation, rise,
+					timelineFrame - Mathf.Max(0, special.StartupFrames), special.RiseAnimationTicksPerSource);
+		}
 		return AttackDrawingTimeline.Resolve(_spriteFrames, animation, timelineFrame,
 			_currentMove?.StartupFrames ?? 0, _currentMove?.ActiveFrames ?? 0,
-			_currentMove?.RecoveryFrames ?? 0, false);
+			_currentMove?.RecoveryFrames ?? 0, false, _currentMove?.AnimationSourceTimeline);
 	}
 
 	private int GetDrawingStartFrame(int targetDrawing)
 	{
 		if (_spriteFrames == null || _animationPicker.Selected < 0) return 0;
-		StringName animation = _animationPicker.GetItemText(_animationPicker.Selected);
+		StringName animation = GetAnimationName(_animationPicker.Selected);
 		int start = 0;
 		for (int drawing = 0; drawing < targetDrawing; drawing++)
 			start += Mathf.Max(1, Mathf.RoundToInt((float)_spriteFrames.GetFrameDuration(animation, drawing)));
@@ -496,7 +596,7 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 	private void StepDrawing(int direction)
 	{
 		if (_spriteFrames == null || _animationPicker.Selected < 0) return;
-		StringName animation = _animationPicker.GetItemText(_animationPicker.Selected);
+		StringName animation = GetAnimationName(_animationPicker.Selected);
 		int count = _spriteFrames.GetFrameCount(animation);
 		if (count <= 0) return;
 		int current = GetDrawingAtTimelineFrame((int)_timeline.Value);
@@ -517,7 +617,7 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 		_currentMove.StartupFrames = (int)_startup.Value;
 		_currentMove.ActiveFrames = (int)_active.Value;
 		_currentMove.RecoveryFrames = (int)_recovery.Value;
-		if (_animationPicker.Selected >= 0) _currentMove.AnimationName = _animationPicker.GetItemText(_animationPicker.Selected);
+		if (_animationPicker.Selected >= 0) _currentMove.AnimationName = GetAnimationName(_animationPicker.Selected);
 		SaveCurrentMoveSet("Saved move timing and animation.");
 		UpdateTimelineRange();
 		UpdateFrameState((int)_timeline.Value);
@@ -703,7 +803,7 @@ public partial class FighterBoxEditorPlugin : EditorPlugin
 			_status.Text = "Enter the exact runtime attack name first.";
 			return;
 		}
-		string animation = _animationPicker.Selected >= 0 ? _animationPicker.GetItemText(_animationPicker.Selected) : "idle";
+		string animation = _animationPicker.Selected >= 0 ? GetAnimationName(_animationPicker.Selected) : "idle";
 		NormalMoveStance stance = (NormalMoveStance)_newMoveStance.Selected;
 		MoveEntry existing = _moves.FirstOrDefault(entry =>
 			string.Equals(entry.Move.AttackName, attackName, StringComparison.OrdinalIgnoreCase) && entry.Move.Stance == stance);

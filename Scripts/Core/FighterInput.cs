@@ -1,5 +1,3 @@
-using Godot;
-
 namespace ModularFighter.Core;
 
 /// <summary>Input sampled once per simulation frame. Replace this with network input for rollback.</summary>
@@ -23,6 +21,9 @@ public readonly struct FighterInput
 	public readonly bool Special1Held;
 	public readonly bool Special2Pressed;
 	public readonly bool Special2Held;
+	public readonly bool FlightPressed;
+	public readonly bool FlightReleased;
+	public readonly bool Special1Released;
 
 	public FighterInput(float horizontal, float vertical, bool jumpPressed, bool jumpHeld, bool dashPressed, bool flightHeld,
 		bool lightPunchPressed = false, bool lightPunchHeld = false,
@@ -30,7 +31,8 @@ public readonly struct FighterInput
 		bool heavyPunchPressed = false, bool heavyPunchHeld = false,
 		bool heavyKickPressed = false, bool heavyKickHeld = false,
 		bool special1Pressed = false, bool special1Held = false,
-		bool special2Pressed = false, bool special2Held = false)
+		bool special2Pressed = false, bool special2Held = false,
+		bool flightPressed = false, bool flightReleased = false, bool special1Released = false)
 	{
 		Horizontal = horizontal;
 		Vertical = vertical;
@@ -50,17 +52,12 @@ public readonly struct FighterInput
 		Special1Held = special1Held;
 		Special2Pressed = special2Pressed;
 		Special2Held = special2Held;
+		FlightPressed = flightPressed;
+		FlightReleased = flightReleased;
+		Special1Released = special1Released;
 	}
 
-	public static FighterInput ReadLocal() => new(
-		Input.GetAxis("move_left", "move_right"),
-		Input.GetAxis("move_up", "move_down"),
-		Input.IsActionJustPressed("jump"), Input.IsActionPressed("jump"),
-		Input.IsActionJustPressed("dash"), Input.IsActionPressed("flight"),
-		Input.IsActionJustPressed("light_punch"), Input.IsActionPressed("light_punch"),
-		Input.IsActionJustPressed("light_kick"), Input.IsActionPressed("light_kick"),
-		Input.IsActionJustPressed("heavy_punch"), Input.IsActionPressed("heavy_punch"),
-		Input.IsActionJustPressed("heavy_kick"), Input.IsActionPressed("heavy_kick"),
-		Input.IsActionJustPressed("special_1"), Input.IsActionPressed("special_1"),
-		Input.IsActionJustPressed("special_2"), Input.IsActionPressed("special_2"));
+	/// <summary>Compatibility entry point backed by the deterministic native frame router.</summary>
+	public static FighterInput ReadLocal(int playerIndex = 0) =>
+		NativeInputRouter.GetCurrentGameplayInput(playerIndex);
 }

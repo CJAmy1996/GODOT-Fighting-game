@@ -22,6 +22,8 @@ public partial class SanzoKongoumaruFighter : SpriteTestFighter
 	private Material _baseCharacterMaterial;
 	private ShaderMaterial _parryWindowFlashMaterial;
 	private static readonly StringName ParryWhiteAmount = "white_flash_amount";
+	private int _reflectorFreezeDrawingTick;
+	private bool _reflectorActivationFreezePlaying;
 
 	public override void _Ready()
 	{
@@ -55,6 +57,30 @@ public partial class SanzoKongoumaruFighter : SpriteTestFighter
 		// frames so the complete 30-frame parry window is visually readable.
 		float whiteAmount = ((Mathf.Max(0, CurrentAttackFrame) / 2) & 1) == 0 ? 1f : 0.35f;
 		_parryWindowFlashMaterial.SetShaderParameter(ParryWhiteAmount, whiteAmount);
+	}
+
+	protected override int ResolveAttackDrawing(StringName animation)
+	{
+		// The activation freeze is real hitstop, so gameplay's attack frame does
+		// not advance. Give only Sanzou's reflector a separate presentation clock
+		// that ping-pongs authored ticks 3→4→5→4 throughout that freeze.
+		bool reflectorActivationFreeze = CurrentAttackName == SanzoSuperReflectorName &&
+			CurrentAttackFrame <= 0 && IsInHitstop;
+		if (!reflectorActivationFreeze)
+		{
+			_reflectorActivationFreezePlaying = false;
+			_reflectorFreezeDrawingTick = 0;
+			return base.ResolveAttackDrawing(animation);
+		}
+
+		if (!_reflectorActivationFreezePlaying)
+		{
+			_reflectorActivationFreezePlaying = true;
+			_reflectorFreezeDrawingTick = 0;
+		}
+		int[] sourceCycle = { 3, 4, 5, 4 };
+		int sourceTick = sourceCycle[_reflectorFreezeDrawingTick++ % sourceCycle.Length];
+		return AttackDrawingTimeline.ResolveSourceTick(CharacterSprite.SpriteFrames, animation, sourceTick);
 	}
 
 	private void EnsureParryWindowFlashMaterial()

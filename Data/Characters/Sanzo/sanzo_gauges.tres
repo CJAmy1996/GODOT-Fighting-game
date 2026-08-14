@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1")
-MaxLife = 2000
-StartingLife = 2000
+MaxLife = 1200
+StartingLife = 1200
 SpecialMeterName = "CHAKRA"
 MaxSpecialMeter = 300
 StartingSpecialMeter = 0
-LifeColor = Color(0.55, 0.12, 0.18, 1)
+LifeColor = Color(0.2, 0.92, 0.3, 1)
 SpecialMeterColor = Color(0.62, 0.2, 0.72, 1)

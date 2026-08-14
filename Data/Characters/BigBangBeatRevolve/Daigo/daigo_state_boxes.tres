@@ -1,0 +1,59 @@
+[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=9 format=3 uid="uid://brwl04ch8lddi"]
+
+[ext_resource type="Script" uid="uid://br48dic8s6gkm" path="res://Scripts/Core/NormalMoveData.cs" id="1_move"]
+[ext_resource type="Script" uid="uid://br5l43bdiww0l" path="res://Scripts/Core/NormalMoveSet.cs" id="2_set"]
+
+[sub_resource type="Resource" id="IdleState"]
+script = ExtResource("1_move")
+AttackName = "STATE IDLE"
+AnimationName = "idle"
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+
+[sub_resource type="Resource" id="CrouchState"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCH"
+AnimationName = "crouch_hold"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+
+[sub_resource type="Resource" id="WalkForwardState"]
+script = ExtResource("1_move")
+AttackName = "STATE WALK FORWARD"
+AnimationName = "walk"
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+
+[sub_resource type="Resource" id="WalkBackState"]
+script = ExtResource("1_move")
+AttackName = "STATE WALK BACK"
+AnimationName = "walk_back"
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+
+[sub_resource type="Resource" id="JumpRiseState"]
+script = ExtResource("1_move")
+AttackName = "STATE JUMP RISE"
+AnimationName = "neutral_jump"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+
+[sub_resource type="Resource" id="FallState"]
+script = ExtResource("1_move")
+AttackName = "STATE FALL"
+AnimationName = "fall"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+
+[resource]
+script = ExtResource("2_set")
+Rules = [SubResource("IdleState"), SubResource("CrouchState"), SubResource("WalkForwardState"), SubResource("WalkBackState"), SubResource("JumpRiseState"), SubResource("FallState")]

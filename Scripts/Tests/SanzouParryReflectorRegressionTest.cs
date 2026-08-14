@@ -161,9 +161,7 @@ public partial class SanzouParryReflectorRegressionTest : Node2D
 
 	private static void LatchMotionEvent(FighterController fighter, StringName action)
 	{
-		fighter.ReadLocalInput = true;
-		fighter._Input(new InputEventAction { Action = action, Pressed = true });
-		fighter.ReadLocalInput = false;
+		fighter.InjectMotionAction(action);
 	}
 
 	private static void Expect(bool condition, string message)

@@ -10,6 +10,7 @@ namespace ModularFighter.Tests;
 public partial class SanzouCrouchRemapRegressionTest : Node2D
 {
 	private SpriteTestFighter _lightKick;
+	private SpriteTestFighter _lowKickTarget;
 	private SpriteTestFighter _medium;
 	private SpriteTestFighter _downForwardHeavy;
 	private SpriteTestFighter _sweep;
@@ -25,6 +26,7 @@ public partial class SanzouCrouchRemapRegressionTest : Node2D
 		floor.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = new Vector2(1600f, 20f) } });
 		AddChild(floor);
 		_lightKick = Spawn("CrouchLightKick", -300f);
+		_lowKickTarget = Spawn("CrouchLightKickTarget", -235f);
 		_medium = Spawn("CrouchMedium", 0f);
 		_downForwardHeavy = Spawn("DownForwardHeavy", 300f);
 		_sweep = Spawn("Sweep", 550f);
@@ -56,7 +58,7 @@ public partial class SanzouCrouchRemapRegressionTest : Node2D
 			if (_stage == 0)
 			{
 				if (--_settleTicks > 0) return;
-				Expect(_lightKick.IsOnFloor() && _medium.IsOnFloor() && _downForwardHeavy.IsOnFloor() &&
+				Expect(_lightKick.IsOnFloor() && _lowKickTarget.IsOnFloor() && _medium.IsOnFloor() && _downForwardHeavy.IsOnFloor() &&
 					_sweep.IsOnFloor() && _forwardHeavy.IsOnFloor() && _backHeavy.IsOnFloor() && _heavyBlocker.IsOnFloor(),
 					"fighters did not settle on the test floor");
 				_lightKick.SetExternalInput(new FighterInput(0f, 1f, false, false, false, false,
@@ -87,6 +89,10 @@ public partial class SanzouCrouchRemapRegressionTest : Node2D
 			Expect(_lightKick.CurrentAttackAnimationName == "crouching_light_kick", "down+LK did not select new crouching-light-kick art");
 			Expect(_lightKick.CharacterSprite.SpriteFrames.GetFrameCount("crouching_light_kick") == 5,
 				"new crouching light kick does not contain five drawings");
+			Expect(_lightKick.TryApplyBasicAttackHit(_lowKickTarget, out _, out _, out _, out _, out _),
+				"crouching light kick did not contact its grounded regression target");
+			Expect(_lowKickTarget.HitstunFramesLeft == _lightKick.LightAttackHitstunFrames + 4,
+				$"non-jab low applied {_lowKickTarget.HitstunFramesLeft} hitstun frames instead of {_lightKick.LightAttackHitstunFrames + 4}");
 
 			Expect(_medium.CurrentAttackName == FighterController.CrouchingMediumJabName,
 				$"down-forward+LP resolved as '{_medium.CurrentAttackName}'");
@@ -126,6 +132,8 @@ public partial class SanzouCrouchRemapRegressionTest : Node2D
 			NormalMoveData mediumRule = _medium.Definition.NormalMoves.FindRule(FighterController.CrouchingMediumJabName, true, false);
 			NormalMoveData heavyRule = _downForwardHeavy.Definition.NormalMoves.FindRule(FighterController.DownForwardHeavyPunchName, true, false);
 			NormalMoveData lowJabRule = _lightKick.Definition.NormalMoves.FindRule("LIGHT PUNCH", true, false);
+			NormalMoveData crouchLightKickRule = _lightKick.Definition.NormalMoves.FindRule("LIGHT KICK", true, false);
+			NormalMoveData sweepRule = _lightKick.Definition.NormalMoves.FindRule(FighterController.CrouchingHeavyKickName, true, false);
 			NormalMoveData crouchingHeavyRule = _lightKick.Definition.NormalMoves.FindRule(FighterController.CrouchingHeavyPunchName, true, false);
 			NormalMoveData backMediumRule = _lightKick.Definition.NormalMoves.FindRule(FighterController.BackLightPunchName, false, false);
 			Expect(mediumRule != null && mediumRule.BoxTimeline.Count(box => box?.Kind == FighterBoxKind.Hitbox) == 1,
@@ -135,9 +143,13 @@ public partial class SanzouCrouchRemapRegressionTest : Node2D
 			Expect(_lightKick.LightAttackHitstunFrames == 5 && _lightKick.HeavyAttackHitstunFrames == 9 &&
 				_lightKick.BasicAttackHitstunFrames == 15,
 				"Sanzou normal hitstun was not reduced by five frames");
-			Expect(lowJabRule?.HitstunFrames == 9 && lowJabRule.BlockstunFrames == 4 &&
+			Expect(lowJabRule?.HitstunFrames == 13 && lowJabRule.BlockstunFrames == 4 &&
 				Mathf.IsEqualApprox(lowJabRule.Pushback, 520f),
 				"crouching jab did not restore pushback with five fewer hit/blockstun frames");
+			Expect(lowJabRule.BoxTimeline.Any(box => box?.Kind == FighterBoxKind.Hitbox && box.AttackLevel == FighterAttackLevel.Low) &&
+				crouchLightKickRule.BoxTimeline.Any(box => box?.Kind == FighterBoxKind.Hitbox && box.AttackLevel == FighterAttackLevel.Low) &&
+				sweepRule.BoxTimeline.Any(box => box?.Kind == FighterBoxKind.Hitbox && box.AttackLevel == FighterAttackLevel.Low),
+				"Sanzou crouching jab, crouching light kick, and sweep are not all authored as lows");
 			Expect(crouchingHeavyRule?.LaunchHitstunFrames == 25 && backMediumRule?.HitstunFrames == 13,
 				"authored launcher/medium hitstun did not lose five frames");
 			Expect(Mathf.IsEqualApprox(_lightKick.HeavyNormalBlockPushbackScale, 0.6f),
@@ -150,8 +162,8 @@ public partial class SanzouCrouchRemapRegressionTest : Node2D
 			Expect(_downForwardHeavy.LastContactWasBlocked &&
 				Mathf.IsEqualApprox(blockedHeavyPushback, expectedBlockedHeavyPushback),
 				$"heavy block pushback was {blockedHeavyPushback:0.0}, expected {expectedBlockedHeavyPushback:0.0}");
-			Expect(_downForwardHeavy.CurrentAttackHitstunFrames == 9 && _heavyBlocker.HitstunFramesLeft == 5,
-				$"heavy normal hit/blockstun resolved as {_downForwardHeavy.CurrentAttackHitstunFrames}/{_heavyBlocker.HitstunFramesLeft}, expected 9/5");
+			Expect(_downForwardHeavy.CurrentAttackHitstunFrames == 13 && _heavyBlocker.HitstunFramesLeft == 5,
+				$"heavy normal hit/blockstun resolved as {_downForwardHeavy.CurrentAttackHitstunFrames}/{_heavyBlocker.HitstunFramesLeft}, expected 13/5");
 			GD.Print("SANZOU CROUCH REMAP TEST PASSED: forward/back+HP use the 29f-recovery standing heavy; crouch remaps hold.");
 			GetTree().Quit();
 		}

@@ -24,6 +24,11 @@ public partial class MovementTuning : Resource
 	[Export] public bool NormalJumpAirActionsRequirePeak { get; set; } = true;
 	[Export] public float NormalJumpAirActionPeakVelocity { get; set; } = 0f;
 	[Export] public bool AllowAirShortHops { get; set; } = false;
+	/// <summary>
+	/// Scales actionable landing recovery when no flight/boost ability was used during the airtime.
+	/// Flight/boost airtime always preserves the authored landing recovery.
+	/// </summary>
+	[Export(PropertyHint.Range, "0.1,1.0,0.05")] public float NonFlightLandingLagMultiplier { get; set; } = 1f;
 
 	[ExportGroup("Timing (frames at 60 fps)")]
 	[Export] public int CoyoteFrames { get; set; } = 3;

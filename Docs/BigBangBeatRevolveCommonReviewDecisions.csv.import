@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://ce58yyp3jjwss"
+
+[deps]
+
+files=["res://Docs/BigBangBeatRevolveCommonReviewDecisions.decision.translation", "res://Docs/BigBangBeatRevolveCommonReviewDecisions.source.translation", "res://Docs/BigBangBeatRevolveCommonReviewDecisions.purpose.translation", "res://Docs/BigBangBeatRevolveCommonReviewDecisions.notes.translation"]
+
+source_file="res://Docs/BigBangBeatRevolveCommonReviewDecisions.csv"
+dest_files=["res://Docs/BigBangBeatRevolveCommonReviewDecisions.decision.translation", "res://Docs/BigBangBeatRevolveCommonReviewDecisions.source.translation", "res://Docs/BigBangBeatRevolveCommonReviewDecisions.purpose.translation", "res://Docs/BigBangBeatRevolveCommonReviewDecisions.notes.translation"]
+
+[params]
+
+compress=true
+delimiter=0

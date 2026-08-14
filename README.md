@@ -27,7 +27,20 @@ Resources are definitions and must be stateless. Every live timer, charge, and c
 2. Create a `CharacterBody2D` scene with collision shape, sprite, and the `FighterController` script.
 3. Create `MovementTuning` and `FighterDefinition` resources in the Inspector; assign them to the controller.
 4. Create ability resources and add them to the definition's `Abilities` array. Give every ability a unique `Id`.
-5. Bind keys or controller buttons to the Input Map actions in `project.godot`. Add `swap_control` if you use a puppet.
+5. Gameplay input is polled by `NativeInputRouter`. The Windows defaults are A/D/W/S, Shift, U/J/I/K,
+   O/L, Escape, Enter, and Tab; XInput pads use the d-pad/stick, X/A/Y/B, shoulders, triggers, Start,
+   and Back. Godot InputMap is only the fallback on unsupported platforms.
+
+## Native input and rollback
+
+`NativeInputRouter` samples Win32 keyboard and XInput state once per 60 Hz simulation frame. It stores
+720 immutable `NativeInputFrame` packets per player, and the fighter consumes only the cached packet for
+the current simulation frame. This prevents different gameplay systems from polling at different times.
+
+For replays or rollback networking, transport `NativeInputFrame.NetworkWord`, submit received packets
+with `SubmitNetworkWord`, call `InvalidateAfter` when a prediction changes, then resimulate from stored
+frames. `MotionInputDefinition` and `MotionInputBinding` consume the resulting `FighterInput`, so local,
+remote, and replay inputs all recognize the same motions.
 
 ## Recommended character recipes
 
@@ -52,4 +65,4 @@ For sharp Alpha-style response, favor high ground acceleration/deceleration and 
 
 ## Next systems to add
 
-Build attacks as another data-driven layer (`AttackDefinition` + frame events) rather than placing them in movement abilities. Have hitstun/blockstun temporarily deny ability activation through a combat-state gate. For rollback networking, replace `FighterInput.ReadLocal()` with a frame-indexed input provider and avoid non-deterministic state inside `Simulate`.
+Build attacks as another data-driven layer (`AttackDefinition` + frame events) rather than placing them in movement abilities. Have hitstun/blockstun temporarily deny ability activation through a combat-state gate. The input side is rollback-ready; full online rollback still needs fighter/world state snapshots, correction, and deterministic resimulation orchestration.

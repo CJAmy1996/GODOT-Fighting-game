@@ -122,7 +122,10 @@ public partial class SanzouJabRegressionTest : Node2D
 					Expect(_fighter.CharacterSprite.Frame == 2, $"active jab displayed drawing {_fighter.CharacterSprite.Frame}, not 2");
 					Expect(_fighter.TryApplyBasicAttackHit(_defender, out int standingHitstop, out _, out _, out _, out _),
 						"jab hitbox exists but failed the real defender collision path");
-					Expect(_defender.HitstunFramesLeft > 0, "jab contact did not apply hitstun to defender");
+					int expectedStandingJabHitstun = _fighter.Definition.NormalMoves
+						.FindRule("LIGHT PUNCH", false, false)?.HitstunFrames ?? -1;
+					Expect(_defender.HitstunFramesLeft == expectedStandingJabHitstun,
+						$"standing jab applied {_defender.HitstunFramesLeft} hitstun frames instead of {expectedStandingJabHitstun}");
 					GD.Print("SANZOU JAB TEST PASSED: LP resolves, frame 0 exists, active frame 4 drawing/hitbox align, defender is hit.");
 					_fighter.RequestHitstop(standingHitstop);
 					_defender.RequestHitstop(standingHitstop);
@@ -155,6 +158,13 @@ public partial class SanzouJabRegressionTest : Node2D
 						out int crouchHitstop, out _, out _, out _, out _))
 					{
 						_crouchMashHits++;
+						if (_crouchMashHits == 1)
+						{
+							NormalMoveData crouchJab = _fighter.Definition.NormalMoves.FindRule("LIGHT PUNCH", true, false);
+							int expectedCrouchJabHitstun = crouchJab.HitstunFrames;
+							Expect(_defender.HitstunFramesLeft == expectedCrouchJabHitstun,
+								$"crouching low jab applied {_defender.HitstunFramesLeft} hitstun frames instead of {expectedCrouchJabHitstun}");
+						}
 						_fighter.RequestHitstop(crouchHitstop);
 						_defender.RequestHitstop(crouchHitstop);
 						if (_crouchMashHits >= 2)

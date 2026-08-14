@@ -26,7 +26,7 @@ project/assembly_name="Modular Fighter Movement Framework"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/fighter_box_editor/plugin.cfg")
+enabled=PackedStringArray("res://addons/fighter_box_editor/plugin.cfg", "res://addons/projectile_path_editor/plugin.cfg")
 
 [input]
 

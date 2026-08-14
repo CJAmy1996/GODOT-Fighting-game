@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=67 format=3 uid="uid://pp527ft7w32"]
+[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=64 format=3 uid="uid://pp527ft7w32"]
 
 [ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="1_2mnce"]
 [ext_resource type="Script" uid="uid://br48dic8s6gkm" path="res://Scripts/Core/NormalMoveData.cs" id="2_wptji"]
@@ -32,10 +32,13 @@ StartupFrames = 4
 ActiveFrames = 2
 RecoveryFrames = 4
 SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 4, 5, 4, 5)
 CanChainToLight = true
 CanChainToHeavy = true
 CanChainToSpecial = true
 ChainEarliestActiveFramesLeft = 3
+HitstunFrames = 9
+BlockstunFrames = 1
 BoxTimeline = [SubResource("Resource_2mnce"), SubResource("Resource_lyh8s"), SubResource("Resource_wptji")]
 
 [sub_resource type="Resource" id="Resource_o6mhf"]
@@ -50,6 +53,7 @@ StartFrame = 4
 EndFrame = 5
 LocalRect = Rect2(20, -66, 33, 33)
 Tag = "crouching jab"
+AttackLevel = 3
 
 [sub_resource type="Resource" id="Resource_0omoi"]
 script = ExtResource("2_wptji")
@@ -64,7 +68,7 @@ CanChainToLight = true
 CanChainToHeavy = true
 CanChainToSpecial = true
 ChainEarliestActiveFramesLeft = 1
-HitstunFrames = 9
+HitstunFrames = 13
 BlockstunFrames = 4
 Pushback = 520.0
 BoxTimeline = [SubResource("Resource_o6mhf"), SubResource("Resource_cxxgx")]
@@ -137,6 +141,7 @@ StartFrame = 4
 EndFrame = 7
 LocalRect = Rect2(18, -20, 70, 22)
 Tag = "crouching-light-kick"
+AttackLevel = 3
 
 [sub_resource type="Resource" id="Resource_rdc7t"]
 script = ExtResource("2_wptji")
@@ -147,10 +152,13 @@ StartupFrames = 4
 ActiveFrames = 4
 RecoveryFrames = 21
 SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 CanChainToLight = true
 CanChainToHeavy = true
 CanChainToSpecial = true
 ChainEarliestActiveFramesLeft = 3
+HitstunFrames = 9
+BlockstunFrames = 1
 BoxTimeline = [SubResource("Resource_qdmck"), SubResource("Resource_uqqe6")]
 
 [sub_resource type="Resource" id="Resource_blaws"]
@@ -181,17 +189,17 @@ CanChainToSpecial = true
 ChainEarliestActiveFramesLeft = 4
 BoxTimeline = [SubResource("Resource_blaws"), SubResource("Resource_6rxpv")]
 
-[sub_resource type="Resource" id="Resource_qswfm"]
+[sub_resource type="Resource" id="Resource_e61mm"]
 script = ExtResource("1_2mnce")
-LocalRect = Rect2(-32, -92, 64, 142)
+LocalRect = Rect2(-64, -141, 143, 143)
 Tag = "body"
 
-[sub_resource type="Resource" id="Resource_mlayv"]
+[sub_resource type="Resource" id="Resource_qswfm"]
 script = ExtResource("1_2mnce")
 Kind = 1
 StartFrame = 15
 EndFrame = 18
-LocalRect = Rect2(26, -66, 68, 36)
+LocalRect = Rect2(32, -125, 76, 59)
 Tag = "heavy-punch"
 
 [sub_resource type="Resource" id="Resource_nadlh"]
@@ -203,8 +211,9 @@ StartupFrames = 15
 ActiveFrames = 4
 RecoveryFrames = 29
 SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 16, 16, 16, 17, 18, 17, 18, 17, 18, 17, 18, 17, 18, 17, 18, 17, 18, 17, 18, 17, 18, 17, 18, 17, 18, 17, 18, 17, 18, 17, 18, 17)
 CanChainToSpecial = true
-BoxTimeline = [SubResource("Resource_qswfm"), SubResource("Resource_mlayv")]
+BoxTimeline = [SubResource("Resource_e61mm"), SubResource("Resource_qswfm")]
 
 [sub_resource type="Resource" id="Resource_7wfml"]
 script = ExtResource("1_2mnce")
@@ -302,7 +311,7 @@ Tag = "air-body"
 script = ExtResource("1_2mnce")
 Kind = 1
 StartFrame = 7
-EndFrame = 8
+EndFrame = 14
 LocalRect = Rect2(-36, -31, 90, 42)
 Tag = "air-heavy-kick"
 AirborneTargetWallSplat = true
@@ -313,37 +322,14 @@ AttackName = "HEAVY KICK"
 AnimationName = "air_heavy_kick"
 Stance = 3
 StartupFrames = 7
-ActiveFrames = 2
+ActiveFrames = 8
 RecoveryFrames = 20
 SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8)
+AnimationTailName = "fall"
+AnimationTailStartFrame = 15
 CanChainToSpecial = true
 BoxTimeline = [SubResource("Resource_8mix0"), SubResource("Resource_igu17")]
-
-[sub_resource type="Resource" id="Resource_os0yu"]
-script = ExtResource("1_2mnce")
-LocalRect = Rect2(-36, -100, 72, 104)
-Tag = "air-body"
-
-[sub_resource type="Resource" id="Resource_bixfn"]
-script = ExtResource("1_2mnce")
-Kind = 1
-StartFrame = 4
-EndFrame = 8
-LocalRect = Rect2(12, -94, 76, 70)
-Tag = "air-up-heavy-kick"
-
-[sub_resource type="Resource" id="Resource_bdv7g"]
-script = ExtResource("2_wptji")
-AttackName = "HEAVY KICK AIR UP"
-AnimationName = "air_up_heavy_kick"
-Stance = 3
-StartupFrames = 4
-ActiveFrames = 5
-RecoveryFrames = 27
-SuppressFallbackHitbox = true
-CanChainToSpecial = true
-HitReaction = 1
-BoxTimeline = [SubResource("Resource_os0yu"), SubResource("Resource_bixfn")]
 
 [sub_resource type="Resource" id="Resource_cqmux"]
 script = ExtResource("1_2mnce")
@@ -353,21 +339,25 @@ Tag = "crouching-body"
 [sub_resource type="Resource" id="Resource_u12w8"]
 script = ExtResource("1_2mnce")
 Kind = 1
-StartFrame = 4
-EndFrame = 8
+StartFrame = 10
+EndFrame = 14
 LocalRect = Rect2(16, -20, 112, 42)
 Tag = "sweep"
+AttackLevel = 3
 
 [sub_resource type="Resource" id="Resource_4ep3j"]
 script = ExtResource("2_wptji")
 AttackName = "HEAVY KICK CROUCHING"
 AnimationName = "crouching_heavy_kick"
 Stance = 2
-StartupFrames = 4
+StartupFrames = 10
 ActiveFrames = 5
-RecoveryFrames = 27
+RecoveryFrames = 6
 SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 0, 6, 6, 12, 12, 18, 18, 24, 24, 30, 30, 30, 30, 30, 30, 24, 18, 12, 6, 0)
 CanChainToSpecial = true
+HitstunFrames = 13
+BlockstunFrames = 5
 KnockdownType = 1
 KnocksDown = true
 KnockdownFrames = 42
@@ -406,6 +396,30 @@ script = ExtResource("1_2mnce")
 LocalRect = Rect2(-36, -66, 72, 86)
 Tag = "crouching-body"
 
+[sub_resource type="Resource" id="Resource_sanzo_crouch_medium_hit"]
+script = ExtResource("1_2mnce")
+Kind = 1
+StartFrame = 4
+EndFrame = 5
+LocalRect = Rect2(22, -52, 62, 34)
+Tag = "crouching-medium-punch"
+AttackLevel = 3
+
+[sub_resource type="Resource" id="Resource_38rvi"]
+script = ExtResource("2_wptji")
+AttackName = "CROUCHING MEDIUM"
+AnimationName = "crouching_medium_punch"
+Stance = 2
+StartupFrames = 4
+ActiveFrames = 4
+RecoveryFrames = 21
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+HitstunFrames = 9
+BlockstunFrames = 1
+HitstopFrames = 6
+BoxTimeline = [SubResource("Resource_u3rpq"), SubResource("Resource_sanzo_crouch_medium_hit")]
+
 [sub_resource type="Resource" id="Resource_e8plm"]
 script = ExtResource("1_2mnce")
 Kind = 1
@@ -430,28 +444,6 @@ KnockdownType = 6
 KnocksDown = true
 KnockdownFrames = 34
 
-[sub_resource type="Resource" id="Resource_sanzo_crouch_medium_hit"]
-script = ExtResource("1_2mnce")
-Kind = 1
-StartFrame = 4
-EndFrame = 5
-LocalRect = Rect2(22, -52, 62, 34)
-Tag = "crouching-medium-punch"
-AttackLevel = 3
-
-[sub_resource type="Resource" id="Resource_38rvi"]
-script = ExtResource("2_wptji")
-AttackName = "CROUCHING MEDIUM"
-AnimationName = "crouching_medium_punch"
-Stance = 2
-StartupFrames = 4
-ActiveFrames = 4
-RecoveryFrames = 21
-SuppressFallbackHitbox = true
-CanChainToSpecial = true
-HitstopFrames = 6
-BoxTimeline = [SubResource("Resource_u3rpq"), SubResource("Resource_sanzo_crouch_medium_hit")]
-
 [sub_resource type="Resource" id="Resource_sanzo_dfhp"]
 script = ExtResource("2_wptji")
 AttackName = "HEAVY PUNCH DOWN FORWARD"
@@ -462,6 +454,8 @@ ActiveFrames = 4
 RecoveryFrames = 21
 SuppressFallbackHitbox = true
 CanChainToSpecial = true
+HitstunFrames = 13
+BlockstunFrames = 5
 HitstopFrames = 6
 BoxTimeline = [SubResource("Resource_u3rpq"), SubResource("Resource_e8plm"), SubResource("Resource_sanzo_cmedium_hit2")]
 
@@ -477,7 +471,6 @@ StartFrame = 8
 EndFrame = 11
 LocalRect = Rect2(16, -86, 110, 56)
 Tag = "back-lp-medium-punch"
-AttackLevel = 3
 
 [sub_resource type="Resource" id="Resource_sanzo_back_lp"]
 script = ExtResource("2_wptji")
@@ -488,6 +481,7 @@ StartupFrames = 8
 ActiveFrames = 4
 RecoveryFrames = 10
 SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 10, 11, 10, 11, 10, 11, 12, 12, 18, 18, 23, 23)
 CanChainToSpecial = true
 HitstunFrames = 13
 HitstopFrames = 8
@@ -573,4 +567,4 @@ BoxTimeline = [SubResource("Resource_hi0en"), SubResource("Resource_4044f"), Sub
 
 [resource]
 script = ExtResource("3_lyh8s")
-Rules = [SubResource("Resource_clv7m"), SubResource("Resource_0omoi"), SubResource("Resource_labas"), SubResource("Resource_cc177"), SubResource("Resource_rdc7t"), SubResource("Resource_a3jqm"), SubResource("Resource_nadlh"), SubResource("Resource_wp6bl"), SubResource("Resource_so1iv"), SubResource("Resource_eh75a"), SubResource("Resource_5ayg2"), SubResource("Resource_bdv7g"), SubResource("Resource_4ep3j"), SubResource("Resource_x5jqg"), SubResource("Resource_38rvi"), SubResource("Resource_sanzo_dfhp"), SubResource("Resource_sanzo_back_lp"), SubResource("Resource_6xol1")]
+Rules = [SubResource("Resource_clv7m"), SubResource("Resource_0omoi"), SubResource("Resource_labas"), SubResource("Resource_cc177"), SubResource("Resource_rdc7t"), SubResource("Resource_a3jqm"), SubResource("Resource_nadlh"), SubResource("Resource_wp6bl"), SubResource("Resource_so1iv"), SubResource("Resource_eh75a"), SubResource("Resource_5ayg2"), SubResource("Resource_4ep3j"), SubResource("Resource_x5jqg"), SubResource("Resource_38rvi"), SubResource("Resource_sanzo_dfhp"), SubResource("Resource_sanzo_back_lp"), SubResource("Resource_6xol1")]

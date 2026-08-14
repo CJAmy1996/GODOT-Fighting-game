@@ -7,6 +7,10 @@ namespace ModularFighter.Core;
 public partial class SuperMoveData : Resource
 {
 	[Export] public string AttackName { get; set; } = "";
+	[Export] public string AnimationName { get; set; } = "";
+	[ExportGroup("Command Input")]
+	[Export] public MotionInputBinding CommandInput { get; set; }
+	[ExportGroup("Timeline / Hit Data")]
 	[Export] public int StartupFrames { get; set; } = 8;
 	[Export] public int ActiveFrames { get; set; } = 24;
 	[Export] public int RecoveryFrames { get; set; } = 24;
@@ -32,6 +36,28 @@ public partial class SuperMoveData : Resource
 	[Export] public Vector2 ProjectileSpawnOffset { get; set; } = new(78f, -62f);
 	[Export] public float ProjectileSpeed { get; set; } = 620f;
 	[Export] public int ProjectileHitCooldownFrames { get; set; } = 5;
+	[Export] public SpriteFrames ProjectileSpriteFrames { get; set; }
+	[Export] public string ProjectileAnimationName { get; set; } = "";
+	[Export] public Vector2 ProjectileVisualOffset { get; set; } = Vector2.Zero;
+	[Export] public Vector2 ProjectileVisualScale { get; set; } = Vector2.One;
+	[Export] public Rect2 ProjectileHitboxLocal { get; set; } = new(-24f, -18f, 72f, 36f);
+	[Export] public SpriteFrames ProjectileImpactSpriteFrames { get; set; }
+	[Export] public string ProjectileImpactAnimationName { get; set; } = "";
+	[Export] public Vector2 ProjectileImpactVisualOffset { get; set; } = Vector2.Zero;
+	[Export] public Vector2 ProjectileImpactScale { get; set; } = Vector2.One;
+	[Export] public bool ProjectileImpactAdditiveBlend { get; set; }
+	[Export] public bool ProjectileImpactBlackKey { get; set; }
+	[Export] public bool ProjectileImpactBlackensDefender { get; set; }
+	[Export(PropertyHint.Range, "1,60,1")] public int ProjectileImpactBlackSilhouetteFrames { get; set; } = 8;
+	[Export] public SpriteFrames ProjectileImpactDefenderFireSpriteFrames { get; set; }
+	[Export] public string ProjectileImpactDefenderFireAnimationName { get; set; } = "";
+	[Export(PropertyHint.Range, "1,32,1")] public int ProjectileCount { get; set; } = 1;
+	[Export(PropertyHint.Range, "1,60,1")] public int ProjectileSpawnIntervalFrames { get; set; } = 4;
+	[Export] public float ProjectileVolleyVerticalSpacing { get; set; }
+	[ExportGroup("Editable Projectile Paths")]
+	[Export] public PackedScene ProjectilePathLayoutScene { get; set; }
+	[Export(PropertyHint.Range, "1,600,1")] public int ProjectilePathTravelFrames { get; set; } = 60;
+	[Export] public bool ProjectileAlignToPath { get; set; } = true;
 	[ExportGroup("Parry")]
 	[Export] public bool Parry { get; set; }
 	[Export] public int ParrySuccessPresentationFrames { get; set; } = 18;

@@ -11,9 +11,23 @@ public partial class VersusStageRules : Node
 	private const int LatestAttackerZIndex = 10;
 	private const string KungFuManSuperPortraitPath = "res://Assets/TestFighter/KungFuMan/kung_fu_man_super_portrait.png";
 	private const string SanzouSuperPortraitPath = "res://Assets/TestFighter/Sanzo/sanzou_kongoumaru/9999.png";
+	private const string BigBangSuperCancelEffectPath = "res://Effects/BigBangSuperCancelEffect.tscn";
+	private const string HyperComboFinishOverlayName = "HyperComboFinishOverlay";
+	private static readonly string[] HyperComboBackdropPaths =
+	{
+		"res://Assets/Backgrounds/ALidej.gif",
+		"res://Assets/Backgrounds/ALidej2.gif"
+	};
 	[Export] public NodePath FighterOnePath { get; set; }
 	[Export] public NodePath FighterTwoPath { get; set; }
 	[Export] public NodePath CameraPath { get; set; }
+	[ExportGroup("Universal Super Presentation")]
+	[Export(PropertyHint.Range, "1,180,1")] public int UniversalSuperFreezeFrames { get; set; } = 45;
+	[Export(PropertyHint.Range, "1,600,1")] public int UniversalSuperBackdropMinimumFrames { get; set; } = 90;
+	[Export] public float UniversalSuperShakeStrength { get; set; } = 8.5f;
+	[Export(PropertyHint.Range, "0.1,3.0,0.05")] public float UniversalSuperCancelEffectScale { get; set; } = 1f;
+	[Export(PropertyHint.Range, "1.0,8.0,0.1")] public float HyperComboFinishMinimumSeconds { get; set; } = 4f;
+	[Export(PropertyHint.Range, "0.1,1.0,0.05")] public float FinishingSuperTimeScale { get; set; } = 0.5f;
 	[Export] public float StageWidth { get; set; } = 3360f;
 	[Export] public float ViewportWidth { get; set; } = 1280f;
 	[Export] public float CornerPushbackTransferStartDistance { get; set; } = 28f;
@@ -26,6 +40,7 @@ public partial class VersusStageRules : Node
 	[Export] public float PushboxSmoothVelocityScale { get; set; } = 30f;
 	[Export] public float JuggleWallSplatDetectionDistance { get; set; } = 30f;
 	[Export] public float JuggleWallSplatPushProjection { get; set; } = 0.08f;
+	[Export] public float AuthoredWallBounceDetectionDistance { get; set; } = 8f;
 	[Export] public bool AllowHealthToReachZero { get; set; } = false;
 	[Export] public float RoundTimeSeconds { get; set; } = 99f;
 	[Export] public float KoResetDelaySeconds { get; set; } = 1.5f;
@@ -74,12 +89,20 @@ public partial class VersusStageRules : Node
 	private SuperPortraitOverlay _superPortrait;
 	private Texture2D _kungFuManSuperPortrait;
 	private Texture2D _sanzouSuperPortrait;
+	private PackedScene _bigBangSuperCancelEffectScene;
+	private readonly RandomNumberGenerator _hyperComboBackdropRandom = new();
 	private readonly List<FighterController> _primaryTeam = new();
 	private double _koResetCountdown;
+	private FighterController _koWinner;
+	private HyperComboFinishOverlay _hyperComboFinishOverlay;
+	private FighterController _pendingSuperKoAttacker;
+	private bool _pendingSuperKo;
 	private float _fighterOneRecoveryDelay;
 	private float _fighterTwoRecoveryDelay;
 	private float _fighterOneLastLife;
 	private float _fighterTwoLastLife;
+	private bool _finishingSuperSlowMotionActive;
+	private double _timeScaleBeforeFinishingSuper = 1.0;
 
 	public void SetPrimaryFighter(FighterController fighter)
 	{
@@ -136,6 +159,8 @@ public partial class VersusStageRules : Node
 		GetParent().CallDeferred(Node.MethodName.AddChild, _hitSparkLayer);
 		_kungFuManSuperPortrait = ResourceLoader.Load<Texture2D>(KungFuManSuperPortraitPath);
 		_sanzouSuperPortrait = ResourceLoader.Load<Texture2D>(SanzouSuperPortraitPath);
+		_bigBangSuperCancelEffectScene = ResourceLoader.Load<PackedScene>(BigBangSuperCancelEffectPath);
+		_hyperComboBackdropRandom.Randomize();
 		RoundSecondsRemaining = Mathf.Max(0f, RoundTimeSeconds);
 		_fighterOneLastLife = _fighterOne.PlaceholderLife;
 		_fighterTwoLastLife = _fighterTwo.PlaceholderLife;
@@ -143,10 +168,26 @@ public partial class VersusStageRules : Node
 
 	public override void _Process(double delta)
 	{
+		if (_pendingSuperKo)
+		{
+			bool superMoveDone = !GodotObject.IsInstanceValid(_pendingSuperKoAttacker) ||
+				!_pendingSuperKoAttacker.CurrentAttackTriggersHyperComboFinish;
+			if (superMoveDone)
+			{
+				RestoreFinishingSuperTimeScale();
+				_hyperComboFinishOverlay?.RequestOutro();
+			}
+			bool finishAnimationDone = _hyperComboFinishOverlay?.IsFinished == true;
+			if (finishAnimationDone && superMoveDone)
+				BeginOfficialKo();
+			return;
+		}
 		if (IsKoActive)
 		{
 			_koResetCountdown -= delta;
-			if (_koResetCountdown <= 0.0)
+			if (_koResetCountdown <= 0.0 &&
+				(_koWinner == null || _koWinner.WinAnimationFinished) &&
+				(_hyperComboFinishOverlay == null || _hyperComboFinishOverlay.IsFinished))
 				GetTree().ReloadCurrentScene();
 			return;
 		}
@@ -190,6 +231,8 @@ public partial class VersusStageRules : Node
 		if (_fighterOne.JustLanded) ResolveLandingOverlap(_fighterOne, _fighterTwo, leftEdge, rightEdge);
 		if (_fighterTwo.JustLanded) ResolveLandingOverlap(_fighterTwo, _fighterOne, leftEdge, rightEdge);
 		ResolvePushboxes(leftEdge, rightEdge);
+		ResolveJumpStartEffects();
+		ResolveRunDustEffects();
 		ResolveBasicAttackHits();
 		ResolveSpdSlamImpacts();
 		for (int index = _primaryTeam.Count - 1; index >= 0; index--)
@@ -204,6 +247,7 @@ public partial class VersusStageRules : Node
 		}
 		_fighterTwo.MaintainSuperHitLock();
 		ResolveProjectileHits();
+		ResolveAuthoredWallBounceImpacts(leftEdge, rightEdge);
 		ClampFightersToCameraCorners(leftEdge, rightEdge);
 		ResolveStateImpactEffects();
 	}
@@ -252,35 +296,54 @@ public partial class VersusStageRules : Node
 		bool secondSuper = _fighterTwo.ConsumeSuperActivationData(out int secondFreezeFrames, out int secondBackdropFrames);
 		if (!firstSuper && !secondSuper) return;
 
-		int freezeFrames = Mathf.Max(firstFreezeFrames, secondFreezeFrames);
-		int backdropFrames = Mathf.Max(Mathf.Max(firstBackdropFrames, secondBackdropFrames), freezeFrames);
+		// Presentation rules belong to the match, not to an individual character.
+		// Move data may request a longer backdrop for a long cinematic, but every
+		// super receives the same ignition freeze, portrait, rings, and backdrop.
+		int freezeFrames = Mathf.Max(1, UniversalSuperFreezeFrames);
+		int backdropFrames = Mathf.Max(UniversalSuperBackdropMinimumFrames,
+			Mathf.Max(firstBackdropFrames, secondBackdropFrames));
 		FighterController activatingFighter = firstSuper ? _fighterOne : _fighterTwo;
 		FighterController otherFighter = activatingFighter == _fighterOne ? _fighterTwo : _fighterOne;
 		// Portrait ignition and its collapsing spark rings are shared by every
 		// super, including supers with a zero-frame gameplay freeze.
 		SpawnSuperPortrait(activatingFighter, otherFighter, Mathf.Max(1, freezeFrames));
+		SpawnBigBangSuperCancelEffect(activatingFighter);
 		if (freezeFrames > 0)
 		{
 			_fighterOne.RequestHitstop(freezeFrames);
 			_fighterTwo.RequestHitstop(freezeFrames);
-			_fightCamera?.ShakeSuper(8.5f, freezeFrames);
+			_fightCamera?.ShakeSuper(UniversalSuperShakeStrength, freezeFrames);
 		}
 		SpawnSuperBackdrop(backdropFrames);
 	}
 
+	private void SpawnBigBangSuperCancelEffect(FighterController activatingFighter)
+	{
+		if (_bigBangSuperCancelEffectScene == null || activatingFighter == null) return;
+		BigBangSuperCancelEffect effect = _bigBangSuperCancelEffectScene.Instantiate<BigBangSuperCancelEffect>();
+		effect.Name = "UniversalBigBangSuperCancelEffect";
+		effect.TopLevel = true;
+		effect.ZAsRelative = false;
+		effect.ZIndex = 4096;
+		effect.Scale = Vector2.One * Mathf.Max(0.1f, UniversalSuperCancelEffectScale);
+		effect.GlobalPosition = activatingFighter.WorldPositionBox.GetCenter();
+		GetParent().AddChild(effect);
+	}
+
 	private void SpawnSuperPortrait(FighterController activatingFighter, FighterController otherFighter, int freezeFrames)
 	{
-		if (activatingFighter is not SpriteTestFighter) return;
 		bool sanzou = string.Equals(activatingFighter.Definition?.FighterName,
 			"Sanzou Kongoumaru", System.StringComparison.OrdinalIgnoreCase);
-		Texture2D portraitTexture = sanzou ? _sanzouSuperPortrait : _kungFuManSuperPortrait;
+		bool kungFuMan = string.Equals(activatingFighter.Definition?.FighterName,
+			"Kung Fu Man", System.StringComparison.OrdinalIgnoreCase);
+		Texture2D portraitTexture = ResolveSuperPortrait(activatingFighter, sanzou, kungFuMan);
 		if (portraitTexture == null) return;
 		if (GodotObject.IsInstanceValid(_superPortrait)) _superPortrait.QueueFree();
 
 		bool entersFromLeft = activatingFighter.GlobalPosition.X <= otherFighter.GlobalPosition.X;
 		var portrait = new SuperPortraitOverlay
 		{
-			Name = sanzou ? "SanzouSuperPortrait9999" : "KungFuManSuperPortrait",
+			Name = sanzou ? "SanzouSuperPortrait9999" : $"{SanitizeNodeName(activatingFighter.Definition?.FighterName)}SuperPortrait",
 			Portrait = portraitTexture,
 			FightCamera = _fightCamera,
 			FocusPosition = activatingFighter.GlobalPosition + new Vector2(0f, -55f),
@@ -295,6 +358,26 @@ public partial class VersusStageRules : Node
 		GetParent().AddChild(portrait);
 	}
 
+	private Texture2D ResolveSuperPortrait(FighterController fighter, bool sanzou, bool kungFuMan)
+	{
+		if (fighter.Definition?.SuperPortrait != null) return fighter.Definition.SuperPortrait;
+		// Preserve the two existing authored cut-ins while allowing every roster
+		// fighter to participate without any character-specific stage code.
+		if (sanzou) return _sanzouSuperPortrait;
+		if (kungFuMan) return _kungFuManSuperPortrait;
+		if (fighter is not SpriteTestFighter spriteFighter) return null;
+		AnimatedSprite2D sprite = spriteFighter.CharacterSprite;
+		if (sprite?.SpriteFrames == null) return null;
+		StringName animation = sprite.Animation;
+		if (!sprite.SpriteFrames.HasAnimation(animation) || sprite.SpriteFrames.GetFrameCount(animation) <= 0)
+			return null;
+		return sprite.SpriteFrames.GetFrameTexture(animation,
+			Mathf.Clamp(sprite.Frame, 0, sprite.SpriteFrames.GetFrameCount(animation) - 1));
+	}
+
+	private static string SanitizeNodeName(string fighterName) =>
+		string.IsNullOrWhiteSpace(fighterName) ? "Fighter" : fighterName.Replace(" ", "");
+
 	private void SpawnSuperBackdrop(int backdropFrames)
 	{
 		if (GodotObject.IsInstanceValid(_superBackdrop)) _superBackdrop.QueueFree();
@@ -304,13 +387,11 @@ public partial class VersusStageRules : Node
 		{
 			Name = "SuperBackdrop",
 			LifetimeFrames = Mathf.Max(75, backdropFrames),
-			Width = ViewportWidth + 240f,
-			Height = 900f,
+			AnimatedBackgroundPath = ChooseHyperComboBackdropPath(_hyperComboBackdropRandom.Randi()),
+			FollowCamera = _stageCamera,
 			ParticleCount = 110,
 			ZIndex = -50
 		};
-		Vector2 center = _stageCamera?.GlobalPosition ?? new Vector2(ViewportWidth * 0.5f, 450f);
-		backdrop.GlobalPosition = new Vector2(center.X - backdrop.Width * 0.5f, center.Y - backdrop.Height * 0.5f);
 		backdrop.TreeExited += () =>
 		{
 			if (_superBackdrop == backdrop) _superBackdrop = null;
@@ -319,17 +400,27 @@ public partial class VersusStageRules : Node
 		GetParent().AddChild(backdrop);
 	}
 
+	public static string ChooseHyperComboBackdropPath(ulong randomValue) =>
+		HyperComboBackdropPaths[(int)(randomValue % (ulong)HyperComboBackdropPaths.Length)];
+
 	private void UpdateFacing()
 	{
 		float delta = _fighterTwo.WorldPositionBox.GetCenter().X - _fighterOne.WorldPositionBox.GetCenter().X;
 		if (Mathf.Abs(delta) <= FacingSideSwitchDeadZone) return;
 		int direction = delta >= 0f ? 1 : -1;
-		if (CanAutoFaceOpponent(_fighterOne)) _fighterOne.SetFacing(direction);
-		if (CanAutoFaceOpponent(_fighterTwo)) _fighterTwo.SetFacing(-direction);
+		if (CanAutoFaceOpponent(_fighterOne, _fighterTwo)) _fighterOne.SetFacing(direction);
+		if (CanAutoFaceOpponent(_fighterTwo, _fighterOne)) _fighterTwo.SetFacing(-direction);
 	}
 
-	private bool CanAutoFaceOpponent(FighterController fighter) =>
-		fighter.WasGrounded || fighter.JustLanded || !fighter.SuppressesGroundedPushWhileAirborne || fighter.EnablesAirControlWhileAirborne;
+	private bool CanAutoFaceOpponent(FighterController fighter, FighterController opponent)
+	{
+		// Preserve facing through a cross-up. A grounded defender must manually
+		// switch from back to the opposite direction when an airborne attacker
+		// passes over them; both sides may auto-correct once that attacker lands.
+		if (!IsGroundedForPushbox(opponent)) return false;
+		return fighter.WasGrounded || fighter.JustLanded ||
+			!fighter.SuppressesGroundedPushWhileAirborne || fighter.EnablesAirControlWhileAirborne;
+	}
 
 	private static bool IsGroundedForPushbox(FighterController fighter) =>
 		fighter.IsOnFloor() || fighter.JustLanded;
@@ -478,12 +569,12 @@ public partial class VersusStageRules : Node
 		bool defenderWasJuggled = defender?.HitState == FighterHitState.Juggle;
 		bool groundedNormal = attacker?.CurrentAttackIsGroundedNormal == true;
 		if (attacker == null || defender == null || attacker.IsSameTeam(defender) || !attacker.TryApplyBasicAttackHit(defender,
-			out int hitstop, out float shake, out float pushback, out Vector2 hitPoint, out bool heavySpark)) return;
+			out int hitlag, out float shake, out float pushback, out Vector2 hitPoint, out bool heavySpark)) return;
 
-		ApplyHitstopForHit(attacker, defender, hitstop);
+		ApplyHitstopForHit(attacker, defender, hitlag);
 		if (attacker.LastContactWasParried)
 		{
-			_fightCamera?.Shake(Mathf.Max(4.5f, shake), Mathf.Max(8, hitstop));
+			_fightCamera?.Shake(Mathf.Max(4.5f, shake), Mathf.Max(8, hitlag));
 			return;
 		}
 		// A real strike/throw contact earns foreground priority. Whiffed attacks never reorder sprites.
@@ -491,20 +582,21 @@ public partial class VersusStageRules : Node
 		if (defenderWasJuggled && groundedNormal && !attacker.LastContactWasBlocked)
 			TryApplyJuggleWallSplat(attacker, defender, pushback);
 		if (!attacker.IsPerformingThrow) ApplyCornerPushbackTransfer(attacker, defender, pushback);
-		if (attacker.LastContactWasBlocked) _hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing);
+		if (attacker.LastContactWasBlocked)
+			_hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing, attacker.LastContactWasInstantBlocked);
 		else
 		{
-			if (!attacker.IsPerformingThrow) _hitSparkLayer?.Spawn(hitPoint, heavySpark);
+			if (!attacker.IsPerformingThrow) _hitSparkLayer?.Spawn(hitPoint, heavySpark, attacker.CurrentHitSparkScene, attacker.Facing);
 			float dramaticDrain = attacker.CurrentAttackName.StartsWith("SUPER")
 				? 58f
 				: heavySpark ? 92f : 44f;
 			defender.ApplyPlaceholderLifeDrain(dramaticDrain, AllowHealthToReachZero);
-			CheckForKo();
+			CheckForKo(attacker.CurrentAttackTriggersHyperComboFinish, attacker);
 		}
 		if (attacker.CurrentAttackName.StartsWith("SUPER"))
-			_fightCamera?.ShakeSuper(Mathf.Max(8f, shake), Mathf.Max(12, hitstop));
+			_fightCamera?.ShakeSuper(Mathf.Max(8f, shake), Mathf.Max(12, hitlag));
 		else if (shake > 0f)
-			_fightCamera?.Shake(shake, hitstop);
+			_fightCamera?.Shake(shake, hitlag);
 	}
 
 	private void TryApplyJuggleWallSplat(FighterController attacker, FighterController defender, float pushback)
@@ -525,12 +617,65 @@ public partial class VersusStageRules : Node
 		defender.ApplyWallSplat(pushDirection);
 	}
 
+	private void ResolveAuthoredWallBounceImpacts(float leftEdge, float rightEdge)
+	{
+		foreach (FighterController ally in _primaryTeam)
+			if (GodotObject.IsInstanceValid(ally)) ResolveAuthoredWallBounceImpact(ally, leftEdge, rightEdge);
+		ResolveAuthoredWallBounceImpact(_fighterTwo, leftEdge, rightEdge);
+	}
+
+	private void ResolveAuthoredWallBounceImpact(FighterController fighter, float leftEdge, float rightEdge)
+	{
+		if (fighter == null || fighter.HitState != FighterHitState.WallBounce || fighter.WasGrounded ||
+			Mathf.IsZeroApprox(fighter.Velocity.X)) return;
+
+		float detection = Mathf.Max(0f, AuthoredWallBounceDetectionDistance);
+		bool hitsLeft = fighter.Velocity.X < 0f && fighter.WorldPushbox.Position.X <= leftEdge + detection;
+		bool hitsRight = fighter.Velocity.X > 0f && fighter.WorldPushbox.End.X >= rightEdge - detection;
+		if (!hitsLeft && !hitsRight) return;
+
+		int wallDirection = hitsRight ? 1 : -1;
+		float wallX = wallDirection > 0
+			? MaxOriginX(fighter, rightEdge)
+			: MinOriginX(fighter, leftEdge);
+		fighter.GlobalPosition = new Vector2(wallX, fighter.GlobalPosition.Y);
+		fighter.ApplyWallSplat(wallDirection);
+	}
+
 	private void ResolveStateImpactEffects()
 	{
 		ResolveStateImpactEffect(_fighterOne);
 		ResolveStateImpactEffect(_fighterTwo);
 		foreach (FighterController ally in _primaryTeam)
 			if (ally != _fighterOne && GodotObject.IsInstanceValid(ally)) ResolveStateImpactEffect(ally);
+	}
+
+	private void ResolveJumpStartEffects()
+	{
+		foreach (FighterController ally in _primaryTeam)
+			if (GodotObject.IsInstanceValid(ally)) ResolveJumpStartEffect(ally);
+		ResolveJumpStartEffect(_fighterTwo);
+	}
+
+	private void ResolveJumpStartEffect(FighterController fighter)
+	{
+		if (fighter == null ||
+			!fighter.TryConsumeJumpStartEffect(out Vector2 groundPosition, out int facing, out bool isSuperJump)) return;
+		_hitSparkLayer?.SpawnJumpStart(groundPosition, facing, isSuperJump);
+	}
+
+	private void ResolveRunDustEffects()
+	{
+		foreach (FighterController ally in _primaryTeam)
+			if (GodotObject.IsInstanceValid(ally)) ResolveRunDustEffect(ally);
+		ResolveRunDustEffect(_fighterTwo);
+	}
+
+	private void ResolveRunDustEffect(FighterController fighter)
+	{
+		if (fighter == null ||
+			!fighter.TryConsumeRunDustEffect(out Vector2 groundPosition, out int facing)) return;
+		_hitSparkLayer?.SpawnRunDust(groundPosition, facing);
 	}
 
 	private void ResolveSpdSlamImpacts()
@@ -552,7 +697,7 @@ public partial class VersusStageRules : Node
 		if (victim != null)
 		{
 			victim.ApplyPlaceholderLifeDrain(damage > 0 ? damage : 220f, AllowHealthToReachZero);
-			CheckForKo();
+			CheckForKo(wasSuper, attacker);
 		}
 	}
 
@@ -613,24 +758,95 @@ public partial class VersusStageRules : Node
 				_fightCamera?.ShakeSuper(Mathf.Max(9f, shake), Mathf.Max(14, hitstop));
 			else if (shake > 0f)
 				_fightCamera?.Shake(shake, hitstop);
-			if (projectile.OwnerFighter.LastContactWasBlocked) _hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing);
+			if (projectile.OwnerFighter.LastContactWasBlocked)
+				_hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing,
+					projectile.OwnerFighter.LastContactWasInstantBlocked);
 			else
 			{
-				_hitSparkLayer?.Spawn(hitPoint, heavySpark);
-				defender.ApplyPlaceholderLifeDrain(projectile.Super ? 58f : 72f, AllowHealthToReachZero);
-				CheckForKo();
+				_hitSparkLayer?.Spawn(hitPoint, heavySpark, projectile.OwnerFighter.Facing);
+				defender.ApplyPlaceholderLifeDrain(projectile.Damage, AllowHealthToReachZero);
+				CheckForKo(projectile.Super, projectile.OwnerFighter);
 			}
-			projectile.MarkHit(defender);
+			projectile.MarkHit(defender, hitPoint);
 		}
 	}
 
-	private void CheckForKo()
+	private void CheckForKo(bool killedBySuper, FighterController superAttacker = null)
 	{
-		if (!AllowHealthToReachZero || IsKoActive || (_fighterOne.PlaceholderLife > 0f && _fighterTwo.PlaceholderLife > 0f)) return;
+		if (!AllowHealthToReachZero || IsKoActive || _pendingSuperKo ||
+			(_fighterOne.PlaceholderLife > 0f && _fighterTwo.PlaceholderLife > 0f)) return;
+		if (killedBySuper)
+		{
+			_pendingSuperKo = true;
+			_pendingSuperKoAttacker = superAttacker;
+			_hyperComboFinishOverlay = GetParent().GetNodeOrNull<HyperComboFinishOverlay>(HyperComboFinishOverlayName);
+			if (_hyperComboFinishOverlay == null)
+			{
+				_hyperComboFinishOverlay = new HyperComboFinishOverlay
+				{
+					Name = HyperComboFinishOverlayName,
+					MinimumPresentationSeconds = Mathf.Max(0.1f, HyperComboFinishMinimumSeconds)
+				};
+				_hyperComboFinishOverlay.SetArenaBackdrop(
+					GetParent().GetNodeOrNull<CanvasItem>("ArenaBackdrop"));
+				_hyperComboFinishOverlay.SetFightCamera(_fightCamera);
+				GetParent().AddChild(_hyperComboFinishOverlay);
+			}
+			if (GodotObject.IsInstanceValid(_superBackdrop))
+			{
+				_superBackdrop.QueueFree();
+				_superBackdrop = null;
+			}
+			BeginFinishingSuperSlowMotion();
+			return;
+		}
+		_pendingSuperKo = true;
+		_pendingSuperKoAttacker = null;
+		_hyperComboFinishOverlay = GetParent().GetNodeOrNull<HyperComboFinishOverlay>(HyperComboFinishOverlayName);
+		if (_hyperComboFinishOverlay == null)
+		{
+			_hyperComboFinishOverlay = new HyperComboFinishOverlay { Name = HyperComboFinishOverlayName };
+			_hyperComboFinishOverlay.SetArenaBackdrop(
+				GetParent().GetNodeOrNull<CanvasItem>("ArenaBackdrop"));
+			_hyperComboFinishOverlay.SetFightCamera(_fightCamera);
+			GetParent().AddChild(_hyperComboFinishOverlay);
+		}
+		_hyperComboFinishOverlay.StartNormalKoImpact();
+	}
+
+	private void BeginOfficialKo()
+	{
+		RestoreFinishingSuperTimeScale();
+		_pendingSuperKo = false;
+		_pendingSuperKoAttacker = null;
 		IsKoActive = true;
+		_koWinner = _fighterOne.PlaceholderLife > 0f ? _fighterOne : _fighterTwo;
+		FighterController defeated = _koWinner == _fighterOne ? _fighterTwo : _fighterOne;
+		defeated?.BeginDefeatedKoState();
+		_koWinner?.BeginWinAnimation();
 		_koResetCountdown = Mathf.Max(0.1f, KoResetDelaySeconds);
 		_fighterOne.SetPhysicsProcess(false);
 		_fighterTwo.SetPhysicsProcess(false);
+	}
+
+	private void BeginFinishingSuperSlowMotion()
+	{
+		if (_finishingSuperSlowMotionActive) return;
+		_timeScaleBeforeFinishingSuper = Engine.TimeScale;
+		Engine.TimeScale = Mathf.Clamp(FinishingSuperTimeScale, 0.1f, 1f);
+		_finishingSuperSlowMotionActive = true;
+	}
+
+	private void RestoreFinishingSuperTimeScale()
+	{
+		if (!_finishingSuperSlowMotionActive) return;
+		Engine.TimeScale = _timeScaleBeforeFinishingSuper;
+		_finishingSuperSlowMotionActive = false;
+	}
+
+	public override void _ExitTree()
+	{
+		RestoreFinishingSuperTimeScale();
 	}
 
 	private void ApplyCornerPushbackTransfer(FighterController attacker, FighterController defender, float hitPushback)
@@ -654,12 +870,13 @@ public partial class VersusStageRules : Node
 			attacker.Velocity = new Vector2(recoilVelocity, attacker.Velocity.Y);
 	}
 
-	private static void ApplyHitstopForHit(FighterController attacker, FighterController defender, int hitstop)
+	internal static void ApplyHitstopForHit(FighterController attacker, FighterController defender, int attackerHitlag)
 	{
-		if (hitstop <= 0) return;
 		bool jumpInHitGroundedDefender = attacker.CurrentAttackStartedAirborne && defender.WasGrounded;
-		attacker.RequestHitstop(hitstop, continueVerticalPhysics: jumpInHitGroundedDefender);
-		defender.RequestHitstop(hitstop);
+		if (attackerHitlag > 0)
+			attacker.RequestHitstop(attackerHitlag, continueVerticalPhysics: jumpInHitGroundedDefender);
+		int defenderHitstop = attacker.LastContactDefenderHitstopFrames;
+		if (defenderHitstop > 0) defender.RequestHitstop(defenderHitstop);
 	}
 
 	private void ClampFightersToCameraCorners(float leftEdge, float rightEdge)

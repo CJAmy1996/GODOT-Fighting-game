@@ -1,0 +1,34 @@
+[gd_resource type="SpriteFrames" load_steps=25 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/120.png" id="1_120"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/122.png" id="2_122"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/124.png" id="3_124"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/126.png" id="4_126"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/128.png" id="5_128"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/130.png" id="6_130"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/132.png" id="7_132"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/134.png" id="8_134"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/136.png" id="9_136"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/138.png" id="10_138"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/140.png" id="11_140"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/142.png" id="12_142"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/144.png" id="13_144"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/146.png" id="14_146"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/148.png" id="15_148"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/150.png" id="16_150"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/151.png" id="17_151"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/152.png" id="18_152"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/153.png" id="19_153"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/154.png" id="20_154"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/155.png" id="21_155"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/156.png" id="22_156"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/157.png" id="23_157"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/158.png" id="24_158"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 2.0, "texture": ExtResource("1_120")}, {"duration": 2.0, "texture": ExtResource("2_122")}, {"duration": 2.0, "texture": ExtResource("3_124")}, {"duration": 2.0, "texture": ExtResource("4_126")}, {"duration": 2.0, "texture": ExtResource("5_128")}, {"duration": 2.0, "texture": ExtResource("6_130")}, {"duration": 2.0, "texture": ExtResource("7_132")}, {"duration": 2.0, "texture": ExtResource("8_134")}, {"duration": 2.0, "texture": ExtResource("9_136")}, {"duration": 2.0, "texture": ExtResource("10_138")}, {"duration": 2.0, "texture": ExtResource("11_140")}, {"duration": 2.0, "texture": ExtResource("12_142")}, {"duration": 2.0, "texture": ExtResource("13_144")}, {"duration": 2.0, "texture": ExtResource("14_146")}, {"duration": 2.0, "texture": ExtResource("15_148")}, {"duration": 2.0, "texture": ExtResource("16_150")}, {"duration": 2.0, "texture": ExtResource("17_151")}, {"duration": 2.0, "texture": ExtResource("18_152")}, {"duration": 2.0, "texture": ExtResource("19_153")}, {"duration": 2.0, "texture": ExtResource("20_154")}, {"duration": 2.0, "texture": ExtResource("21_155")}, {"duration": 2.0, "texture": ExtResource("22_156")}, {"duration": 2.0, "texture": ExtResource("23_157")}, {"duration": 2.0, "texture": ExtResource("24_158")}],
+"loop": true,
+"name": &"unassigned_120_158",
+"speed": 60.0
+}]

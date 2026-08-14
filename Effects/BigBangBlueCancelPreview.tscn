@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="SpriteFrames" path="res://Assets/Effects/BigBangCommon/blue_cancel_360_363_frames.tres" id="1"]
+
+[sub_resource type="Shader" id="Shader_black_key_add"]
+code = "shader_type canvas_item;\nrender_mode blend_add;\n\nvoid fragment() {\n\tvec4 texel = texture(TEXTURE, UV);\n\tfloat luminance = max(texel.r, max(texel.g, texel.b));\n\tCOLOR = vec4(texel.rgb, texel.a * smoothstep(0.01, 0.08, luminance));\n}\n"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_black_key_add"]
+shader = SubResource("Shader_black_key_add")
+
+[node name="BigBangBlueCancelPreview" type="Node2D"]
+
+[node name="BodyAnchor" type="Marker2D" parent="."]
+position = Vector2(160, 184)
+
+[node name="Effect" type="AnimatedSprite2D" parent="BodyAnchor"]
+texture_filter = 1
+material = SubResource("ShaderMaterial_black_key_add")
+position = Vector2(64, -64)
+sprite_frames = ExtResource("1")
+animation = &"blue_cancel"
+autoplay = "blue_cancel"

@@ -1,0 +1,16 @@
+[gd_resource type="SpriteFrames" load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/275.png" id="1_275"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/276.png" id="2_276"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/277.png" id="3_277"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/278.png" id="4_278"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/279.png" id="5_279"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/280.png" id="6_280"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 2.0, "texture": ExtResource("1_275")}, {"duration": 2.0, "texture": ExtResource("2_276")}, {"duration": 2.0, "texture": ExtResource("3_277")}, {"duration": 2.0, "texture": ExtResource("4_278")}, {"duration": 2.0, "texture": ExtResource("5_279")}, {"duration": 2.0, "texture": ExtResource("6_280")}],
+"loop": true,
+"name": &"energy_ring_candidate_275_280",
+"speed": 60.0
+}]

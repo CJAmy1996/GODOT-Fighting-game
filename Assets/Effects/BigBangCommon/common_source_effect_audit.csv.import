@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cve7688hyukuq"
+
+[deps]
+
+files=["res://Assets/Effects/BigBangCommon/common_source_effect_audit.source.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.drawing.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.timeline.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.alignment.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.timing.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.transform.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.gif.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.sheet.translation"]
+
+source_file="res://Assets/Effects/BigBangCommon/common_source_effect_audit.csv"
+dest_files=["res://Assets/Effects/BigBangCommon/common_source_effect_audit.source.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.drawing.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.timeline.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.alignment.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.timing.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.transform.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.gif.translation", "res://Assets/Effects/BigBangCommon/common_source_effect_audit.sheet.translation"]
+
+[params]
+
+compress=true
+delimiter=0

@@ -11,6 +11,7 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 {
 	private FighterController _attacker;
 	private FighterController _victim;
+	private StageCamera _camera;
 	private VersusStageRules _presentationRules;
 	private int _stage;
 	private int _settleTicks = 6;
@@ -18,10 +19,13 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 	private float _highestY;
 	private bool _sawForcedDescent;
 	private bool _sawSuperAfterimage;
+	private int _backdropInitialFrame;
+	private int _backdropAnimationTicks;
 
 	public override void _Ready()
 	{
 		ValidateSanzouArenaRemovesCloneController();
+		ValidateHyperComboBackdropAssets();
 		var floor = new StaticBody2D { Position = new Vector2(0f, 10f) };
 		floor.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = new Vector2(1400f, 20f) } });
 		AddChild(floor);
@@ -29,13 +33,13 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 		_victim = Spawn("SuperSpdVictim", 65f, -1, 2);
 		_attacker.SetOpponent(_victim);
 		_victim.SetOpponent(_attacker);
-		var camera = new StageCamera
+		_camera = new StageCamera
 		{
 			Name = "StageCamera",
 			FighterOnePath = new NodePath("../SuperSpdSanzou"),
 			FighterTwoPath = new NodePath("../SuperSpdVictim")
 		};
-		AddChild(camera);
+		AddChild(_camera);
 		_presentationRules = new VersusStageRules
 		{
 			Name = "PresentationRules",
@@ -44,6 +48,24 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 			CameraPath = new NodePath("../StageCamera")
 		};
 		AddChild(_presentationRules);
+	}
+
+	private static void ValidateHyperComboBackdropAssets()
+	{
+		for (ulong index = 0; index < 2; index++)
+		{
+			string path = VersusStageRules.ChooseHyperComboBackdropPath(index);
+			Expect(AnimatedGifFrameSource.TryOpen(path, out AnimatedGifFrameSource source, out string error),
+				$"hyper-combo background '{path}' could not decode: {error}");
+			using (source)
+			{
+				int expectedFrames = index == 0 ? 201 : 212;
+				Expect(source.FrameCount == expectedFrames,
+					$"hyper-combo background '{path}' decoded {source.FrameCount} frames, expected {expectedFrames}");
+				source.Advance(0.1);
+				Expect(source.CurrentFrame > 0, $"hyper-combo background '{path}' did not animate");
+			}
+		}
 	}
 
 	private FighterController Spawn(string name, float x, int facing, int team)
@@ -119,10 +141,45 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 						"Sanzou Super 1 did not select 9999.png for its activation cut-in");
 					Expect(portrait.GetNodeOrNull<SuperActivationRings>("ForegroundActivationRings") != null,
 						"Sanzou's super did not receive the universal Kung Fu Man activation spark/rings");
-					_presentationRules.QueueFree();
+					BigBangSuperCancelEffect superCancel = GetNodeOrNull<BigBangSuperCancelEffect>(
+						"UniversalBigBangSuperCancelEffect");
+					Expect(superCancel != null && superCancel.CurrentInnerFrame is >= 0 and <= 7 &&
+						superCancel.CurrentOuterFrame is >= 8 and <= 15 &&
+						superCancel.CurrentCoreFrame is >= 17 and <= 36,
+						"Sanzou's super did not spawn the universal layered BBB super-cancel effect");
+					Expect(superCancel.GlobalPosition.DistanceTo(_attacker.WorldPositionBox.GetCenter()) < 0.5f,
+						"BBB super-cancel effect was not centered on the activating fighter");
+					SuperBackdrop backdrop = GetNodeOrNull<SuperBackdrop>("SuperBackdrop");
+					string firstBackdropPath = VersusStageRules.ChooseHyperComboBackdropPath(0);
+					string secondBackdropPath = VersusStageRules.ChooseHyperComboBackdropPath(1);
+					Expect(firstBackdropPath != secondBackdropPath,
+						"hyper-combo backdrop selector does not expose both background images");
+					Expect(backdrop != null &&
+						(backdrop.AnimatedBackgroundPath == firstBackdropPath || backdrop.AnimatedBackgroundPath == secondBackdropPath),
+						"super activation did not randomly select one of the two hyper-combo backgrounds");
+					int expectedFrameCount = backdrop.AnimatedBackgroundPath == firstBackdropPath ? 201 : 212;
+					Expect(backdrop.AnimatedBackgroundReady && backdrop.AnimatedBackgroundFrameCount == expectedFrameCount,
+						$"selected hyper-combo GIF decoded {backdrop.AnimatedBackgroundFrameCount} frames, expected {expectedFrameCount}");
+					Expect(Mathf.IsEqualApprox(backdrop.AnimationSpeedMultiplier, 4f),
+						$"hyper-combo background speed is {backdrop.AnimationSpeedMultiplier:0.0}x instead of 4x");
+					Expect(Mathf.IsEqualApprox(backdrop.MaxAnimationTextureUpdatesPerSecond, 30f),
+						"hyper-combo texture decoding is not capped at 30 updates per second");
+					Vector2 expectedBackdropSize = GetViewportRect().Size / _camera.Zoom;
+					Expect(Mathf.Abs(backdrop.Width - expectedBackdropSize.X) < 0.5f &&
+						Mathf.Abs(backdrop.Height - expectedBackdropSize.Y) < 0.5f,
+						$"hyper-combo background size {backdrop.Width:0.0}x{backdrop.Height:0.0} does not cover camera view {expectedBackdropSize.X:0.0}x{expectedBackdropSize.Y:0.0}");
+					_backdropInitialFrame = backdrop.AnimatedBackgroundFrame;
 					_stage = 3;
 					break;
 				case 3:
+					if (++_backdropAnimationTicks < 5) return;
+					SuperBackdrop animatedBackdrop = GetNodeOrNull<SuperBackdrop>("SuperBackdrop");
+					Expect(animatedBackdrop != null && animatedBackdrop.AnimatedBackgroundFrame != _backdropInitialFrame,
+						"hyper-combo background did not advance beyond its initial GIF frame");
+					_presentationRules.QueueFree();
+					_stage = 4;
+					break;
+				case 4:
 					if (!_attacker.IsAttackActive) return;
 					Expect(_attacker.TryApplyBasicAttackHit(_victim, out int hitstop, out _, out _, out _, out _),
 						"Super SPD did not capture its grounded victim");
@@ -130,9 +187,9 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 					Expect(_attacker.CurrentAttackAnimationName == "spd_air_grab", "Super SPD did not use airborne SPD art");
 					Expect(_attacker.Velocity.Y <= -3500f, "Super SPD did not begin its ultra-high ascent");
 					_highestY = _attacker.GlobalPosition.Y;
-					_stage = 4;
+					_stage = 5;
 					break;
-				case 4:
+				case 5:
 					_highestY = Mathf.Min(_highestY, _attacker.GlobalPosition.Y);
 					_sawForcedDescent |= _attacker.Velocity.Y >= 4000f;
 					_sawSuperAfterimage |= GetNodeOrNull<Sprite2D>("SuperAfterimage1")?.Visible == true;
@@ -158,9 +215,7 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 
 	private static void LatchMotionEvent(FighterController fighter, StringName action)
 	{
-		fighter.ReadLocalInput = true;
-		fighter._Input(new InputEventAction { Action = action, Pressed = true });
-		fighter.ReadLocalInput = false;
+		fighter.InjectMotionAction(action);
 	}
 
 	private static void Expect(bool condition, string message)

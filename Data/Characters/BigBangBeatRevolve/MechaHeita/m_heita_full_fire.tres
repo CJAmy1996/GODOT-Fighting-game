@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="SuperMoveData" load_steps=8 format=3 uid="uid://b5uuxymmwh8hh"]
+
+[ext_resource type="Script" uid="uid://fm6xbpwyvhnb" path="res://Scripts/Core/SuperMoveData.cs" id="1_super"]
+[ext_resource type="Script" uid="uid://b60x15w1xhb6k" path="res://Scripts/Core/MotionInputBinding.cs" id="2_binding"]
+[ext_resource type="Resource" path="res://Data/Motions/double_quarter_circle_forward.tres" id="3_motion"]
+[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/m_heita_sprite_frames.tres" id="4_frames"]
+[ext_resource type="PackedScene" uid="uid://c3rola7qcu05q" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_full_fire_paths.tscn" id="5_paths"]
+[ext_resource type="SpriteFrames" path="res://Assets/Effects/BigBangSystemFire/bigbang_system_fire_frames.tres" id="6_system_fire"]
+
+[sub_resource type="Resource" id="FullFireBinding"]
+script = ExtResource("2_binding")
+Motion = ExtResource("3_motion")
+Buttons = 10
+ButtonMatchMode = 1
+Priority = 90
+
+[resource]
+script = ExtResource("1_super")
+AttackName = "SUPER FULL FIRE"
+AnimationName = "anim_165"
+CommandInput = SubResource("FullFireBinding")
+StartupFrames = 20
+RecoveryFrames = 6
+BackdropFrames = 95
+HitIntervalFrames = 1
+HitstunFrames = 16
+HitstopFrames = 7
+AddsGlobalHitstopBonus = false
+Pushback = 180.0
+FinalHitKnocksDown = false
+Projectile = true
+ProjectileSpawnOffset = Vector2(-22, -92)
+ProjectileSpeed = 800.0
+ProjectileHitCooldownFrames = 1
+ProjectileSpriteFrames = ExtResource("4_frames")
+ProjectileAnimationName = "anim_155"
+ProjectileVisualOffset = Vector2(16, 0)
+ProjectileImpactSpriteFrames = ExtResource("6_system_fire")
+ProjectileImpactAnimationName = "system_explosion"
+ProjectileImpactAdditiveBlend = true
+ProjectileImpactBlackKey = true
+ProjectileImpactBlackensDefender = true
+ProjectileImpactDefenderFireSpriteFrames = ExtResource("6_system_fire")
+ProjectileImpactDefenderFireAnimationName = "system_burn_flame"
+ProjectileCount = 12
+ProjectileSpawnIntervalFrames = 2
+ProjectilePathLayoutScene = ExtResource("5_paths")

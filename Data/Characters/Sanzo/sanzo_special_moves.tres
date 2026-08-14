@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SpecialMoveSet" load_steps=15 format=3 uid="uid://564wyp23f63v"]
+[gd_resource type="Resource" script_class="SpecialMoveSet" load_steps=36 format=3 uid="uid://564wyp23f63v"]
 
 [ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="1_xhsmf"]
 [ext_resource type="Script" uid="uid://cvrl3b6rdaomb" path="res://Scripts/Core/SpecialMoveData.cs" id="2_i2gei"]
@@ -26,6 +26,7 @@ StartupFrames = 15
 ActiveFrames = 8
 RecoveryFrames = 15
 SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 19, 17, 19, 17, 19, 17, 19, 21, 21, 22, 22, 23, 23, 28, 28, 33, 33, 33, 33, 33, 33, 33)
 HitstunFrames = 10
 HitstopFrames = 5
 Pushback = 390.0
@@ -53,52 +54,12 @@ StartupFrames = 15
 ActiveFrames = 8
 RecoveryFrames = 15
 SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 19, 17, 19, 17, 19, 17, 19, 21, 21, 22, 22, 23, 23, 28, 28, 33, 33, 33, 33, 33, 33, 33)
 HitstunFrames = 14
 HitstopFrames = 11
 Pushback = 682.0
 ShakeStrength = 5.85
 BoxTimeline = [SubResource("Resource_28l6n"), SubResource("Resource_sanzo_qcf_hp_hit")]
-
-[sub_resource type="Resource" id="Resource_rew4f"]
-script = ExtResource("1_xhsmf")
-LocalRect = Rect2(-32, -92, 64, 142)
-Tag = "body"
-
-[sub_resource type="Resource" id="Resource_noyx7"]
-script = ExtResource("1_xhsmf")
-Kind = 1
-StartFrame = 7
-EndFrame = 96
-LocalRect = Rect2(20, -70, 76, 52)
-Tag = "super-rush"
-
-[sub_resource type="Resource" id="Resource_jiads"]
-script = ExtResource("2_i2gei")
-AttackName = "SANZOU PARRY"
-AnimationName = "stand_block"
-Stance = 1
-StartupFrames = 0
-ActiveFrames = 30
-RecoveryFrames = 18
-SuppressFallbackHitbox = true
-Parry = true
-ParrySuccessPresentationFrames = 18
-BoxTimeline = [SubResource("Resource_rew4f")]
-
-[sub_resource type="Resource" id="Resource_u4u6u"]
-script = ExtResource("1_xhsmf")
-LocalRect = Rect2(-32, -92, 64, 142)
-Tag = "body"
-
-[sub_resource type="Resource" id="Resource_hoke5"]
-script = ExtResource("2_i2gei")
-AttackName = "SUPER REFLECTOR"
-AnimationName = "reflector_cast"
-StartupFrames = 7
-ActiveFrames = 2
-RecoveryFrames = 24
-SuppressFallbackHitbox = true
-BoxTimeline = [SubResource("Resource_u4u6u")]
 
 [sub_resource type="Resource" id="Resource_sanzo_rekka_body"]
 script = ExtResource("1_xhsmf")
@@ -109,7 +70,7 @@ Tag = "body"
 script = ExtResource("1_xhsmf")
 Kind = 1
 StartFrame = 8
-EndFrame = 11
+EndFrame = 14
 LocalRect = Rect2(16, -86, 110, 56)
 Tag = "qcf-power-punch-rekka"
 
@@ -119,9 +80,10 @@ AttackName = "QCF POWER PUNCH REKKA"
 AnimationName = "qcf_power_punch_rekka"
 Stance = 1
 StartupFrames = 8
-ActiveFrames = 4
+ActiveFrames = 7
 RecoveryFrames = 12
 SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 13, 13, 18, 18, 23)
 HitstunFrames = 18
 HitstopFrames = 10
 Pushback = 720.0
@@ -135,15 +97,16 @@ Tag = "reflector-cast-body"
 
 [sub_resource type="Resource" id="Resource_sanzo_block_reflector"]
 script = ExtResource("2_i2gei")
+ReflectorScene = ExtResource("4_reflector")
+ReflectorSpawnOffset = Vector2(78, -62)
 AttackName = "BLOCK REFLECTOR"
 AnimationName = "reflector_cast"
 Stance = 1
 StartupFrames = 7
 ActiveFrames = 2
-RecoveryFrames = 5
+RecoveryFrames = 17
 SuppressFallbackHitbox = true
-ReflectorScene = ExtResource("4_reflector")
-ReflectorSpawnOffset = Vector2(78, -62)
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 6, 7, 8, 6, 7, 8, 6, 7, 8, 9, 10, 11, 12, 13, 13, 13, 13)
 BoxTimeline = [SubResource("Resource_sanzo_block_reflector_body")]
 
 [sub_resource type="Resource" id="Resource_sanzo_stomp_body"]
@@ -168,31 +131,42 @@ JumpCancelWindowFrames = 0
 [sub_resource type="Resource" id="Resource_sanzo_stomp_down"]
 script = ExtResource("1_xhsmf")
 Kind = 1
-StartFrame = 7
-EndFrame = 9
+StartFrame = 32
 LocalRect = Rect2(-48, -58, 96, 72)
 Tag = "stomp-finisher"
 HitGroup = 2
-HitReaction = 2
-KnockdownType = 3
+Pushback = 35.0
+HitReaction = 4
+KnockdownType = 6
 KnocksDown = true
 KnockdownFrames = 52
+GroundBounceSpeed = 340.0
+GroundBounceIntoJuggle = true
+GroundBounceStrength = 1
 
 [sub_resource type="Resource" id="Resource_sanzo_stomp"]
 script = ExtResource("2_i2gei")
+SelfLaunch = true
+SelfLaunchSpeed = 950.0
+SelfHorizontalSpeed = 135.0
+ForceDownwardStartFrame = 32
+ForceDownwardSpeed = 380.0
+ForceDownwardTerminalSpeed = 480.0
+HoldUntilLanding = true
+LandingRecoveryFrames = 12
+RiseAnimationSourceCycle = PackedInt32Array(2, 3)
+RiseAnimationTicksPerSource = 3
+DescentAnimationSourceCycle = PackedInt32Array(7, 8, 9)
+DescentAnimationTicksPerSource = 2
+LandingAnimationSourceTimeline = PackedInt32Array(10, 10, 10, 10, 10, 10, 16, 16, 16, 16, 16, 16)
 AttackName = "STOMP SPECIAL"
 AnimationName = "stomp_special"
 Stance = 1
 StartupFrames = 3
-ActiveFrames = 7
+ActiveFrames = 120
 RecoveryFrames = 12
 SuppressFallbackHitbox = true
-SelfLaunch = true
-SelfLaunchSpeed = 560.0
-SelfHorizontalSpeed = 135.0
-ForceDownwardStartFrame = 7
-ForceDownwardSpeed = 725.0
-HoldUntilLanding = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2)
 HitstunFrames = 16
 HitstopFrames = 7
 Pushback = 180.0
@@ -206,6 +180,8 @@ Tag = "command-run-body"
 
 [sub_resource type="Resource" id="Resource_sanzo_command_run_light"]
 script = ExtResource("2_i2gei")
+SelfDrive = true
+SelfDriveSpeed = 577.5
 AttackName = "COMMAND RUN LIGHT"
 AnimationName = "command_run"
 Stance = 1
@@ -213,12 +189,12 @@ StartupFrames = 1
 ActiveFrames = 17
 RecoveryFrames = 1
 SuppressFallbackHitbox = true
-SelfDrive = true
-SelfDriveSpeed = 577.5
 BoxTimeline = [SubResource("Resource_sanzo_command_run_body")]
 
 [sub_resource type="Resource" id="Resource_sanzo_command_run_heavy"]
 script = ExtResource("2_i2gei")
+SelfDrive = true
+SelfDriveSpeed = 577.5
 AttackName = "COMMAND RUN HEAVY"
 AnimationName = "command_run"
 Stance = 1
@@ -226,12 +202,13 @@ StartupFrames = 1
 ActiveFrames = 29
 RecoveryFrames = 1
 SuppressFallbackHitbox = true
-SelfDrive = true
-SelfDriveSpeed = 577.5
 BoxTimeline = [SubResource("Resource_sanzo_command_run_body")]
 
 [sub_resource type="Resource" id="Resource_sanzo_command_hop"]
 script = ExtResource("2_i2gei")
+SelfLaunch = true
+SelfLaunchSpeed = 430.0
+SelfHorizontalSpeed = 760.0
 AttackName = "COMMAND RUN HOP"
 AnimationName = "forward_dash"
 Stance = 1
@@ -239,9 +216,6 @@ StartupFrames = 1
 ActiveFrames = 7
 RecoveryFrames = 2
 SuppressFallbackHitbox = true
-SelfLaunch = true
-SelfLaunchSpeed = 430.0
-SelfHorizontalSpeed = 760.0
 BoxTimeline = [SubResource("Resource_sanzo_command_run_body")]
 
 [sub_resource type="Resource" id="Resource_sanzo_command_punch_hit"]
@@ -291,6 +265,7 @@ Tag = "spd-victim-anchor"
 
 [sub_resource type="Resource" id="Resource_sanzo_spd"]
 script = ExtResource("2_i2gei")
+HoldUntilLanding = true
 AttackName = "SANZOU SPD"
 AnimationName = "spd_grab"
 Stance = 1
@@ -305,7 +280,6 @@ ShakeStrength = 18.0
 KnockdownType = 4
 KnocksDown = true
 KnockdownFrames = 90
-HoldUntilLanding = true
 BoxTimeline = [SubResource("Resource_sanzo_spd_body"), SubResource("Resource_sanzo_spd_grab"), SubResource("Resource_sanzo_spd_victim_anchor")]
 
 [sub_resource type="Resource" id="Resource_sanzo_super_spd_victim_anchor"]
@@ -318,6 +292,7 @@ Tag = "super-spd-victim-anchor"
 
 [sub_resource type="Resource" id="Resource_sanzo_super_spd"]
 script = ExtResource("2_i2gei")
+HoldUntilLanding = true
 AttackName = "SANZOU SUPER SPD"
 AnimationName = "spd_grab"
 Stance = 1
@@ -332,8 +307,40 @@ ShakeStrength = 24.0
 KnockdownType = 4
 KnocksDown = true
 KnockdownFrames = 150
-HoldUntilLanding = true
 BoxTimeline = [SubResource("Resource_sanzo_spd_body"), SubResource("Resource_sanzo_spd_grab"), SubResource("Resource_sanzo_super_spd_victim_anchor")]
+
+[sub_resource type="Resource" id="Resource_rew4f"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="Resource_jiads"]
+script = ExtResource("2_i2gei")
+Parry = true
+AttackName = "SANZOU PARRY"
+AnimationName = "stand_block"
+Stance = 1
+StartupFrames = 0
+ActiveFrames = 30
+RecoveryFrames = 18
+SuppressFallbackHitbox = true
+BoxTimeline = [SubResource("Resource_rew4f")]
+
+[sub_resource type="Resource" id="Resource_u4u6u"]
+script = ExtResource("1_xhsmf")
+LocalRect = Rect2(-32, -92, 64, 142)
+Tag = "body"
+
+[sub_resource type="Resource" id="Resource_hoke5"]
+script = ExtResource("2_i2gei")
+AttackName = "SUPER REFLECTOR"
+AnimationName = "reflector_cast"
+StartupFrames = 12
+ActiveFrames = 2
+RecoveryFrames = 24
+SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(6, 7, 8, 6, 7, 8, 6, 7, 8, 6, 7, 8, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13)
+BoxTimeline = [SubResource("Resource_u4u6u")]
 
 [resource]
 script = ExtResource("3_2q7q2")

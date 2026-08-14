@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="FighterDefinition" load_steps=17 format=3 uid="uid://cbpo8sk0fquxp"]
+
+[ext_resource type="Script" uid="uid://p3g6dew2wiky" path="res://Scripts/Core/FighterDefinition.cs" id="1_def"]
+[ext_resource type="Script" uid="uid://s1q2kuukuw7h" path="res://Scripts/Core/MovementTuning.cs" id="2_tuning"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/neutral_jump.tres" id="3_neutral_jump"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/forward_jump.tres" id="4_forward_jump"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/backward_jump.tres" id="5_backward_jump"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/forward_run.tres" id="6_run"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/backdash.tres" id="7_backdash"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/air_dash.tres" id="8_air_dash"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/backward_air_dash.tres" id="9_back_air_dash"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/super_jump.tres" id="10_super_jump"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kinako/kinako_normal_moves.tres" id="11_normals"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kinako/kinako_special_moves.tres" id="12_specials"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kinako/kinako_gauges.tres" id="13_gauges"]
+[ext_resource type="Resource" uid="uid://buorwoycb1rfb" path="res://Data/Characters/BigBangBeatRevolve/Kinako/kinako_state_boxes.tres" id="14_states"]
+[ext_resource type="Texture2D" uid="uid://bdmvtqcemvrp4" path="res://Assets/TestFighter/BigBangBeatRevolve/Kinako/super_portrait.png" id="20_portrait"]
+
+[sub_resource type="Resource" id="MovementTuning_imported"]
+script = ExtResource("2_tuning")
+GroundAcceleration = 4200.0
+GroundDeceleration = 5000.0
+GroundFriction = 5800.0
+Gravity = 2400.0
+TerminalFallSpeed = 1900.0
+AirSpeed = 340.0
+AirAcceleration = 2200.0
+AirDeceleration = 1500.0
+AllowAirControl = false
+InputBufferFrames = 4
+
+[resource]
+script = ExtResource("1_def")
+FighterName = "Kinako"
+SuperPortrait = ExtResource("20_portrait")
+Gauges = ExtResource("13_gauges")
+Tuning = SubResource("MovementTuning_imported")
+Abilities = [ExtResource("10_super_jump"), ExtResource("3_neutral_jump"), ExtResource("4_forward_jump"), ExtResource("5_backward_jump"), ExtResource("6_run"), ExtResource("7_backdash"), ExtResource("9_back_air_dash"), ExtResource("8_air_dash")]
+NormalMoves = ExtResource("11_normals")
+StateBoxes = ExtResource("14_states")
+SpecialMoves = ExtResource("12_specials")

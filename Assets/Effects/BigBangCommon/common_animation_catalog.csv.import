@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://c04e6cotprdoh"
+
+[deps]
+
+files=["res://Assets/Effects/BigBangCommon/common_animation_catalog.source.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.legacy.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.source.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.implemented.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.drawing.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.timeline.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.kir.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.source.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.hold.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.origin.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.origin.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.missing.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.command.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.child.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.system.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.sound.translation"]
+
+source_file="res://Assets/Effects/BigBangCommon/common_animation_catalog.csv"
+dest_files=["res://Assets/Effects/BigBangCommon/common_animation_catalog.source.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.legacy.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.source.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.implemented.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.drawing.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.timeline.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.kir.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.source.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.hold.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.origin.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.origin.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.missing.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.command.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.child.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.system.translation", "res://Assets/Effects/BigBangCommon/common_animation_catalog.sound.translation"]
+
+[params]
+
+compress=true
+delimiter=0

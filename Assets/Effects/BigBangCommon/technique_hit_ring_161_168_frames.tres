@@ -1,0 +1,18 @@
+[gd_resource type="SpriteFrames" load_steps=9 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/161.png" id="1_161"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/162.png" id="2_162"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/163.png" id="3_163"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/164.png" id="4_164"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/165.png" id="5_165"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/166.png" id="6_166"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/167.png" id="7_167"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/168.png" id="8_168"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 1.0, "texture": ExtResource("1_161")}, {"duration": 1.0, "texture": ExtResource("2_162")}, {"duration": 1.0, "texture": ExtResource("3_163")}, {"duration": 1.0, "texture": ExtResource("4_164")}, {"duration": 1.0, "texture": ExtResource("5_165")}, {"duration": 1.0, "texture": ExtResource("6_166")}, {"duration": 1.0, "texture": ExtResource("7_167")}, {"duration": 1.0, "texture": ExtResource("8_168")}],
+"loop": true,
+"name": &"technique_hit_ring_161_168",
+"speed": 60.0
+}]

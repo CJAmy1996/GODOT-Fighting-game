@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from PIL import Image
+from catalog_sanzo_animations import write_catalog
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -298,6 +299,7 @@ def main() -> None:
         )
     lines.append("]")
     RESOURCE.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    write_catalog(RESOURCE)
     print(f"Imported {len(all_paths)} Sanzo frames into {OUTPUT}")
 
 

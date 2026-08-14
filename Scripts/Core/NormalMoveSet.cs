@@ -19,4 +19,14 @@ public partial class NormalMoveSet : Resource
 				return rule;
 		return null;
 	}
+
+	/// <summary>State-box channels use exact names; their stance describes the reaction, not an attack-start filter.</summary>
+	public NormalMoveData FindStateRule(string stateName)
+	{
+		string requested = stateName?.Trim() ?? "";
+		foreach (NormalMoveData rule in Rules)
+			if (rule != null && string.Equals(rule.AttackName?.Trim(), requested, StringComparison.OrdinalIgnoreCase))
+				return rule;
+		return null;
+	}
 }

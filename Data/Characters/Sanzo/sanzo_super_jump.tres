@@ -7,5 +7,5 @@ script = ExtResource("1")
 Id = "super_jump"
 Priority = 40
 InitialSpeed = 1265.0
-ForwardSpeed = 385.0
+ForwardSpeed = 250.25
 CommandWindowFrames = 4

@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="SpriteFrames" path="res://Assets/Effects/BigBangCommon/run_dust_205_217_frames.tres" id="1_frames"]
+
+[sub_resource type="Shader" id="Shader_green_key"]
+code = "shader_type canvas_item;\n\nvoid fragment() {\n\tvec4 texel = texture(TEXTURE, UV);\n\tfloat dominant_green = texel.g - max(texel.r, texel.b);\n\tfloat keyed = step(0.45, texel.g) * step(0.22, dominant_green);\n\tCOLOR = vec4(texel.rgb, texel.a * (1.0 - keyed));\n}\n"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_green_key"]
+shader = SubResource("Shader_green_key")
+
+[node name="BigBangRunDust205To217Preview" type="AnimatedSprite2D"]
+texture_filter = 1
+material = SubResource("ShaderMaterial_green_key")
+sprite_frames = ExtResource("1_frames")
+animation = &"run_dust_205_217"
+autoplay = "run_dust_205_217"

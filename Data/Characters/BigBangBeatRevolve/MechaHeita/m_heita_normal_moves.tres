@@ -1,0 +1,699 @@
+[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=72 format=3 uid="uid://c0l6icodj88b5"]
+
+[ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="1_box"]
+[ext_resource type="Script" uid="uid://br48dic8s6gkm" path="res://Scripts/Core/NormalMoveData.cs" id="2_move"]
+[ext_resource type="Script" uid="uid://br5l43bdiww0l" path="res://Scripts/Core/NormalMoveSet.cs" id="3_set"]
+[ext_resource type="SpriteFrames" path="res://Assets/Effects/BigBangSystemFire/bigbang_system_fire_frames.tres" id="5_system_fire"]
+
+[sub_resource type="Resource" id="MechaAirHeavyHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-48, -104, 96, 104)
+Tag = "air-heavy-kick-body"
+
+[sub_resource type="Resource" id="Resource_kqjv5"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 3
+EndFrame = 20
+LocalRect = Rect2(15, -72, 78, 45)
+Tag = "jumping-heavy-kick"
+
+[sub_resource type="Resource" id="Resource_wxf61"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 3
+EndFrame = 20
+LocalRect = Rect2(-47, -42, 66, 39)
+Tag = "jumping-heavy-kick"
+
+[sub_resource type="Resource" id="MechaAirHeavyKick"]
+script = ExtResource("2_move")
+AttackName = "HEAVY KICK"
+AnimationName = "air_heavy_kick"
+Stance = 3
+StartupFrames = 3
+ActiveFrames = 18
+RecoveryFrames = 15
+SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 1027, 1028, 1029, 1030, 1031, 1032)
+AnimationDrawingOffsets = PackedVector2Array(0, 0, 34, -29.5, 31, -29.5, 31, -29.5, 31, -29.5, 31, -29.5, 31, -29.5, 21, -28.5, 12, -12.5, 8, -10.5, 6, -2, 0, 0, 4.5, 1.5)
+CanChainToSpecial = true
+Damage = 100
+BoxTimeline = [SubResource("MechaAirHeavyHurtbox"), SubResource("Resource_kqjv5"), SubResource("Resource_wxf61")]
+
+[sub_resource type="Resource" id="MechaStandingLightPunchHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-38, -112, 76, 112)
+Tag = "standing-light-punch-body"
+
+[sub_resource type="Resource" id="MechaStandingLightPunchHitbox"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 3
+EndFrame = 6
+LocalRect = Rect2(12, -92, 88, 42)
+Tag = "standing-light-punch"
+
+[sub_resource type="Resource" id="MechaStandingLightPunch"]
+script = ExtResource("2_move")
+AttackName = "LIGHT PUNCH"
+AnimationName = "standing_light_punch"
+Stance = 1
+StartupFrames = 3
+ActiveFrames = 4
+RecoveryFrames = 4
+SuppressFallbackHitbox = true
+AnimationDrawingOffsets = PackedVector2Array(0, 0, 1, 0, 14, 0, 11, 0, 0, 0, 0, 0)
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+AllowedChainTargets = PackedStringArray("LIGHT PUNCH", "LIGHT KICK", "MEDIUM PUNCH BACK", "CROUCHING MEDIUM KICK", "HEAVY")
+CancelWindowStartFrame = 0
+Damage = 35
+BoxTimeline = [SubResource("MechaStandingLightPunchHurtbox"), SubResource("MechaStandingLightPunchHitbox")]
+
+[sub_resource type="Resource" id="MechaStandingMediumPunchHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-42, -112, 84, 112)
+Tag = "standing-medium-punch-body"
+
+[sub_resource type="Resource" id="Resource_d5suj"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 9
+EndFrame = 14
+LocalRect = Rect2(33, -68, 42, 25)
+Tag = "standing-medium-punch-back"
+
+[sub_resource type="Resource" id="Resource_3wv2i"]
+script = ExtResource("1_box")
+StartFrame = 9
+EndFrame = 14
+LocalRect = Rect2(25, -78, 41, 33)
+Tag = "standing-medium-punch-body"
+
+[sub_resource type="Resource" id="MechaStandingMediumPunch"]
+script = ExtResource("2_move")
+AttackName = "MEDIUM PUNCH BACK"
+AnimationName = "medium_punch_back"
+Stance = 1
+StartupFrames = 9
+ActiveFrames = 6
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+AnimationDrawingOffsets = PackedVector2Array(0, 0, -5, -5, 4, -5, 21, -5, 19, -5, 13, -5, 3.5, -5, 3, -4, 0, 0)
+CanChainToHeavy = true
+CanChainToSpecial = true
+AllowedChainTargets = PackedStringArray("CROUCHING MEDIUM KICK", "HEAVY")
+MaxUsesPerCombo = 1
+CancelWindowStartFrame = 0
+Damage = 60
+BoxTimeline = [SubResource("MechaStandingMediumPunchHurtbox"), SubResource("Resource_d5suj"), SubResource("Resource_3wv2i")]
+
+[sub_resource type="Resource" id="MechaStandingHeavyKickHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-44, -132, 88, 132)
+Tag = "standing-heavy-kick-body"
+
+[sub_resource type="Resource" id="MechaStandingHeavyKickHitbox"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 8
+EndFrame = 16
+LocalRect = Rect2(18, -132, 126, 62)
+Tag = "standing-heavy-kick"
+
+[sub_resource type="Resource" id="MechaStandingHeavyKick"]
+script = ExtResource("2_move")
+AttackName = "HEAVY KICK"
+AnimationName = "heavy_kick"
+Stance = 1
+StartupFrames = 8
+ActiveFrames = 9
+RecoveryFrames = 13
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+Damage = 100
+BoxTimeline = [SubResource("MechaStandingHeavyKickHurtbox"), SubResource("MechaStandingHeavyKickHitbox")]
+
+[sub_resource type="Resource" id="MechaCrouchingLightPunchHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-42, -78, 84, 78)
+Tag = "crouching-light-punch-body"
+
+[sub_resource type="Resource" id="Resource_w63xb"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 10
+LocalRect = Rect2(27, -62, 31, 26)
+Tag = "crouching-light-punch"
+
+[sub_resource type="Resource" id="MechaCrouchingLightPunch"]
+script = ExtResource("2_move")
+AttackName = "LIGHT PUNCH"
+AnimationName = "crouching_light_punch"
+Stance = 2
+StartupFrames = 4
+ActiveFrames = 7
+RecoveryFrames = 2
+SuppressFallbackHitbox = true
+AnimationDrawingOffsets = PackedVector2Array(0, 0, 2, 0, 20, 1, 18, 1, 5, 0, -1, 0)
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+AllowedChainTargets = PackedStringArray("LIGHT PUNCH", "LIGHT KICK", "MEDIUM PUNCH BACK", "CROUCHING MEDIUM KICK", "HEAVY")
+CancelWindowStartFrame = 0
+Damage = 30
+BoxTimeline = [SubResource("MechaCrouchingLightPunchHurtbox"), SubResource("Resource_w63xb")]
+
+[sub_resource type="Resource" id="MechaCrouchingLightPunchHitbox"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 10
+LocalRect = Rect2(16, -68, 98, 36)
+Tag = "crouching-light-punch"
+AttackLevel = 3
+
+[sub_resource type="Resource" id="MechaJumpingLightPunch"]
+script = ExtResource("2_move")
+AttackName = "LIGHT PUNCH"
+AnimationName = "crouching_light_punch"
+Stance = 3
+StartupFrames = 4
+ActiveFrames = 7
+RecoveryFrames = 2
+SuppressFallbackHitbox = true
+AnimationDrawingOffsets = PackedVector2Array(0, 0, 2, 0, 20, 1, 18, 1, 5, 0, -1, 0)
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+AllowedChainTargets = PackedStringArray("LIGHT PUNCH", "LIGHT KICK", "MEDIUM PUNCH AIR BACK", "MEDIUM KICK AIR BACK", "HEAVY")
+RepeatLightPunchChainTarget = "MEDIUM PUNCH AIR BACK"
+MaxUsesPerCombo = 1
+CancelWindowStartFrame = 0
+Damage = 30
+BoxTimeline = [SubResource("MechaCrouchingLightPunchHurtbox"), SubResource("MechaCrouchingLightPunchHitbox")]
+
+[sub_resource type="Resource" id="MechaCrouchingLightKickHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-44, -78, 88, 78)
+Tag = "crouching-light-kick-body"
+
+[sub_resource type="Resource" id="Resource_4yq0l"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 3
+EndFrame = 5
+LocalRect = Rect2(11, -21, 55, 21)
+Tag = "crouching-light-kick-fast"
+
+[sub_resource type="Resource" id="MechaCrouchingLightKick"]
+script = ExtResource("2_move")
+AttackName = "LIGHT KICK"
+AnimationName = "crouching_light_kick_generated"
+Stance = 2
+StartupFrames = 3
+ActiveFrames = 3
+RecoveryFrames = 4
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+AllowedChainTargets = PackedStringArray("LIGHT PUNCH", "LIGHT KICK", "MEDIUM PUNCH BACK", "CROUCHING MEDIUM KICK", "HEAVY")
+CancelWindowStartFrame = 0
+Damage = 30
+BoxTimeline = [SubResource("MechaCrouchingLightKickHurtbox"), SubResource("Resource_4yq0l")]
+
+[sub_resource type="Resource" id="MechaCrouchingMediumKickHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-44, -78, 88, 78)
+Tag = "crouching-medium-kick-body"
+
+[sub_resource type="Resource" id="Resource_fhuuc"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 4
+EndFrame = 11
+LocalRect = Rect2(5, -34, 64, 31)
+Tag = "crouching-medium-kick-down-back"
+
+[sub_resource type="Resource" id="Resource_w8pg8"]
+script = ExtResource("1_box")
+StartFrame = 4
+EndFrame = 11
+LocalRect = Rect2(5, -34, 75, 22)
+Tag = "crouching-medium-kick-body"
+
+[sub_resource type="Resource" id="MechaCrouchingMediumKick"]
+script = ExtResource("2_move")
+AttackName = "CROUCHING MEDIUM KICK"
+AnimationName = "crouching_medium_kick"
+Stance = 2
+StartupFrames = 4
+ActiveFrames = 8
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+AnimationDrawingOffsets = PackedVector2Array(0, 0, 0, 0, 4, 3, 3, 1.5, 2, 0, -1, 0, -3, 0)
+CanChainToHeavy = true
+CanChainToSpecial = true
+AllowedChainTargets = PackedStringArray("MEDIUM PUNCH BACK", "HEAVY")
+MaxUsesPerCombo = 1
+CancelWindowStartFrame = 0
+Damage = 60
+BoxTimeline = [SubResource("MechaCrouchingMediumKickHurtbox"), SubResource("Resource_fhuuc"), SubResource("Resource_w8pg8")]
+
+[sub_resource type="Resource" id="MechaCrouchingHeavyPunchHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-46, -102, 92, 102)
+Tag = "crouching-heavy-punch-body"
+
+[sub_resource type="Resource" id="Resource_io31e"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 10
+EndFrame = 24
+LocalRect = Rect2(13, -127, 58, 57)
+Tag = "crouching-heavy-punch-rising"
+
+[sub_resource type="Resource" id="MechaCrouchingHeavyPunch"]
+script = ExtResource("2_move")
+AttackName = "HEAVY PUNCH CROUCHING"
+AnimationName = "crouching_heavy_punch"
+Stance = 2
+StartupFrames = 10
+ActiveFrames = 15
+RecoveryFrames = 9
+SuppressFallbackHitbox = true
+AnimationDrawingOffsets = PackedVector2Array(0, 0, 18.5, 0, 21, 0, 27, 0, 24, 0, 22, 0, 22, 0, 15.5, 0, 7, 1, 4, 0)
+CanChainToSpecial = true
+Damage = 100
+BoxTimeline = [SubResource("MechaCrouchingHeavyPunchHurtbox"), SubResource("Resource_io31e")]
+Launches = true
+LaunchSpeed = 1265.0
+LaunchHitstunFrames = 30
+ChaseJumpSpeed = 1380.0
+
+[sub_resource type="Resource" id="MechaJumpingLightKickHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-46, -106, 92, 102)
+Tag = "jumping-light-kick-body"
+
+[sub_resource type="Resource" id="Resource_lyku2"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 3
+EndFrame = 8
+LocalRect = Rect2(9, -27, 69, 37)
+Tag = "jumping-light-kick"
+
+[sub_resource type="Resource" id="MechaJumpingLightKick"]
+script = ExtResource("2_move")
+AttackName = "LIGHT KICK"
+AnimationName = "air_light_kick"
+Stance = 3
+StartupFrames = 3
+ActiveFrames = 6
+RecoveryFrames = 9
+SuppressFallbackHitbox = true
+AnimationDrawingOffsets = PackedVector2Array(0, 0, 3.5, 15, 2.5, 15.5, -4, 14, -6.5, 16, -7, 3.5)
+CanChainToHeavy = true
+CanChainToSpecial = true
+AllowedChainTargets = PackedStringArray("LIGHT PUNCH", "LIGHT KICK", "MEDIUM PUNCH AIR BACK", "MEDIUM KICK AIR BACK", "HEAVY")
+RepeatLightPunchChainTarget = "MEDIUM PUNCH AIR BACK"
+MaxUsesPerCombo = 1
+CancelWindowStartFrame = 0
+Damage = 35
+BoxTimeline = [SubResource("MechaJumpingLightKickHurtbox"), SubResource("Resource_lyku2")]
+
+[sub_resource type="Resource" id="MechaJumpingMediumPunchHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-46, -116, 92, 112)
+Tag = "jumping-medium-punch-body"
+
+[sub_resource type="Resource" id="Resource_3yb1d"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 8
+EndFrame = 20
+LocalRect = Rect2(3, -134, 53, 93)
+Tag = "jumping-medium-punch-upward"
+
+[sub_resource type="Resource" id="MechaJumpingMediumPunch"]
+script = ExtResource("2_move")
+AttackName = "MEDIUM PUNCH AIR BACK"
+AnimationName = "air_medium_punch_back"
+Stance = 3
+StartupFrames = 8
+ActiveFrames = 13
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+AnimationDrawingOffsets = PackedVector2Array(0, 0, 1, 2, -4.5, 7, -1.5, 17.5, -10, 23, -11, 24, -15, 23, -7.5, 30, -3.5, 13, -3.5, -7)
+CanChainToHeavy = true
+CanChainToSpecial = true
+AllowedChainTargets = PackedStringArray("MEDIUM KICK AIR BACK", "HEAVY")
+MaxUsesPerCombo = 1
+CancelWindowStartFrame = 0
+Damage = 60
+HitstunFrames = 21
+Pushback = 70.0
+PreserveAirborneTargetVelocity = true
+BoxTimeline = [SubResource("MechaJumpingMediumPunchHurtbox"), SubResource("Resource_3yb1d")]
+
+[sub_resource type="Resource" id="MechaJumpingHeavyPunchHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-48, -114, 96, 110)
+Tag = "jumping-heavy-punch-body"
+
+[sub_resource type="Resource" id="Resource_uop83"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 9
+EndFrame = 20
+LocalRect = Rect2(-9, -80, 60, 91)
+Tag = "jumping-heavy-punch-downward"
+
+[sub_resource type="Resource" id="Resource_p2008"]
+script = ExtResource("1_box")
+StartFrame = 9
+EndFrame = 20
+LocalRect = Rect2(-6, -73, 46, 78)
+Tag = "jumping-heavy-punch"
+
+[sub_resource type="Resource" id="MechaJumpingHeavyPunch"]
+script = ExtResource("2_move")
+AttackName = "HEAVY PUNCH AIR"
+AnimationName = "air_heavy_punch"
+Stance = 3
+StartupFrames = 9
+ActiveFrames = 12
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+AnimationDrawingOffsets = PackedVector2Array(0, 0, -3, 41.5, -4, 42.5, 2, 21.5, 13.5, 16.5, 11.5, 16.5, 0.5, 17.5, -1.5, 25, 0, 14.5, 0.5, 6.5)
+CanChainToSpecial = true
+Damage = 100
+BoxTimeline = [SubResource("MechaJumpingHeavyPunchHurtbox"), SubResource("Resource_uop83"), SubResource("Resource_p2008")]
+
+[sub_resource type="Resource" id="MechaStandingLightKickHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-42, -124, 84, 124)
+Tag = "standing-light-kick-body"
+
+[sub_resource type="Resource" id="Resource_doxky"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 5
+EndFrame = 10
+LocalRect = Rect2(-9, -133, 64, 57)
+Tag = "standing-light-kick-fast"
+
+[sub_resource type="Resource" id="MechaStandingLightKick"]
+script = ExtResource("2_move")
+AttackName = "LIGHT KICK"
+AnimationName = "anim_140"
+Stance = 1
+StartupFrames = 5
+ActiveFrames = 6
+RecoveryFrames = 14
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+AllowedChainTargets = PackedStringArray("LIGHT PUNCH", "LIGHT KICK", "MEDIUM PUNCH BACK", "CROUCHING MEDIUM KICK", "HEAVY")
+CancelWindowStartFrame = 0
+Damage = 35
+BoxTimeline = [SubResource("MechaStandingLightKickHurtbox"), SubResource("Resource_doxky")]
+
+[sub_resource type="Resource" id="MechaThrowStartupHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-40, -116, 80, 116)
+Tag = "throw-startup-body"
+
+[sub_resource type="Resource" id="MechaThrowStartupGrabbox"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 5
+EndFrame = 8
+LocalRect = Rect2(10, -96, 76, 84)
+Tag = "throw-startup-grab"
+Attributes = 4
+AttackLevel = 0
+
+[sub_resource type="Resource" id="MechaForwardThrowAnchorHold"]
+script = ExtResource("1_box")
+Kind = 7
+StartFrame = 5
+EndFrame = 34
+LocalRect = Rect2(28, -118, 48, 72)
+Tag = "forward-throw-victim-hold"
+
+[sub_resource type="Resource" id="MechaForwardThrowAnchorTurn"]
+script = ExtResource("1_box")
+Kind = 7
+StartFrame = 35
+EndFrame = 55
+LocalRect = Rect2(-20, -152, 54, 74)
+Tag = "forward-throw-victim-turn"
+
+[sub_resource type="Resource" id="MechaForwardThrowAnchorRelease"]
+script = ExtResource("1_box")
+Kind = 7
+StartFrame = 56
+EndFrame = 70
+LocalRect = Rect2(38, -82, 58, 72)
+Tag = "forward-throw-victim-release"
+
+[sub_resource type="Resource" id="MechaThrowStartup"]
+script = ExtResource("2_move")
+AttackName = "THROW"
+AnimationName = "throw"
+Stance = 1
+StartupFrames = 5
+ActiveFrames = 4
+RecoveryFrames = 22
+SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5)
+AnimationTailName = "forward_throw"
+AnimationTailStartFrame = 5
+ConnectedThrowRecoveryFrames = 78
+KnockdownType = 3
+KnocksDown = true
+KnockdownFrames = 42
+BoxTimeline = [SubResource("MechaThrowStartupHurtbox"), SubResource("MechaThrowStartupGrabbox"), SubResource("MechaForwardThrowAnchorHold"), SubResource("MechaForwardThrowAnchorTurn"), SubResource("MechaForwardThrowAnchorRelease")]
+
+[sub_resource type="Resource" id="MechaBackThrowAnchorHold"]
+script = ExtResource("1_box")
+Kind = 7
+StartFrame = 5
+EndFrame = 34
+LocalRect = Rect2(-76, -118, 48, 72)
+Tag = "back-throw-victim-hold"
+
+[sub_resource type="Resource" id="MechaBackThrowAnchorTurn"]
+script = ExtResource("1_box")
+Kind = 7
+StartFrame = 35
+EndFrame = 55
+LocalRect = Rect2(-34, -152, 54, 74)
+Tag = "back-throw-victim-turn"
+
+[sub_resource type="Resource" id="MechaBackThrowAnchorRelease"]
+script = ExtResource("1_box")
+Kind = 7
+StartFrame = 56
+EndFrame = 70
+LocalRect = Rect2(-96, -82, 58, 72)
+Tag = "back-throw-victim-release"
+
+[sub_resource type="Resource" id="MechaBackThrow"]
+script = ExtResource("2_move")
+AttackName = "BACK THROW"
+AnimationName = "back_throw_startup"
+Stance = 1
+StartupFrames = 5
+ActiveFrames = 4
+RecoveryFrames = 22
+SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5)
+AnimationTailName = "back_throw"
+AnimationTailStartFrame = 5
+ConnectedThrowRecoveryFrames = 78
+KnockdownType = 3
+KnocksDown = true
+KnockdownFrames = 42
+BoxTimeline = [SubResource("MechaThrowStartupHurtbox"), SubResource("MechaThrowStartupGrabbox"), SubResource("MechaBackThrowAnchorHold"), SubResource("MechaBackThrowAnchorTurn"), SubResource("MechaBackThrowAnchorRelease")]
+
+[sub_resource type="Resource" id="MechaStandingHeavyPunchHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-48, -124, 96, 124)
+Tag = "standing-heavy-punch-body"
+
+[sub_resource type="Resource" id="Resource_etncu"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 14
+EndFrame = 25
+LocalRect = Rect2(6, -88, 81, 37)
+Tag = "standing-heavy-punch-knuckle"
+
+[sub_resource type="Resource" id="Resource_hynjc"]
+script = ExtResource("1_box")
+StartFrame = 14
+EndFrame = 25
+LocalRect = Rect2(7, -80, 90, 22)
+Tag = "standing-heavy-punch-body"
+
+[sub_resource type="Resource" id="MechaStandingHeavyPunch"]
+script = ExtResource("2_move")
+AttackName = "HEAVY PUNCH"
+AnimationName = "anim_144"
+Stance = 1
+StartupFrames = 14
+ActiveFrames = 12
+RecoveryFrames = 15
+SuppressFallbackHitbox = true
+AnimationDrawingOffsets = PackedVector2Array(0.5, -9, -0.5, 0, -1.5, 0, -5.5, -5, -1.5, -5, 8, -5, 39, -8.5, 33.5, -9, 33.5, -9, 33.5, -9, 33.5, -9, 33.5, -9, 33.5, -9, 22.5, -4, 4.5, -4, 3, -2, -1.5, 0, -1.5, 0)
+EffectSpriteFrames = ExtResource("5_system_fire")
+EffectAnimationName = "system_explosion"
+EffectSpawnFrame = 14
+EffectRequiresFullCharge = true
+EffectAdditiveBlend = true
+EffectBlackKey = true
+EffectSpawnOnHitContact = true
+EffectBlackensDefender = true
+EffectDefenderFireSpriteFrames = ExtResource("5_system_fire")
+EffectDefenderFireAnimationName = "system_burn_flame"
+Chargeable = true
+CanChainToSpecial = true
+Damage = 115
+HitstunFrames = 20
+BlockstunFrames = 14
+HitstopFrames = 15
+Pushback = 210.0
+ShakeStrength = 7.0
+BoxTimeline = [SubResource("MechaStandingHeavyPunchHurtbox"), SubResource("Resource_etncu"), SubResource("Resource_hynjc")]
+
+[sub_resource type="Resource" id="MechaJumpingMediumKickHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-50, -116, 100, 112)
+Tag = "jumping-medium-kick-body"
+
+[sub_resource type="Resource" id="Resource_wq80g"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 12
+EndFrame = 21
+LocalRect = Rect2(-9, -54, 42, 36)
+Tag = "jumping-medium-kick-slash-down"
+
+[sub_resource type="Resource" id="Resource_4ke2y"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 12
+EndFrame = 21
+LocalRect = Rect2(17, -32, 56, 34)
+Tag = "jumping-medium-kick-slash-down"
+
+[sub_resource type="Resource" id="MechaJumpingMediumKick"]
+script = ExtResource("2_move")
+AttackName = "MEDIUM KICK AIR BACK"
+AnimationName = "anim_136"
+Stance = 3
+StartupFrames = 12
+ActiveFrames = 10
+RecoveryFrames = 20
+SuppressFallbackHitbox = true
+AirAttackLandingAnimationName = "anim_137"
+AirAttackLandingFrames = 11
+AnimationDrawingOffsets = PackedVector2Array(0, 0, -1, 1, -2, 0, 11.5, 11, 12, 9, 12, 9, 6.5, -12.5, 3.5, -12.5, 0, -30, 1, -27, 0, -11, 0, 17, 0, 17.5)
+CanChainToHeavy = true
+CanChainToSpecial = true
+AllowedChainTargets = PackedStringArray("MEDIUM PUNCH AIR BACK", "HEAVY")
+MaxUsesPerCombo = 1
+CancelWindowStartFrame = 0
+Damage = 70
+HitstunFrames = 17
+BlockstunFrames = 11
+HitstopFrames = 11
+Pushback = 145.0
+ShakeStrength = 4.0
+BoxTimeline = [SubResource("MechaJumpingMediumKickHurtbox"), SubResource("Resource_wq80g"), SubResource("Resource_4ke2y")]
+
+[sub_resource type="Resource" id="MechaSpinSweepHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-54, -84, 108, 84)
+Tag = "spin-sweep-crouching-body"
+
+[sub_resource type="Resource" id="Resource_4aquu"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 12
+EndFrame = 15
+LocalRect = Rect2(-3, -27, 70, 26)
+Tag = "spinning-sweep-low"
+
+[sub_resource type="Resource" id="Resource_8eu22"]
+script = ExtResource("1_box")
+StartFrame = 12
+EndFrame = 15
+LocalRect = Rect2(-3, -20, 77, 18)
+Tag = "spin-sweep-crouching-body"
+
+[sub_resource type="Resource" id="MechaSpinSweep"]
+script = ExtResource("2_move")
+AttackName = "HEAVY KICK CROUCHING"
+AnimationName = "crouching_spin_sweep_generated"
+Stance = 2
+StartupFrames = 12
+ActiveFrames = 4
+RecoveryFrames = 4
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+Damage = 90
+HitstunFrames = 22
+BlockstunFrames = 13
+HitstopFrames = 13
+Pushback = 195.0
+ShakeStrength = 6.0
+KnockdownType = 1
+KnocksDown = true
+KnockdownFrames = 48
+BoxTimeline = [SubResource("MechaSpinSweepHurtbox"), SubResource("Resource_4aquu"), SubResource("Resource_8eu22")]
+
+[sub_resource type="Resource" id="MechaForwardHeavyKickHurtbox"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-48, -126, 96, 126)
+Tag = "forward-heavy-kick-body"
+
+[sub_resource type="Resource" id="MechaForwardHeavyKickHitbox"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 12
+EndFrame = 21
+LocalRect = Rect2(8, -132, 142, 116)
+Tag = "forward-heavy-kick-slash-down"
+AttackLevel = 4
+
+[sub_resource type="Resource" id="MechaForwardHeavyKick"]
+script = ExtResource("2_move")
+AttackName = "HEAVY KICK FORWARD"
+AnimationName = "anim_146"
+Stance = 1
+StartupFrames = 12
+ActiveFrames = 10
+RecoveryFrames = 20
+SuppressFallbackHitbox = true
+AnimationSourceTimeline = PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41)
+CanChainToSpecial = true
+Damage = 105
+HitstunFrames = 21
+BlockstunFrames = 14
+HitstopFrames = 14
+Pushback = 210.0
+ShakeStrength = 6.0
+BoxTimeline = [SubResource("MechaForwardHeavyKickHurtbox"), SubResource("MechaForwardHeavyKickHitbox")]
+
+[resource]
+script = ExtResource("3_set")
+Rules = [SubResource("MechaAirHeavyKick"), SubResource("MechaStandingLightPunch"), SubResource("MechaStandingMediumPunch"), SubResource("MechaStandingHeavyKick"), SubResource("MechaCrouchingLightPunch"), SubResource("MechaJumpingLightPunch"), SubResource("MechaCrouchingLightKick"), SubResource("MechaCrouchingMediumKick"), SubResource("MechaCrouchingHeavyPunch"), SubResource("MechaJumpingLightKick"), SubResource("MechaJumpingMediumPunch"), SubResource("MechaJumpingHeavyPunch"), SubResource("MechaStandingLightKick"), SubResource("MechaThrowStartup"), SubResource("MechaBackThrow"), SubResource("MechaStandingHeavyPunch"), SubResource("MechaJumpingMediumKick"), SubResource("MechaSpinSweep"), SubResource("MechaForwardHeavyKick")]

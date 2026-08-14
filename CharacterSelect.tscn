@@ -53,7 +53,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(700, 410)
+custom_minimum_size = Vector2(1000, 720)
 layout_mode = 2
 theme_override_styles/panel = SubResource("Panel")
 
@@ -74,23 +74,92 @@ theme_override_font_sizes/font_size = 30
 text = "<  KUNG FU MAN  >"
 horizontal_alignment = 1
 
-[node name="KungFuMan" type="Button" parent="Center/Panel/Layout"]
-custom_minimum_size = Vector2(0, 70)
+[node name="Roster" type="GridContainer" parent="Center/Panel/Layout"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="KungFuMan" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("Button")
 text = "KUNG FU MAN"
 
-[node name="Sanzou" type="Button" parent="Center/Panel/Layout"]
-custom_minimum_size = Vector2(0, 70)
+[node name="Sanzou" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("Button")
 text = "SANZOU KONGOUMARU"
+
+[node name="Kinako" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("Button")
+text = "KINAKO"
+
+[node name="Senna" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("Button")
+text = "SENNA"
+
+[node name="MechaHeita" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("Button")
+text = "MECHA HEITA"
+
+[node name="Kunagi" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("Button")
+text = "KUNAGI"
+
+[node name="Daigo" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("Button")
+text = "DAIGO"
+
+[node name="Rouga" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("Button")
+text = "ROUGA"
+
+[node name="Kamui" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("Button")
+text = "KAMUI"
+
+[node name="Heita" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("Button")
+text = "HEITA"
+
+[node name="Agito" type="Button" parent="Center/Panel/Layout/Roster"]
+custom_minimum_size = Vector2(420, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("Button")
+text = "AGITO"
 
 [node name="Instructions" type="Label" parent="Center/Panel/Layout"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.72, 0.78, 1)
 theme_override_font_sizes/font_size = 19
-text = "A / D or Arrow Keys to choose     ENTER to fight"
+text = "A / D or Left / Right: choose     W / S or Up / Down: change row     ENTER: fight"
 horizontal_alignment = 1

@@ -19,7 +19,10 @@ public sealed class FighterHitLogEntry
 	public int HitboxPriority { get; init; }
 	public int AttackFrame { get; init; }
 	public int HitstunFrames { get; init; }
+	/// <summary>Attacker freeze, traditionally called hitlag.</summary>
 	public int HitstopFrames { get; init; }
+	/// <summary>Defender freeze; normally equal to hitlag unless a contact rule splits them.</summary>
+	public int DefenderHitstopFrames { get; init; }
 	public float Pushback { get; init; }
 	public bool CounterHit { get; init; }
 	public bool Projectile { get; init; }

@@ -29,11 +29,9 @@ public partial class TrainingBlockControls : Control
 		Visible = false;
 	}
 
-	public override void _UnhandledKeyInput(InputEvent @event)
+	public override void _Process(double delta)
 	{
-		if (@event is not InputEventKey { Pressed: true, Echo: false, Keycode: Key.Escape }) return;
-		ToggleMenu();
-		GetViewport().SetInputAsHandled();
+		if (NativeInputRouter.GetUiFrame().WasPressed(NativeInputButtons.Pause)) ToggleMenu();
 	}
 
 	private void ToggleMenu()
@@ -73,6 +71,12 @@ public partial class TrainingBlockControls : Control
 		_airBlockToggle = AddToggle(content, "Opponent air-block", _opponent?.TrainingAirBlock ?? false,
 			enabled => { if (_opponent != null) _opponent.TrainingAirBlock = enabled; });
 		UpdateAirToggleAvailability(block.ButtonPressed);
+		AddToggle(content, "Enable instant block (auto-block dummy perfects)",
+			(_fighterOne?.InstantBlockEnabled ?? false) || (_opponent?.InstantBlockEnabled ?? false), enabled =>
+			{
+				if (_fighterOne != null) _fighterOne.InstantBlockEnabled = enabled;
+				if (_opponent != null) _opponent.InstantBlockEnabled = enabled;
+			});
 
 		content.AddChild(new HSeparator());
 		AddToggle(content, "Show combat HUD", _combatHud?.Visible ?? true,

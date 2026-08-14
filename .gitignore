@@ -23,6 +23,12 @@ obj/
 *.log
 *.tmp
 *.temp
+.codex-temp/
+.codex/
+Extraction/
+__pycache__/
+*.pyc
+Docs/*Previews/
 
 # OS/editor noise
 .DS_Store

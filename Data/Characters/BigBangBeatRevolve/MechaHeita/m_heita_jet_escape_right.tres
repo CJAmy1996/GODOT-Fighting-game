@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="JetEscapeAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/JetEscapeAbility.cs" id="1_escape"]
+
+[resource]
+script = ExtResource("1_escape")
+Id = "mecha_heita_jet_escape_right"
+Priority = 35
+SuspendsInputBufferWhileActive = true
+Direction = 0
+ActiveFrames = 16
+Speed = 650.0
+VerticalSpeed = 280.0
+GasCost = 20.0
+InvulnerabilityFrames = 4
+AnimationName = "jet_escape_right"
+StateName = "STATE ESCAPE RIGHT / JET FORWARD DASH"
