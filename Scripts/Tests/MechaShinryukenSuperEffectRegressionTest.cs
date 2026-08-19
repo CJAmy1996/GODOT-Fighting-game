@@ -20,7 +20,7 @@ public partial class MechaShinryukenSuperEffectRegressionTest : Node2D
 		floor.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = new Vector2(1200f, 20f) } });
 		AddChild(floor);
 
-		_fighter = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/MechaHeitaTest.tscn")
+		_fighter = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/MechaHeita.tscn")
 			.Instantiate<SpriteTestFighter>();
 		_fighter.ReadLocalInput = false;
 		_fighter.FaceWithMovement = false;

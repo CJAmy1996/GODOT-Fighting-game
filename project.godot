@@ -15,6 +15,10 @@ run/main_scene="res://CharacterSelect.tscn"
 config/features=PackedStringArray("4.5", "C#")
 run/max_fps=60
 
+[autoload]
+
+AudioController="*res://Audio/audio_controller.tscn"
+
 [display]
 
 window/size/viewport_width=1280
@@ -26,7 +30,7 @@ project/assembly_name="Modular Fighter Movement Framework"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/fighter_box_editor/plugin.cfg", "res://addons/projectile_path_editor/plugin.cfg")
+enabled=PackedStringArray("res://addons/fighter_box_editor/plugin.cfg")
 
 [input]
 

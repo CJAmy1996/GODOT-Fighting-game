@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SpecialMoveSet" load_steps=73 format=3 uid="uid://cdf5b0vbftpog"]
+[gd_resource type="Resource" script_class="SpecialMoveSet" load_steps=75 format=3 uid="uid://cdf5b0vbftpog"]
 
 [ext_resource type="Script" uid="uid://b0wbufr78dysp" path="res://Scripts/Core/SpecialMoveSet.cs" id="1_set"]
 [ext_resource type="Script" uid="uid://cvrl3b6rdaomb" path="res://Scripts/Core/SpecialMoveData.cs" id="2_move"]
@@ -8,7 +8,7 @@
 [ext_resource type="SpriteFrames" path="res://Assets/Effects/MechaOpticBeam/mecha_optic_beam_frames.tres" id="6_optic_beam"]
 [ext_resource type="Resource" path="res://Data/Motions/shoryuken.tres" id="7_dp"]
 [ext_resource type="PackedScene" path="res://Effects/BigBangBloodHitSpark.tscn" id="8_blood"]
-[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/m_heita_sprite_frames.tres" id="9_mecha_frames"]
+[ext_resource type="SpriteFrames" uid="uid://cr7hqa3fqrdxh" path="res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/m_heita_sprite_frames.tres" id="9_mecha_frames"]
 [ext_resource type="Resource" path="res://Data/Motions/mash_five.tres" id="10_mash"]
 [ext_resource type="SpriteFrames" path="res://Assets/Effects/BigBangSystemFire/bigbang_system_fire_frames.tres" id="11_system_fire"]
 
@@ -105,13 +105,19 @@ Motion = ExtResource("5_qcf")
 Buttons = 4
 Priority = 20
 
+[sub_resource type="Curve2D" id="MechaLightMissilePath"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 73, 24, 0, 0, 0, 0, 285, 36, 0, 0, 0, 0, 333, 13, 0, 0, 0, 0, 390, -7)
+}
+point_count = 6
+
 [sub_resource type="Resource" id="MechaMissileMove"]
 script = ExtResource("2_move")
 CommandInput = SubResource("MechaMissileBinding")
 CanCancelIntoFromNormals = true
 Projectile = true
 ProjectileSpeed = 660.0
-ProjectileSpawnOffset = Vector2(-22, -92)
+ProjectileSpawnOffset = Vector2(-16, -57)
 ProjectileHitboxLocal = Rect2(-24, -18, 72, 36)
 ProjectileSpriteFrames = ExtResource("9_mecha_frames")
 ProjectileAnimationName = "anim_134"
@@ -123,10 +129,11 @@ ProjectileImpactBlackKey = true
 ProjectileImpactBlackensDefender = true
 ProjectileImpactDefenderFireSpriteFrames = ExtResource("11_system_fire")
 ProjectileImpactDefenderFireAnimationName = "system_burn_flame"
+ProjectilePath = SubResource("MechaLightMissilePath")
 AttackName = "LIGHT MECHA MISSILE"
 AnimationName = "anim_133"
 Stance = 1
-StartupFrames = 20
+StartupFrames = 15
 ActiveFrames = 2
 RecoveryFrames = 34
 SuppressFallbackHitbox = true
@@ -138,6 +145,11 @@ HitstopFrames = 12
 Pushback = 320.0
 ShakeStrength = 6.0
 BoxTimeline = [SubResource("MechaMissileHurtbox")]
+Launches = true
+LaunchGroundedOnly = true
+LaunchSpeed = 760.0
+LaunchPushback = 85.0
+LaunchHitstunFrames = 38
 
 [sub_resource type="Resource" id="MechaHeavyMissileBinding"]
 script = ExtResource("4_binding")
@@ -145,13 +157,19 @@ Motion = ExtResource("5_qcf")
 Buttons = 8
 Priority = 20
 
+[sub_resource type="Curve2D" id="MechaHeavyMissilePath"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, -49, 0, 0, 0, 0, 66, -69, 0, 0, 0, 0, 162, -69, 0, 0, 0, 0, 225, -50, 0, 0, 0, 0, 312, 30)
+}
+point_count = 6
+
 [sub_resource type="Resource" id="MechaHeavyMissileMove"]
 script = ExtResource("2_move")
 CommandInput = SubResource("MechaHeavyMissileBinding")
 CanCancelIntoFromNormals = true
 Projectile = true
 HeavyProjectile = true
-ProjectileSpawnOffset = Vector2(-28, -72)
+ProjectileSpawnOffset = Vector2(-19, -71)
 ProjectileHitboxLocal = Rect2(-26, -20, 78, 40)
 ProjectileSpriteFrames = ExtResource("9_mecha_frames")
 ProjectileAnimationName = "anim_135"
@@ -164,10 +182,11 @@ ProjectileImpactBlackKey = true
 ProjectileImpactBlackensDefender = true
 ProjectileImpactDefenderFireSpriteFrames = ExtResource("11_system_fire")
 ProjectileImpactDefenderFireAnimationName = "system_burn_flame"
+ProjectilePath = SubResource("MechaHeavyMissilePath")
 AttackName = "HEAVY MECHA MISSILE"
 AnimationName = "anim_133"
 Stance = 1
-StartupFrames = 20
+StartupFrames = 25
 ActiveFrames = 2
 RecoveryFrames = 34
 SuppressFallbackHitbox = true

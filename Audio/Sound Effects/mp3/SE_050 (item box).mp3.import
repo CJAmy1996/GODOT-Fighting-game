@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dtg5b31tmkor1"
+path="res://.godot/imported/SE_050 (item box).mp3-c174fb4704b4c11046bb7dc154300260.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_050 (item box).mp3"
+dest_files=["res://.godot/imported/SE_050 (item box).mp3-c174fb4704b4c11046bb7dc154300260.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

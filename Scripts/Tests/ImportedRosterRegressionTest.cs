@@ -102,7 +102,7 @@ public partial class ImportedRosterRegressionTest : Node
 			instance.Free();
 		}
 
-		PackedScene arenaScene = GD.Load<PackedScene>("res://TestArena.tscn");
+		PackedScene arenaScene = GD.Load<PackedScene>("res://Arena.tscn");
 		if (arenaScene == null)
 		{
 			GD.PushError("Imported roster regression: TestArena did not load");

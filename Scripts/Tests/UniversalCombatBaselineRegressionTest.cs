@@ -8,17 +8,17 @@ public partial class UniversalCombatBaselineRegressionTest : Node
 {
 	private static readonly string[] FighterScenes =
 	{
-		"res://Scenes/TestCharacters/KungFuManTest.tscn",
-		"res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn",
-		"res://Scenes/TestCharacters/MechaHeitaTest.tscn",
-		"res://Scenes/TestCharacters/AgitoTest.tscn",
-		"res://Scenes/TestCharacters/DaigoTest.tscn",
-		"res://Scenes/TestCharacters/HeitaTest.tscn",
-		"res://Scenes/TestCharacters/KamuiTest.tscn",
-		"res://Scenes/TestCharacters/KinakoTest.tscn",
-		"res://Scenes/TestCharacters/KunagiTest.tscn",
-		"res://Scenes/TestCharacters/RougaTest.tscn",
-		"res://Scenes/TestCharacters/SennaTest.tscn"
+		"res://Scenes/Characters/KungFuMan.tscn",
+		"res://Scenes/Characters/SanzoKongoumaru.tscn",
+		"res://Scenes/Characters/MechaHeita.tscn",
+		"res://Scenes/Characters/Agito.tscn",
+		"res://Scenes/Characters/Daigo.tscn",
+		"res://Scenes/Characters/Heita.tscn",
+		"res://Scenes/Characters/Kamui.tscn",
+		"res://Scenes/Characters/Kinako.tscn",
+		"res://Scenes/Characters/Kunagi.tscn",
+		"res://Scenes/Characters/Rouga.tscn",
+		"res://Scenes/Characters/Senna.tscn"
 	};
 
 	public override void _Ready()

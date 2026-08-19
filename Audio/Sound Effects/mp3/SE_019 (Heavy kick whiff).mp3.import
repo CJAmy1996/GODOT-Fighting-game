@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://t48tninq7p5u"
+path="res://.godot/imported/SE_019 (Heavy kick whiff).mp3-db80997ed2eb5c4fdca9c8774570eae4.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_019 (Heavy kick whiff).mp3"
+dest_files=["res://.godot/imported/SE_019 (Heavy kick whiff).mp3-db80997ed2eb5c4fdca9c8774570eae4.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

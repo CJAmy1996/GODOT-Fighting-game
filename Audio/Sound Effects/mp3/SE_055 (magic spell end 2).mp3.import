@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://duy5nsxduoo2q"
+path="res://.godot/imported/SE_055 (magic spell end 2).mp3-a8deab525af3d767465dd24d4bbd51a2.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_055 (magic spell end 2).mp3"
+dest_files=["res://.godot/imported/SE_055 (magic spell end 2).mp3-a8deab525af3d767465dd24d4bbd51a2.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -29,7 +29,7 @@ public partial class ReusableMotionInputsRegressionTest : Node2D
 		var floor = new StaticBody2D { Position = new Vector2(0f, 10f) };
 		floor.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = new Vector2(900f, 20f) } });
 		AddChild(floor);
-		_fighter = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn")
+		_fighter = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
 			.Instantiate<SpriteTestFighter>();
 		_fighter.ReadLocalInput = false;
 		_fighter.FaceWithMovement = false;

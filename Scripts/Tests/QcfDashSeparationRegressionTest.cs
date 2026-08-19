@@ -26,7 +26,7 @@ public partial class QcfDashSeparationRegressionTest : Node2D
 
 	private SpriteTestFighter Spawn(string name, float x)
 	{
-		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn")
+		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
 			.Instantiate<SpriteTestFighter>();
 		fighter.Name = name;
 		fighter.ReadLocalInput = false;

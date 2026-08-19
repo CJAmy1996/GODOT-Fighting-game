@@ -19,13 +19,30 @@ ANIMATION_HOLD_TICKS = {
     "crouch_start": 1.0,
     "crouch_end": 1.0,
     "crouch_hold": 5.0,
-    "idle": 5.0,
-    "walk": 8.0,
-    "walk_back": 8.0,
+    # Match the 165 px/s runtime movement closely enough that planted sandals
+    # do not skate while the CharacterBody advances.
+    "walk": 3.0,
+    "walk_back": 3.0,
+    "win_start": 5.0,
+    "win": 5.0,
+    "win_loop": 5.0,
+    "trait_2": 3.0,
     "spd_air_grab": 4.0,
 }
 FRAME_HOLD_OVERRIDES = {
-    "intro": {0: 15.0},
+    # BIGBANG BEAT Revolve script.txt, neutral action, images 104-115.
+    "idle": {
+        0: 4.0, 1: 4.0, 2: 4.0, 3: 4.0, 4: 4.0, 5: 4.0,
+        6: 5.0, 7: 6.0, 8: 6.0, 9: 6.0, 10: 6.0, 11: 5.0,
+    },
+    # BIGBANG BEAT Revolve [System] Start action, including the post-144
+    # continuation into images 254-262. Image 142 is intentionally absent.
+    "intro": {
+        0: 130.0, 1: 5.0, 2: 5.0, 3: 5.0, 4: 5.0, 5: 5.0,
+        6: 5.0, 7: 5.0, 8: 5.0, 9: 6.0, 10: 6.0, 11: 30.0,
+        12: 4.0, 13: 4.0, 14: 3.0, 15: 4.0, 16: 13.0, 17: 5.0,
+        18: 5.0,
+    },
 	# Group 25 standing jab: four unique drawings across a ten-tick move.
 	"light_punch": {0: 2.0, 1: 2.0, 2: 2.0, 3: 4.0},
 	"group_25": {0: 2.0, 1: 2.0, 2: 2.0, 3: 4.0},
@@ -86,7 +103,24 @@ FRAME_HOLD_OVERRIDES = {
 # Keep the crouching jab's hips planted while its arms change the silhouette's
 # width. Without these small corrections, per-frame centering makes the body
 # appear to slide sideways even though the CharacterBody remains stationary.
-GROUP_FRAME_X_OFFSETS = {18: [0, 0, 6, 6, 2]}
+GROUP_FRAME_X_OFFSETS = {
+    # BIGBANG BEAT Revolve script.txt uses half-scale X coordinates
+    # 20,22,28,34,34,32,28,28,24,20,18,22 for neutral images 104-115.
+    # Preserve those authored coordinates relative to the first drawing.
+    12: [0, 1, 4, 7, 7, 6, 4, 4, 2, 0, -1, 1],
+    # Source victory action, images 126-132, relative to neutral image 104.
+    14: [-10, -10, -4, 9, 16, 9, 9],
+    # Revolve [BB] Big Bang Mode activation, images 146-149, relative to
+    # neutral image 104.
+    16: [-24, -20, -19, -17],
+    18: [0, 0, 6, 6, 2],
+}
+
+GROUP_FRAME_Y_OFFSETS = {
+    # Source Y anchors are 9.5,9.5,8,8,8,8,8 versus neutral's 5.
+    14: [4, 4, 3, 3, 3, 3, 3],
+    16: [-1, -1, -1, -1],
+}
 
 GROUPS = [
     (0, 5), (7, 13), (15, 20), (22, 29), (31, 35), (37, 41), (43, 48),
@@ -95,6 +129,17 @@ GROUPS = [
     (164, 168), (170, 178), (180, 187), (189, 192), (194, 200),
     (202, 211), (213, 224), (226, 229), (231, 240), (242, 252),
     (254, 263), (265, 277), (279, 290), (292, 311),
+]
+
+# Extracted Revolve script.txt [System] Start action. Offsets are the source
+# anchors relative to neutral image 104, rounded only where the legacy
+# half-scale renderer lands between physical pixels.
+INTRO_SOURCE_DRAWINGS = [
+    (134, -21, 0), (135, -18, 0), (136, -14, 0), (137, -16, 0),
+    (138, -14, 0), (139, -22, 0), (140, -8, 0), (141, -7, 0),
+    (143, -3, 0), (144, 0, 0), (254, -23, 0), (255, -35, 0),
+    (256, -33, 0), (257, -38, 0), (258, -16, 0), (259, -14, 0),
+    (260, -16, 0), (261, -15, 0), (262, -13, 0),
 ]
 
 # User-confirmed gameplay aliases. Values are (group, start, end); omitted slice
@@ -132,11 +177,11 @@ ALIASES = {
     "walk_back": (10, None, None),
     "walk": (11, None, None),
     "idle": (12, None, None),
-    "win_start": (14, 0, 2),
-    "win": (14, 2, 7),
-    "win_loop": (14, 2, 7),
+    "win_start": (14, 0, 3),
+    "win": (14, 3, 7),
+    "win_loop": (14, 3, 7),
     "intro": (15, None, None),
-    "command_grab_active": (16, None, None),
+    "trait_2": (16, None, None),
 
     # Normals and grabs.
     "crouching_heavy_punch": (17, None, None),
@@ -207,11 +252,11 @@ def align_to_sandal_baseline(image: Image.Image) -> Image.Image:
     return canvas
 
 
-def shift_canvas_x(image: Image.Image, offset: int) -> Image.Image:
-    if offset == 0:
+def shift_canvas(image: Image.Image, offset_x: int, offset_y: int) -> Image.Image:
+    if offset_x == 0 and offset_y == 0:
         return image
     shifted = Image.new("RGBA", CANVAS_SIZE, (0, 0, 0, 0))
-    shifted.alpha_composite(image, (offset, 0))
+    shifted.alpha_composite(image, (offset_x, offset_y))
     return shifted
 
 
@@ -228,7 +273,9 @@ def main() -> None:
             aligned = align_to_sandal_baseline(remove_green(Image.open(source)))
             offsets = GROUP_FRAME_X_OFFSETS.get(group_index, [])
             offset_x = offsets[drawing_index] if drawing_index < len(offsets) else 0
-            shift_canvas_x(aligned, offset_x).save(destination)
+            y_offsets = GROUP_FRAME_Y_OFFSETS.get(group_index, [])
+            offset_y = y_offsets[drawing_index] if drawing_index < len(y_offsets) else 0
+            shift_canvas(aligned, offset_x, offset_y).save(destination)
             paths.append(destination)
         group_paths.append(paths)
 
@@ -256,6 +303,13 @@ def main() -> None:
         # its exact placement so only the two loose cape tips animate.
         Image.open(source).convert("RGBA").save(destination)
         generated_spd_paths.append(destination)
+    intro_paths = []
+    for frame_number, offset_x, offset_y in INTRO_SOURCE_DRAWINGS:
+        source = SOURCE / f"{frame_number}.bmp"
+        destination = OUTPUT / f"source_intro_{frame_number:03d}.png"
+        aligned = align_to_sandal_baseline(remove_green(Image.open(source)))
+        shift_canvas(aligned, offset_x, offset_y).save(destination)
+        intro_paths.append(destination)
     generated_animations = {
         "crouching_heavy_kick": generated_sweep_paths,
         "crouching_light_kick": generated_light_kick_paths,
@@ -263,6 +317,7 @@ def main() -> None:
     }
     all_paths = [path for paths in group_paths for path in paths]
     all_paths.extend(path for paths in generated_animations.values() for path in paths)
+    all_paths.extend(intro_paths)
     ext_ids = {path: index + 1 for index, path in enumerate(all_paths)}
     lines = [f'[gd_resource type="SpriteFrames" load_steps={len(all_paths) + 1} format=3]', ""]
     for path in all_paths:
@@ -271,15 +326,16 @@ def main() -> None:
 
     animations = [(f"group_{index:02d}", group_paths[index]) for index in range(len(group_paths))]
     for name, (group_index, start, end) in ALIASES.items():
-        selected_paths = group_paths[group_index][slice(start, end)]
+        selected_paths = intro_paths if name == "intro" else group_paths[group_index][slice(start, end)]
+        if name == "trait_2":
+            # Source order: 146,147,148,149 repeated twice, then 146,147.
+            selected_paths = selected_paths + selected_paths + selected_paths[:2]
         if name == "crouch_end":
             selected_paths = list(reversed(selected_paths))
         elif name == "heavy_punch" and selected_paths:
             # Source group frame 11 is empty; retain the final visible recovery
             # pose as drawing 11 so the fighter never disappears.
             selected_paths = selected_paths + [selected_paths[-1]]
-        elif name in {"win", "win_loop"} and len(selected_paths) > 2:
-            selected_paths = selected_paths + list(reversed(selected_paths[1:-1]))
         animations.append((name, selected_paths))
     animations.extend(generated_animations.items())
     animations.append(("spd_grab", group_paths[24][:2] + generated_spd_paths))

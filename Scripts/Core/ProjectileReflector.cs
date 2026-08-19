@@ -20,12 +20,12 @@ public partial class ProjectileReflector : BasicProjectile
 	[ExportGroup("Super Reflector")]
 	[Export] public int SuperLifetimeFrames { get; set; } = 600;
 	[Export] public int SuperHitCount { get; set; } = 8;
-	[Export] public int SuperHitCooldownFrames { get; set; } = 30;
+	[Export] public int SuperHitCooldownFrames { get; set; } = 5;
 	[Export] public float SuperSlideSpeed { get; set; } = 18f;
 	[Export] public int SuperHitstunFrames { get; set; } = 12;
 	[Export] public float SuperPushback { get; set; } = 170f;
-	[Export] public int SuperHitstopFrames { get; set; } = 4;
-	[Export] public float HoverAmplitude { get; set; } = 6f;
+	[Export] public int SuperHitstopFrames { get; set; } = 1;
+	[Export] public float HoverAmplitude { get; set; } = 0f;
 	[Export] public int HoverPeriodFrames { get; set; } = 120;
 
 	public bool IsSuperReflector { get; private set; }
@@ -40,6 +40,7 @@ public partial class ProjectileReflector : BasicProjectile
 		{
 			Visual.FlipH = Direction < 0;
 			Visual.Play("reflector");
+			AlignVisualToGround();
 		}
 	}
 
@@ -73,7 +74,7 @@ public partial class ProjectileReflector : BasicProjectile
 		if (Visual != null)
 		{
 			float period = Mathf.Max(1, HoverPeriodFrames);
-			Visual.Position = new Vector2(0f, Mathf.Sin(_ageFrames * Mathf.Tau / period) * HoverAmplitude);
+			AlignVisualToGround(Mathf.Sin(_ageFrames * Mathf.Tau / period) * HoverAmplitude);
 		}
 		if (!IsSuperReflector) return;
 
@@ -88,6 +89,14 @@ public partial class ProjectileReflector : BasicProjectile
 				ReflectedProjectileCount++;
 			}
 		}
+	}
+
+	private void AlignVisualToGround(float hoverOffset = 0f)
+	{
+		Texture2D texture = Visual?.SpriteFrames?.GetFrameTexture(Visual.Animation, Visual.Frame);
+		if (texture == null) return;
+		float scaledHeight = texture.GetHeight() * Mathf.Abs(Visual.Scale.Y);
+		Visual.Position = new Vector2(0f, -scaledHeight * 0.5f + hoverOffset);
 	}
 
 	public override void _Draw() { }

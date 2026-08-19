@@ -26,7 +26,7 @@ means it should be checked in motion or against the original character.
 | `group_13` | 117–124 | Held crouching stance | `crouch_hold` | Confirmed by user |
 | `group_14` | 126–132 | Drawings 0–1 turn around once; drawings 2–6 loop back and forth as the back-facing victory pose | `win_start`, then `win`/`win_loop` | Confirmed by user |
 | `group_15` | 134–144 | Enters and settles into combat stance | intro animation | Confirmed by user |
-| `group_16` | 146–149 | Active catch portion of the SPD-style suplex command grab | `command_grab_active` | Confirmed by user |
+| `group_16` | 146–149 | `[BB] Big Bang Mode Activation`; Sanzou Trait 2 on S2/L | `trait_2` | Confirmed from Revolve source and by user |
 | `group_17` | 151–162 | Heavy attack performed from crouch | crouching heavy | Confirmed by user |
 | `group_18` | 164–168 | Quick punch from crouch | crouching jab / `crouching_light_punch` | Confirmed by user |
 | `group_19` | 170–178 | Command normal performed from crouch | crouching medium command normal | Confirmed by user |

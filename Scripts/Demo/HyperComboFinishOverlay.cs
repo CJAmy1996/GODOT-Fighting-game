@@ -5,9 +5,12 @@ namespace ModularFighter.Demo;
 /// <summary>MVC-style finish: explosion, tunnel, arena dissolve, then foreground kanji impact.</summary>
 public partial class HyperComboFinishOverlay : Node
 {
+	[Signal] public delegate void TunnelEndedEventHandler();
 	[Export(PropertyHint.Range, "1.0,8.0,0.1")] public float MinimumPresentationSeconds { get; set; } = 4f;
-	private const string FramesPath = "res://Assets/Effects/BigBangCommon/hyper_combo_finish_frames.tres";
+	private const string NormalFramesPath = "res://Assets/Effects/BigBangCommon/hyper_combo_finish_frames.tres";
+	private const string Level3FramesPath = "res://Assets/Effects/BigBangCommon/hyper_combo_finish_level3_frames.tres";
 	private const string KanjiPath = "res://Assets/Effects/BigBangCommon/hyper_combo_finish_kanji.png";
+	private const string AnnouncerPath = "res://Audio/Sound Effects/(BIG BANG FINISH)PS2.DAT_00882.wav";
 	private static readonly StringName ExplosionAnimation = "hyper_combo_finish_explosion";
 	private static readonly StringName TunnelAnimation = "hyper_combo_finish_activation";
 	private const float CrossfadeTicks = 3f;
@@ -35,6 +38,7 @@ public partial class HyperComboFinishOverlay : Node
 	private TextureRect _crossfadeDisplay;
 	private TextureRect _kanjiDisplay;
 	private ColorRect _whiteFlash;
+	private AudioStreamPlayer _announcer;
 	private CanvasItem _arenaBackdrop;
 	private StageCamera _fightCamera;
 	private Color _arenaOriginalModulate = Colors.White;
@@ -45,8 +49,12 @@ public partial class HyperComboFinishOverlay : Node
 	private bool _outroRequested;
 	private bool _tunnelCycleComplete;
 	private float _elapsedRealSeconds;
+	private float _tunnelElapsedRealSeconds;
+	private bool _musicDucked;
 
 	public bool IsFinished { get; private set; }
+	public bool UseLevel3Palette { get; set; }
+	public bool PlayAnnouncerVoice { get; set; } = true;
 
 	public void SetArenaBackdrop(CanvasItem backdrop)
 	{
@@ -63,6 +71,8 @@ public partial class HyperComboFinishOverlay : Node
 	public void StartNormalKoImpact()
 	{
 		if (_backgroundLayer == null || _kanjiDisplay == null) return;
+		_announcer?.Stop();
+		RestoreMusic();
 		SetArenaAlpha(1f);
 		_backgroundLayer.Visible = false;
 		BeginKanjiImpact();
@@ -70,7 +80,14 @@ public partial class HyperComboFinishOverlay : Node
 
 	public override void _Ready()
 	{
-		_frames = ResourceLoader.Load<SpriteFrames>(FramesPath);
+		_frames = ResourceLoader.Load<SpriteFrames>(UseLevel3Palette ? Level3FramesPath : NormalFramesPath);
+		_announcer = new AudioStreamPlayer
+		{
+			Name = "HyperComboFinishAnnouncer",
+			Stream = ResourceLoader.Load<AudioStream>(AnnouncerPath),
+			VolumeDb = 3.0f
+		};
+		AddChild(_announcer);
 		_backgroundLayer = new CanvasLayer { Name = "HyperComboFinishBackground", Layer = -1 };
 		_foregroundLayer = new CanvasLayer { Name = "HyperComboFinishForeground", Layer = 150 };
 		AddChild(_backgroundLayer);
@@ -100,7 +117,14 @@ public partial class HyperComboFinishOverlay : Node
 		_foregroundLayer.AddChild(_kanjiDisplay);
 		CallDeferred(MethodName.SetKanjiPivot);
 
-		ShowBackgroundFrame(ExplosionAnimation, 0);
+		if (UseLevel3Palette)
+		{
+			ShowBackgroundFrame(ExplosionAnimation, 0);
+		}
+		else
+		{
+			BeginTunnel();
+		}
 	}
 
 	public override void _Process(double delta)
@@ -159,14 +183,26 @@ public partial class HyperComboFinishOverlay : Node
 
 		_backgroundDisplay.Texture = _crossfadeDisplay.Texture;
 		_crossfadeDisplay.Modulate = new Color(1f, 1f, 1f, 0f);
+		BeginTunnel();
+	}
+
+	private void BeginTunnel()
+	{
 		_phase = FinishPhase.Tunnel;
 		_frame = 0;
 		_ticksLeft = 0f;
+		_tunnelElapsedRealSeconds = 0f;
+		_tunnelCycleComplete = false;
 		ShowBackgroundFrame(TunnelAnimation, 0);
+		if (!PlayAnnouncerVoice || _announcer?.Stream == null) return;
+		_announcer.Play();
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("duck_music_for_hyper_finish");
+		_musicDucked = true;
 	}
 
 	private void AdvanceTunnel(float ticks)
 	{
+		_tunnelElapsedRealSeconds += ticks / 60f;
 		_ticksLeft -= ticks;
 		while (_ticksLeft <= 0f)
 		{
@@ -181,8 +217,13 @@ public partial class HyperComboFinishOverlay : Node
 			_frame = 0;
 			ShowBackgroundFrame(TunnelAnimation, _frame);
 		}
-		if (!_outroRequested || !_tunnelCycleComplete ||
-			_elapsedRealSeconds < Mathf.Max(0.1f, MinimumPresentationSeconds)) return;
+		float soundSeconds = _announcer?.Stream?.GetLength() > 0.0
+			? (float)_announcer.Stream.GetLength()
+			: Mathf.Max(0.1f, MinimumPresentationSeconds);
+		if (_tunnelElapsedRealSeconds < soundSeconds) return;
+		_announcer?.Stop();
+		RestoreMusic();
+		EmitSignal(SignalName.TunnelEnded);
 		_phase = FinishPhase.ReturnToArena;
 		_phaseTicks = 0f;
 	}
@@ -270,4 +311,13 @@ public partial class HyperComboFinishOverlay : Node
 		color.A *= Mathf.Clamp(alpha, 0f, 1f);
 		_arenaBackdrop.Modulate = color;
 	}
+
+	private void RestoreMusic()
+	{
+		if (!_musicDucked) return;
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("restore_music_after_hyper_finish");
+		_musicDucked = false;
+	}
+
+	public override void _ExitTree() => RestoreMusic();
 }

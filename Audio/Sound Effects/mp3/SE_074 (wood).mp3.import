@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://feuleur0nnir"
+path="res://.godot/imported/SE_074 (wood).mp3-e63e45a27d59a96317396c238479117a.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_074 (wood).mp3"
+dest_files=["res://.godot/imported/SE_074 (wood).mp3-e63e45a27d59a96317396c238479117a.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

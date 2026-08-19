@@ -293,7 +293,7 @@ BoxTimeline = [SubResource("MechaCrouchingHeavyPunchHurtbox"), SubResource("Reso
 Launches = true
 LaunchSpeed = 1265.0
 LaunchHitstunFrames = 30
-ChaseJumpSpeed = 1380.0
+ChaseJumpSpeed = 1440.0
 
 [sub_resource type="Resource" id="MechaJumpingLightKickHurtbox"]
 script = ExtResource("1_box")
@@ -322,9 +322,12 @@ CanChainToHeavy = true
 CanChainToSpecial = true
 AllowedChainTargets = PackedStringArray("LIGHT PUNCH", "LIGHT KICK", "MEDIUM PUNCH AIR BACK", "MEDIUM KICK AIR BACK", "HEAVY")
 RepeatLightPunchChainTarget = "MEDIUM PUNCH AIR BACK"
+RepeatLightKickChainTarget = "MEDIUM KICK AIR BACK"
 MaxUsesPerCombo = 1
 CancelWindowStartFrame = 0
 Damage = 35
+HitstunFrames = 12
+PreserveAirborneTargetVelocity = true
 BoxTimeline = [SubResource("MechaJumpingLightKickHurtbox"), SubResource("Resource_lyku2")]
 
 [sub_resource type="Resource" id="MechaJumpingMediumPunchHurtbox"]
@@ -617,6 +620,7 @@ HitstunFrames = 17
 BlockstunFrames = 11
 HitstopFrames = 11
 Pushback = 145.0
+PreserveAirborneTargetVelocity = true
 ShakeStrength = 4.0
 BoxTimeline = [SubResource("MechaJumpingMediumKickHurtbox"), SubResource("Resource_wq80g"), SubResource("Resource_4ke2y")]
 

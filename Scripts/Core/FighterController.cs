@@ -33,6 +33,7 @@ public partial class FighterController : CharacterBody2D
 	[Export] public bool ReadLocalInput { get; set; } = true;
 	[Export(PropertyHint.Range, "0,3,1")] public int LocalPlayerIndex { get; set; }
 	[Export] public bool FaceWithMovement { get; set; } = true;
+	[Export] public bool FaceOpponentWhenNeutral { get; set; } = true;
 	[ExportGroup("Match Identity")]
 	[Export] public int TeamId { get; set; }
 	public bool ParticipatesInPointCollision { get; private set; } = true;
@@ -78,6 +79,9 @@ public partial class FighterController : CharacterBody2D
 	[Export] public int SpecialAttackRecoveryFrames { get; set; } = 13;
 	[Export] public int ProjectileAttackStartupFrames { get; set; } = 4;
 	[Export] public int LightAttackHitstunFrames { get; set; } = 10;
+	[Export] public int GroundedLightNormalHitstunFrames { get; set; } = 12;
+	[Export] public int GroundedMediumNormalHitstunFrames { get; set; } = 14;
+	[Export] public int GroundedHeavyNormalHitstunFrames { get; set; } = 16;
 	[Export] public int HeavyAttackHitstunFrames { get; set; } = 14;
 	[Export] public int SpecialAttackHitstunFrames { get; set; } = 20;
 	[Export] public float LightAttackPushback { get; set; } = 520f;
@@ -119,9 +123,14 @@ public partial class FighterController : CharacterBody2D
 	[Export] public float SpecialAirAttackMomentumMultiplier { get; set; } = 0.9f;
 	[Export] public float LightAirAttackMomentumBoost { get; set; }
 	[Export(PropertyHint.Range, "0.0,1.0,0.05")] public float AirLightHitMomentumScale { get; set; } = 0.7f;
+	[Export(PropertyHint.Range, "0.0,1.0,0.05")] public float AirNonLightHitMomentumScale { get; set; } = 0.6f;
 	[Export] public int AirChainEarliestActiveFramesLeft { get; set; } = 4;
 	[Export] public float AirHitPopUpSpeed { get; set; } = 620f;
 	[Export] public float AirLightInitialPopUpSpeed { get; set; } = 140f;
+	[Export] public float JuggleHitBounceSpeed { get; set; } = 180f;
+	[Export] public float GroundNormalJuggleHitBounceSpeed { get; set; } = 220f;
+	[Export] public float JuggleHitBounceDecayPerHit { get; set; } = 24f;
+	[Export] public float MinimumJuggleHitBounceSpeed { get; set; } = 60f;
 	[Export] public float HeavyAirAttackSpikeSpeed { get; set; } = 980f;
 	[Export] public int AirToAirHitstunBonusFrames { get; set; } = 8;
 	[Export(PropertyHint.Range, "-20,20,1")] public int AirToAirNormalHitstunAdjustment { get; set; }
@@ -133,7 +142,6 @@ public partial class FighterController : CharacterBody2D
 	[Export] public float JuggleDistanceScalePerHit { get; set; } = 0.09f;
 	[Export] public float MaxJuggleDistanceScale { get; set; } = 1.55f;
 	[Export(PropertyHint.Range, "0.0,1.0,0.01")] public float GroundNormalJugglePushbackMultiplier { get; set; } = 0.65f;
-	[Export(PropertyHint.Range, "0.0,1.0,0.01")] public float GroundJabJugglePopLossPerHit { get; set; } = 0.22f;
 	[Export] public int WallSplatHitstunFrames { get; set; } = 28;
 	[Export] public float WallSplatSlideSpeed { get; set; } = 105f;
 	[Export] public int CounterHitExtraHitstunFrames { get; set; } = 4;
@@ -259,8 +267,10 @@ public partial class FighterController : CharacterBody2D
 	public bool IsCurrentSuperConfirmed => _currentSuperConfirmed;
 	public int CurrentSuperConfirmedFrame => _currentSuperConfirmedFrame;
 	public bool IsPerformingSuperMove => IsAttacking && _currentSuperMove != null;
+	public int CurrentSuperLevel => _currentSuperMove?.Level ?? 1;
 	public bool IsPlayingWinAnimation { get; private set; }
 	public bool WinAnimationFinished { get; private set; }
+	public bool DefeatedKoSettled { get; private set; }
 	/// <summary>True for real supers and authored special moves that use the universal super presentation.</summary>
 	public bool CurrentAttackTriggersHyperComboFinish => IsAttacking &&
 		(_currentSuperMove != null || _currentSpecialMove?.TriggersSuperPresentation == true);
@@ -277,6 +287,7 @@ public partial class FighterController : CharacterBody2D
 	public bool IsCrouchBlocking { get; private set; }
 	public bool LastContactWasBlocked { get; private set; }
 	public bool LastContactWasInstantBlocked { get; private set; }
+	public ulong InstantBlockFlashSerial { get; private set; }
 	public bool LastContactWasParried { get; private set; }
 	public int LastContactDefenderHitstopFrames { get; private set; }
 	public bool IsParryWindowActive =>
@@ -501,15 +512,49 @@ public partial class FighterController : CharacterBody2D
 
 	public void BeginDefeatedKoState()
 	{
+		if (_defeatedKoActive) return;
 		StopActiveAbility();
 		ClearAttackState();
-		// The lethal hit has already authored the correct knockdown reaction.
-		// Official KO only locks that result; it must not start a second knockdown.
-		Velocity = Vector2.Zero;
-		OnDefeatedKoRequested();
+		_defeatedKoActive = true;
+		DefeatedKoSettled = false;
+		if (IsOnFloor() || WasGrounded || Velocity.IsZeroApprox())
+		{
+			LockDefeatedKoOnGround();
+			return;
+		}
+		CurrentKnockdownType = KnockdownType.AirKnockdown;
+		ApplyHitReaction(int.MaxValue / 4, FighterHitState.Knockdown);
+		Velocity = new Vector2(Velocity.X, Mathf.Max(180f, Velocity.Y));
 	}
 
 	protected virtual void OnDefeatedKoRequested() { }
+
+	public void SetFinishingSuperTimelineSlow(bool active)
+	{
+		_finishingSuperTimelineSlow = active;
+		_finishingSuperTimelineTick = 0;
+	}
+
+	private void TickDefeatedKo(float delta)
+	{
+		if (DefeatedKoSettled) return;
+		Velocity = new Vector2(Mathf.MoveToward(Velocity.X, 0f, BasicAttackFriction * delta),
+			Mathf.Max(Velocity.Y, 180f));
+		ApplyBaseMotion(delta);
+		MoveAndSlide();
+		if (IsOnFloor()) LockDefeatedKoOnGround();
+	}
+
+	private void LockDefeatedKoOnGround()
+	{
+		Velocity = Vector2.Zero;
+		HitState = FighterHitState.GroundedKnockdown;
+		CurrentKnockdownType = KnockdownType.HardKnockdown;
+		HitstunFramesLeft = int.MaxValue / 4;
+		DefeatedKoSettled = true;
+		OnDefeatedKoRequested();
+		SetPhysicsProcess(false);
+	}
 
 	public void ApplyPlaceholderLifeDrain(float amount, bool allowEmpty = true)
 	{
@@ -570,7 +615,9 @@ public partial class FighterController : CharacterBody2D
 	private int _special1BufferFramesLeft;
 	private int _special2BufferFramesLeft;
 	private int _runCrouchSlideFramesLeft;
+	private bool _pendingGroundCrossUnderTurn;
 	private int _runStopSlideFramesLeft;
+	private int _footstepFramesUntilNext;
 	private int _previousSampledHorizontalDirection;
 	private int _heldHorizontalDirection;
 	private int _horizontalDirectionHeldFrames;
@@ -581,6 +628,11 @@ public partial class FighterController : CharacterBody2D
 	private int _attackRecoveryFramesLeft;
 	private bool _attackHasHit;
 	private bool _attackHasUnblockedHit;
+	private bool _attackWhiffSoundPlayed;
+	private bool _elementalAttackSoundPlayed;
+	private bool _defeatedKoActive;
+	private bool _finishingSuperTimelineSlow;
+	private int _finishingSuperTimelineTick;
 	private readonly HashSet<int> _attackHitGroups = new();
 	private bool _projectileSpawnedThisAttack;
 	private int _projectilesSpawnedThisAttack;
@@ -724,6 +776,7 @@ public partial class FighterController : CharacterBody2D
 		public bool CanChainToSpecial { get; init; }
 		public string[] AllowedChainTargets { get; init; }
 		public string RepeatLightPunchChainTarget { get; init; }
+		public string RepeatLightKickChainTarget { get; init; }
 		public int MaxUsesPerCombo { get; init; }
 		public bool ChainRequiresContact { get; init; }
 		public int ChainEarliestActiveFramesLeft { get; init; }
@@ -768,6 +821,7 @@ public partial class FighterController : CharacterBody2D
 				CanChainToSpecial = data.CanChainToSpecial,
 				AllowedChainTargets = data.AllowedChainTargets,
 				RepeatLightPunchChainTarget = data.RepeatLightPunchChainTarget,
+				RepeatLightKickChainTarget = data.RepeatLightKickChainTarget,
 				MaxUsesPerCombo = data.MaxUsesPerCombo,
 				ChainRequiresContact = data.ChainRequiresContact,
 				ChainEarliestActiveFramesLeft = data.ChainEarliestActiveFramesLeft,
@@ -833,7 +887,77 @@ public partial class FighterController : CharacterBody2D
 		else if (action == "move_right") HandleHorizontalTap(1);
 		else if (action == "jump") _motionInputBuffer.PressJump(Definition?.Tuning?.InputBufferFrames ?? 3);
 	}
-	public void SetFacing(int direction) => Facing = direction >= 0 ? 1 : -1;
+	public void SetFacing(int direction) => Facing = FacingResolver.Normalize(direction);
+
+	private FighterFacingState CaptureFacingState() => new(
+		FaceOpponentWhenNeutral,
+		IsOnFloor(),
+		IsInSuperJumpRoute,
+		IsAttacking,
+		ActiveAbility != null,
+		HitState != FighterHitState.None,
+		IsWakingUp,
+		IsInAirAttackLanding,
+		IsInFlightLanding,
+		IsInRunStopSlide,
+		_runCrouchSlideFramesLeft > 0,
+		GodotObject.IsInstanceValid(_throwCaptor) || GodotObject.IsInstanceValid(_capturedThrowVictim),
+		_pendingGroundCrossUnderTurn);
+
+	private void TrackPendingGroundCrossUnderTurn()
+	{
+		if (!GodotObject.IsInstanceValid(_opponent))
+		{
+			_pendingGroundCrossUnderTurn = false;
+			return;
+		}
+		if (_opponent.IsOnFloor() || _opponent.JustLanded)
+		{
+			_pendingGroundCrossUnderTurn = false;
+			return;
+		}
+		if (!IsOnFloor())
+		{
+			_pendingGroundCrossUnderTurn = false;
+			return;
+		}
+
+		// Only the grounded fighter's own run establishes this exception. Merely standing
+		// still while an airborne opponent crosses continues to preserve the old facing.
+		if (ActiveAbility is not RunAbility && !IsInRunStopSlide) return;
+		float separation = _opponent.WorldPositionBox.GetCenter().X - WorldPositionBox.GetCenter().X;
+		if (Mathf.Abs(separation) <= 0.5f) return;
+		_pendingGroundCrossUnderTurn = (separation > 0f ? 1 : -1) != Facing;
+	}
+
+	/// <summary>
+	/// Facing may be adopted only from a genuinely neutral grounded state. Holding a run into
+	/// another action never creates an implicit neutral frame, so the whole sequence keeps its side.
+	/// </summary>
+	public bool CanAdoptFacingFromNeutral(FighterInput input)
+		=> FacingResolver.CanAdoptFromNeutral(CaptureFacingState(), input);
+
+	/// <summary>
+	/// Grounded neutral facing normally waits for an airborne opponent to land. A deliberate walk
+	/// is the exception: beginning to walk re-evaluates the opponent's current side immediately.
+	/// </summary>
+	public bool CanAdoptFacingTowardOpponent(FighterInput input, bool opponentIsGrounded)
+		=> FacingResolver.CanAdoptTowardOpponent(CaptureFacingState(), input, opponentIsGrounded);
+
+	private bool TryFaceOpponentWhileNeutral(FighterInput input)
+	{
+		if (!GodotObject.IsInstanceValid(_opponent)) return false;
+		bool resolved = FacingResolver.TryResolveOpponentFacing(CaptureFacingState(), input,
+			_opponent.IsOnFloor() || _opponent.JustLanded,
+			WorldPositionBox.GetCenter().X, _opponent.WorldPositionBox.GetCenter().X,
+			Facing, out int resolvedFacing);
+		if (resolved)
+		{
+			Facing = resolvedFacing;
+			_pendingGroundCrossUnderTurn = false;
+		}
+		return resolved;
+	}
 	public bool TryBeginCloneCall()
 	{
 		if (string.Equals(Definition?.FighterName, "Sanzou Kongoumaru", System.StringComparison.OrdinalIgnoreCase))
@@ -852,9 +976,13 @@ public partial class FighterController : CharacterBody2D
 		JustLanded = false;
 		PreviousGlobalPosition = GlobalPosition;
 		CurrentInput = input;
+		TrackPendingGroundCrossUnderTurn();
+		bool facedOpponent = TryFaceOpponentWhileNeutral(input);
 		TrackHorizontalHoldDuration(input.Horizontal);
 		RecordSampledMotionEdges(input);
-		_motionInputBuffer.RecordReusableInput(input, Facing);
+		// Contact freeze pauses command age just like it pauses attack-button buffers.
+		// New edges are still recorded, so inputs during hitstop remain usable afterward.
+		_motionInputBuffer.RecordReusableInput(input, Facing, HitstopFramesLeft <= 0);
 		_motionInputBuffer.UpdateDownCharge(input.Vertical > 0.5f);
 		_motionInputBuffer.UpdateBackForwardCharge(input.Horizontal, Facing,
 			Mathf.Max(ChargeButtonLenienceFrames, Definition?.Tuning?.InputBufferFrames ?? 3));
@@ -865,6 +993,11 @@ public partial class FighterController : CharacterBody2D
 		}
 		_throwCaptor = null;
 		WasGrounded = IsOnFloor();
+		if (_defeatedKoActive)
+		{
+			TickDefeatedKo(delta);
+			return;
+		}
 		if (_spdGrabConnected && !WasGrounded) _spdHasLeftGround = true;
 		UpdateStateBoxTimeline(input);
 		if (HitstopFramesLeft > 0)
@@ -892,7 +1025,8 @@ public partial class FighterController : CharacterBody2D
 		if (_parrySuccessPresentationFramesLeft > 0) _parrySuccessPresentationFramesLeft--;
 		if (_movementInvulnerabilityFramesLeft > 0) _movementInvulnerabilityFramesLeft--;
 		if (WasGrounded && LandingLagFramesLeft > 0) LandingLagFramesLeft--;
-		if (FaceWithMovement && input.Horizontal != 0) Facing = input.Horizontal > 0 ? 1 : -1;
+		if (!facedOpponent && FacingResolver.TryResolveMovementFacing(CaptureFacingState(), input,
+			FaceWithMovement, out int movementFacing)) Facing = movementFacing;
 		UpdateInputBuffer(input, false);
 		if (IsInBlockstun && _motionInputBuffer.HasDragonPunchCommand &&
 			(input.LightPunchPressed || input.HeavyPunchPressed))
@@ -969,7 +1103,7 @@ public partial class FighterController : CharacterBody2D
 				TryStartBasicAttack();
 				if (!IsAttacking) TryStartAbility();
 			}
-			TickBasicAttack();
+			if (ShouldAdvanceAttackTimeline()) TickBasicAttack();
 			UpdateCapturedThrowVictim();
 			bool tickAbility = !IsAttacking || ActiveAbility is FlightAbility activeFlight &&
 				activeFlight.ShouldTickDuringAttack(this);
@@ -989,6 +1123,7 @@ public partial class FighterController : CharacterBody2D
 		ClampForcedDescentSpeed();
 		TickComboDisplay();
 		MoveAndSlide();
+		TickFootstepAudio();
 		if (!WasGrounded && HitstunFramesLeft > 0 && HitState == FighterHitState.Tumble &&
 			CurrentBlowAwayDirection == BlowAwayDirection.None && Velocity.Y >= 0f)
 			RecoverFromComboHitstun();
@@ -1302,9 +1437,16 @@ public partial class FighterController : CharacterBody2D
 		int authoredBaseHitstun = finalSuperHit
 			? _currentSuperMove.FinalHitstunFrames
 			: penultimateSuperRushHit ? 100 : ResolveIntOverride(hitboxData?.HitstunFrames, _currentAttackHitstunFrames);
-		int baseHitstun = authoredBaseHitstun;
-		if (jumpingHeavyHitGroundedDefender)
-			baseHitstun = Mathf.Max(1, JumpingHeavyGroundedHitstunFrames);
+		GroundedNormalStrength groundedNormalStrength = GroundedNormalStrength.None;
+		if (!_currentAttackStartedAirborne && CurrentAttackIsNormal && !IsRegularThrowAttackName(CurrentAttackName))
+		{
+			if (CurrentAttackName.Contains("LIGHT"))
+				groundedNormalStrength = GroundedNormalStrength.Light;
+			else if (CurrentAttackName.Contains("MEDIUM"))
+				groundedNormalStrength = GroundedNormalStrength.Medium;
+			else if (CurrentAttackName.Contains("HEAVY"))
+				groundedNormalStrength = GroundedNormalStrength.Heavy;
+		}
 		float basePushback = finalSuperHit ? _currentSuperMove.FinalPushback : ResolveFloatOverride(hitboxData?.Pushback, _currentAttackPushback);
 		HitReactionKind hitReaction = hitboxData?.HitReaction ?? _currentAttackHitReaction;
 		BlowAwayDirection blowAwayDirection = hitboxData?.BlowAwayDirection is { } boxDirection && boxDirection != BlowAwayDirection.None
@@ -1324,32 +1466,44 @@ public partial class FighterController : CharacterBody2D
 			: _currentAttackGroundBounceStrength;
 		GuardReactionStrength guardReactionStrength = ResolveCurrentGuardReactionStrength(hitboxData);
 		bool airborneLightNormal = _currentAttackStartedAirborne && IsCurrentAttackLightNormal();
-		float appliedPushback = isLauncher
-			? ResolveFloatOverride(hitboxData?.LaunchPushback, _currentMoveRule.LaunchPushback)
-			: airborneLightNormal
-				? Mathf.Max(0f, AirLightAttackPushback)
-				: basePushback * (_currentAttackStartedAirborne ? AirAttackPushbackMultiplier : 1f);
-		// Keep light air-chain spacing stable instead of pushing the defender farther
-		// away on every juggle hit.
-		if (!airborneLightNormal && defender.HitState == FighterHitState.Juggle && !defender.WasGrounded)
-			appliedPushback *= Mathf.Min(MaxJuggleDistanceScale,
-				1f + Mathf.Max(0, defender.JuggleHitCount) * JuggleDistanceScalePerHit);
-		if (!_currentAttackStartedAirborne && !defender.WasGrounded)
-			appliedPushback *= GroundToAirPushbackMultiplier;
 		bool groundedNormalContinuingJuggle = defender.HitState == FighterHitState.Juggle &&
 			!defender.WasGrounded && !_currentAttackStartedAirborne &&
 			_currentSpecialMove == null && _currentSuperMove == null && IsNormalAttackName(CurrentAttackName);
-		if (groundedNormalContinuingJuggle)
-		{
-			appliedPushback *= GroundNormalJugglePushbackMultiplier;
-			defender.GroundNormalJuggleHitCount++;
-		}
+		PushbackResolution pushbackResolution = HitResolver.ResolvePushback(new PushbackResolutionRequest(
+			isLauncher,
+			ResolveFloatOverride(hitboxData?.LaunchPushback, _currentMoveRule.LaunchPushback),
+			airborneLightNormal,
+			AirLightAttackPushback,
+			basePushback,
+			_currentAttackStartedAirborne,
+			AirAttackPushbackMultiplier,
+			defender.WasGrounded,
+			defender.HitState == FighterHitState.Juggle && !defender.WasGrounded,
+			defender.JuggleHitCount,
+			JuggleDistanceScalePerHit,
+			MaxJuggleDistanceScale,
+			GroundToAirPushbackMultiplier,
+			groundedNormalContinuingJuggle,
+			GroundNormalJugglePushbackMultiplier));
+		float appliedPushback = pushbackResolution.AppliedPushback;
+		if (pushbackResolution.GroundedNormalContinuesJuggle) defender.GroundNormalJuggleHitCount++;
 		bool counterHit = defender.IsAttacking;
-		int appliedHitstun = baseHitstun + (counterHit ? CounterHitExtraHitstunFrames : 0);
-		if (_currentAttackStartedAirborne && !defender.WasGrounded)
-			appliedHitstun += AirToAirHitstunBonusFrames;
-		if (_currentAttackStartedAirborne && !defender.WasGrounded && CurrentAttackIsNormal)
-			appliedHitstun = Mathf.Max(1, appliedHitstun + AirToAirNormalHitstunAdjustment);
+		HitstunResolution hitstunResolution = HitResolver.ResolveHitstun(new HitstunResolutionRequest(
+			authoredBaseHitstun,
+			jumpingHeavyHitGroundedDefender,
+			JumpingHeavyGroundedHitstunFrames,
+			groundedNormalStrength,
+			GroundedLightNormalHitstunFrames,
+			GroundedMediumNormalHitstunFrames,
+			GroundedHeavyNormalHitstunFrames,
+			counterHit,
+			CounterHitExtraHitstunFrames,
+			_currentAttackStartedAirborne,
+			defender.WasGrounded,
+			CurrentAttackIsNormal,
+			AirToAirHitstunBonusFrames,
+			AirToAirNormalHitstunAdjustment));
+		int appliedHitstun = hitstunResolution.AppliedHitstun;
 		SpecialReactionKind specialReaction = ResolveCurrentSpecialReaction(hitboxData);
 		bool hasDedicatedReaction = blowAwayDirection != BlowAwayDirection.None || isLauncher ||
 			hitReaction != HitReactionKind.Normal || CurrentHitboxRequestsKnockdown(hitboxData);
@@ -1360,9 +1514,10 @@ public partial class FighterController : CharacterBody2D
 		if (defender.CanBlockStrike(attackLevel, this))
 		{
 			int authoredBlockstun = ResolveIntOverride(hitboxData?.BlockstunFrames, _currentAttackBlockstunFrames);
-			int appliedBlockstun = authoredBlockstun > 0 ? authoredBlockstun : Mathf.Max(1, authoredBaseHitstun - 4);
 			bool instantBlock = defender.IsInstantBlockAgainst(this);
-			if (instantBlock) appliedBlockstun = Mathf.Max(1, Mathf.CeilToInt(appliedBlockstun * 0.5f));
+			int appliedBlockstun = HitResolver.ResolveBlockstun(authoredBlockstun,
+				hitstunResolution.AuthoredBaseHitstun, instantBlock);
+			if (instantBlock) defender.InstantBlockFlashSerial++;
 			float blockPushback = appliedPushback * BlockPushbackMultiplier;
 			if (IsCurrentAttackHeavyNormal())
 				blockPushback *= Mathf.Clamp(HeavyNormalBlockPushbackScale, 0f, 1f);
@@ -1395,6 +1550,8 @@ public partial class FighterController : CharacterBody2D
 			return true;
 		}
 		_attackHasUnblockedHit = true;
+		Node audioController = GetNodeOrNull<Node>("/root/AudioController");
+		audioController?.Call("play_hit", CurrentAttackName, IsPerformingSuperMove);
 		if (TrySpawnMoveContactEffect(hitPoint))
 			defender.OnMoveContactBurnVisual(_currentMoveData.EffectBlackensDefender,
 				_currentMoveData.EffectBlackSilhouetteFrames,
@@ -1404,96 +1561,108 @@ public partial class FighterController : CharacterBody2D
 			? 2
 			: CurrentAttackName.Contains("MEDIUM") ? 1 : 0;
 		defender.LastHitCameFromAir = _currentAttackStartedAirborne;
-		if (blowAwayDirection != BlowAwayDirection.None)
+		bool requestsKnockdown = CurrentHitboxRequestsKnockdown(hitboxData) ||
+			(hitboxData?.AirborneTargetWallSplat == true && !defender.WasGrounded);
+		ResolvedHitReaction resolvedReaction = HitResolver.SelectReaction(new HitReactionSelectionRequest(
+			blowAwayDirection != BlowAwayDirection.None,
+			isLauncher,
+			specialReaction != SpecialReactionKind.None && !IsGuardSpecialReaction(specialReaction),
+			hitReaction,
+			requestsKnockdown,
+			finalSuperHit && CurrentAttackName == SuperRushName,
+			finalSuperHit && _currentSuperMove.FinalHitKnocksDown,
+			defender.WasGrounded,
+			_currentAttackStartedAirborne,
+			CurrentAttackName.StartsWith("HEAVY"),
+			defender.HitState == FighterHitState.Juggle));
+		switch (resolvedReaction)
 		{
-			float authoredBlowAwaySpeed = ResolveFloatOverride(hitboxData?.BlowAwaySpeed,
-				_currentMoveRule.BlowAwaySpeed);
-			defender.ApplyBlowAwayHitstun(appliedHitstun, Facing, blowAwayDirection, blowAwayStrength,
-				blowAwayNoBounce, authoredBlowAwaySpeed);
-		}
-		else if (isLauncher)
-		{
-			int launchHitstun = ResolveIntOverride(hitboxData?.LaunchHitstunFrames, _currentMoveRule.LaunchHitstunFrames) +
-				(counterHit ? CounterHitExtraHitstunFrames : 0);
-			if (_currentAttackStartedAirborne && !defender.WasGrounded)
-				launchHitstun += AirToAirHitstunBonusFrames;
-			if (_currentAttackStartedAirborne && !defender.WasGrounded && CurrentAttackIsNormal)
-				launchHitstun = Mathf.Max(1, launchHitstun + AirToAirNormalHitstunAdjustment);
-			float launchSpeed = ResolveFloatOverride(hitboxData?.LaunchSpeed, _currentMoveRule.LaunchSpeed);
-			if (CurrentAttackName == CrouchingMediumJabName)
-				defender.ApplyJuggleHitstun(launchHitstun, Facing * appliedPushback, -launchSpeed, true);
-			else
-				defender.ApplyLaunchHitstun(launchHitstun, Facing * appliedPushback, launchSpeed, counterHit);
-			_launcherJumpCancelFramesLeft = ResolveIntOverride(hitboxData?.JumpCancelWindowFrames, _currentMoveRule.JumpCancelWindowFrames);
-		}
-		else if (specialReaction != SpecialReactionKind.None && !IsGuardSpecialReaction(specialReaction))
-		{
-			defender.ApplySpecialReactionHitstun(appliedHitstun, Facing * appliedPushback, specialReaction);
-		}
-		else if (hitReaction == HitReactionKind.Stumble)
-		{
-			defender.ApplyStumbleHitstun(appliedHitstun, Facing * appliedPushback);
-		}
-		else if (hitReaction == HitReactionKind.HitFall)
-		{
-			defender.ApplyHitFallHitstun(appliedHitstun, Facing * appliedPushback);
-		}
-		else if (CurrentHitboxRequestsKnockdown(hitboxData) || (hitboxData?.AirborneTargetWallSplat == true && !defender.WasGrounded))
-		{
-			int overrideKnockdownFrames = ResolveIntOverride(hitboxData?.KnockdownFrames, _currentAttackKnockdownFrames);
-			int knockdownFrames = overrideKnockdownFrames > 0 ? overrideKnockdownFrames : appliedHitstun;
-			KnockdownType knockdownType = hitboxData?.AirborneTargetWallSplat == true && !defender.WasGrounded
-				? KnockdownType.WallBounce
-				: ResolveCurrentAttackKnockdownType(defender, hitboxData);
-			if (knockdownType == KnockdownType.Sweep)
-				appliedPushback = 0f;
-			float downwardSpeed = !defender.WasGrounded ? HeavyAirAttackSpikeSpeed : 0f;
-			float groundBounceSpeed = ResolveFloatOverride(hitboxData?.GroundBounceSpeed, defender.GroundBounceSpeed);
-			defender.ApplyKnockdown(knockdownFrames, Facing * appliedPushback, downwardSpeed, knockdownType, counterHit,
-				groundBounceSpeed, hitboxData?.GroundBounceIntoJuggle == true, groundBounceStrength, wallBounceStrength);
-		}
-		else if (finalSuperHit && CurrentAttackName == SuperRushName)
-		{
-			// Launch into a knockback tumble while retaining a pending hard knockdown;
-			// the grounded knockdown state begins only when the defender lands.
-			defender.ApplyThrowLaunch(_currentSuperMove.FinalKnockdownFrames,
-				Facing * _currentSuperMove.FinalPushback, 820f);
-		}
-		else if (finalSuperHit && _currentSuperMove.FinalHitKnocksDown)
-		{
-			int knockdownFrames = _currentSuperMove.FinalKnockdownFrames > 0 ? _currentSuperMove.FinalKnockdownFrames : appliedHitstun;
-			float downwardSpeed = !defender.WasGrounded ? HeavyAirAttackSpikeSpeed : 0f;
-			defender.ApplyKnockdown(knockdownFrames, Facing * appliedPushback, downwardSpeed, _currentSuperMove.FinalKnockdownType, counterHit);
-		}
-		else
-		{
-			if (!defender.WasGrounded)
-			{
-				if (_currentAttackStartedAirborne && CurrentAttackName.StartsWith("HEAVY"))
-					defender.ApplyJuggleHitstun(appliedHitstun, Facing * appliedPushback, HeavyAirAttackSpikeSpeed, true);
-				else if (defender.HitState == FighterHitState.Juggle)
-				{
-					float verticalVelocity = airborneLightNormal || _currentMoveRule.PreserveAirborneTargetVelocity
-						? defender.Velocity.Y
-						: -AirHitPopUpSpeed;
-					if (!airborneLightNormal && !_currentAttackStartedAirborne && CurrentAttackName == "LIGHT PUNCH")
-					{
-						float popScale = Mathf.Max(0f,
-							1f - defender.GroundNormalJuggleHitCount * GroundJabJugglePopLossPerHit);
-						verticalVelocity = popScale > 0f
-							? -AirHitPopUpSpeed * popScale
-							: Mathf.Max(0f, defender.Velocity.Y);
-					}
-					defender.ApplyJuggleHitstun(appliedHitstun, Facing * appliedPushback, verticalVelocity, true);
-				}
+			case ResolvedHitReaction.BlowAway:
+				if (!IsPerformingSuperMove)
+					GetNodeOrNull<Node>("/root/AudioController")?.Call("play_knock_away");
+				float authoredBlowAwaySpeed = ResolveFloatOverride(hitboxData?.BlowAwaySpeed,
+					_currentMoveRule.BlowAwaySpeed);
+				defender.ApplyBlowAwayHitstun(appliedHitstun, Facing, blowAwayDirection, blowAwayStrength,
+					blowAwayNoBounce, authoredBlowAwaySpeed);
+				break;
+			case ResolvedHitReaction.Launcher:
+				if (!IsPerformingSuperMove)
+					GetNodeOrNull<Node>("/root/AudioController")?.Call("play_knock_away");
+				int launchHitstun = HitResolver.ResolveModifiedHitstun(
+					ResolveIntOverride(hitboxData?.LaunchHitstunFrames, _currentMoveRule.LaunchHitstunFrames),
+					counterHit, CounterHitExtraHitstunFrames, _currentAttackStartedAirborne,
+					defender.WasGrounded, CurrentAttackIsNormal, AirToAirHitstunBonusFrames,
+					AirToAirNormalHitstunAdjustment);
+				float launchSpeed = ResolveFloatOverride(hitboxData?.LaunchSpeed, _currentMoveRule.LaunchSpeed);
+				if (CurrentAttackName == CrouchingMediumJabName)
+					defender.ApplyJuggleHitstun(launchHitstun, Facing * appliedPushback, -launchSpeed, true);
 				else
-					defender.ApplyAirPopHitstun(appliedHitstun, Facing * appliedPushback,
-						_currentMoveRule.PreserveAirborneTargetVelocity ? 0f :
-							airborneLightNormal ? AirLightInitialPopUpSpeed : AirHitPopUpSpeed,
-						counterHit || hitReaction == HitReactionKind.Tumble);
-			}
-			else
+					defender.ApplyLaunchHitstun(launchHitstun, Facing * appliedPushback, launchSpeed, counterHit);
+				_launcherJumpCancelFramesLeft = ResolveIntOverride(hitboxData?.JumpCancelWindowFrames,
+					_currentMoveRule.JumpCancelWindowFrames);
+				break;
+			case ResolvedHitReaction.Special:
+				defender.ApplySpecialReactionHitstun(appliedHitstun, Facing * appliedPushback, specialReaction);
+				break;
+			case ResolvedHitReaction.Stumble:
+				defender.ApplyStumbleHitstun(appliedHitstun, Facing * appliedPushback);
+				break;
+			case ResolvedHitReaction.HitFall:
+				defender.ApplyHitFallHitstun(appliedHitstun, Facing * appliedPushback);
+				break;
+			case ResolvedHitReaction.Knockdown:
+				int overrideKnockdownFrames = ResolveIntOverride(hitboxData?.KnockdownFrames, _currentAttackKnockdownFrames);
+				int knockdownFrames = overrideKnockdownFrames > 0 ? overrideKnockdownFrames : appliedHitstun;
+				KnockdownType knockdownType = hitboxData?.AirborneTargetWallSplat == true && !defender.WasGrounded
+					? KnockdownType.WallBounce
+					: ResolveCurrentAttackKnockdownType(defender, hitboxData);
+				if (knockdownType == KnockdownType.Sweep) appliedPushback = 0f;
+				float downwardSpeed = !defender.WasGrounded ? HeavyAirAttackSpikeSpeed : 0f;
+				float groundBounceSpeed = ResolveFloatOverride(hitboxData?.GroundBounceSpeed, defender.GroundBounceSpeed);
+				defender.ApplyKnockdown(knockdownFrames, Facing * appliedPushback, downwardSpeed, knockdownType,
+					counterHit, groundBounceSpeed, hitboxData?.GroundBounceIntoJuggle == true,
+					groundBounceStrength, wallBounceStrength);
+				break;
+			case ResolvedHitReaction.FinalSuperRush:
+				defender.ApplyThrowLaunch(_currentSuperMove.FinalKnockdownFrames,
+					Facing * _currentSuperMove.FinalPushback, 820f);
+				break;
+			case ResolvedHitReaction.FinalSuperKnockdown:
+				int finalKnockdownFrames = _currentSuperMove.FinalKnockdownFrames > 0
+					? _currentSuperMove.FinalKnockdownFrames : appliedHitstun;
+				float finalDownwardSpeed = !defender.WasGrounded ? HeavyAirAttackSpikeSpeed : 0f;
+				defender.ApplyKnockdown(finalKnockdownFrames, Facing * appliedPushback, finalDownwardSpeed,
+					_currentSuperMove.FinalKnockdownType, counterHit);
+				break;
+			case ResolvedHitReaction.AirHeavyJuggle:
+				defender.ApplyJuggleHitstun(appliedHitstun, Facing * appliedPushback,
+					HeavyAirAttackSpikeSpeed, true);
+				break;
+			case ResolvedHitReaction.ContinuingJuggle:
+				{
+					float initialBounceSpeed = !_currentAttackStartedAirborne && CurrentAttackIsNormal
+						? GroundNormalJuggleHitBounceSpeed
+						: JuggleHitBounceSpeed;
+					float bounceSpeed = HitResolver.ResolveJuggleBounceSpeed(initialBounceSpeed,
+						defender.JuggleHitCount, JuggleHitBounceDecayPerHit, MinimumJuggleHitBounceSpeed);
+					float verticalVelocity = -Mathf.Max(0f, bounceSpeed);
+					defender.ApplyJuggleHitstun(appliedHitstun, Facing * appliedPushback, verticalVelocity, true);
+					break;
+				}
+			case ResolvedHitReaction.AirPop:
+				defender.ApplyAirPopHitstun(appliedHitstun, Facing * appliedPushback,
+					_currentMoveRule.PreserveAirborneTargetVelocity ? 0f :
+						airborneLightNormal ? AirLightInitialPopUpSpeed : AirHitPopUpSpeed,
+					counterHit || hitReaction == HitReactionKind.Tumble);
+				break;
+			case ResolvedHitReaction.GroundHitstun:
 				defender.ApplyHitstun(appliedHitstun, Facing * appliedPushback, counterHit);
+				break;
+		}
+		if (resolvedReaction is ResolvedHitReaction.AirHeavyJuggle or
+			ResolvedHitReaction.ContinuingJuggle or ResolvedHitReaction.AirPop or
+			ResolvedHitReaction.GroundHitstun)
+		{
 			if (_currentAttackStartedAirborne && CurrentAttackName.StartsWith("LIGHT"))
 				_airLightJumpCancelFramesLeft = AirLightHitJumpCancelWindowFrames;
 		}
@@ -1526,8 +1695,13 @@ public partial class FighterController : CharacterBody2D
 		if (_currentAttackStartedAirborne && defender.WasGrounded && !superHit)
 			shakeStrength *= AirToGroundShakeMultiplier;
 		hitPushback = appliedPushback;
-		if (airborneLightNormal)
-			Velocity = new Vector2(Velocity.X * Mathf.Clamp(AirLightHitMomentumScale, 0f, 1f), Velocity.Y);
+		if (_currentAttackStartedAirborne && CurrentAttackIsNormal)
+		{
+			float momentumScale = airborneLightNormal
+				? AirLightHitMomentumScale
+				: AirNonLightHitMomentumScale;
+			Velocity = new Vector2(Velocity.X * Mathf.Clamp(momentumScale, 0f, 1f), Velocity.Y);
+		}
 		if (superHit)
 		{
 			_currentAttackHitsRemaining--;
@@ -1565,6 +1739,7 @@ public partial class FighterController : CharacterBody2D
 
 	public bool TryApplyProjectileHit(FighterController defender, Rect2 projectileHitbox, int hitstunFrames, float pushback, int hitstopFrames,
 		float shakeStrength, bool knocksDown, KnockdownType knockdownType, int knockdownFrames,
+		bool launches, bool launchGroundedOnly, float launchSpeed, float launchPushback, int launchHitstunFrames,
 		out int appliedHitstopFrames, out float appliedShakeStrength, out float hitPushback, out Vector2 hitPoint, out bool heavySpark)
 	{
 		appliedHitstopFrames = 0;
@@ -1594,9 +1769,9 @@ public partial class FighterController : CharacterBody2D
 		const FighterAttackLevel projectileAttackLevel = FighterAttackLevel.Mid;
 		if (defender.CanBlockStrike(projectileAttackLevel, this))
 		{
-			int blockstunFrames = Mathf.Max(1, hitstunFrames - 4);
 			bool instantBlock = defender.IsInstantBlockAgainst(this);
-			if (instantBlock) blockstunFrames = Mathf.Max(1, Mathf.CeilToInt(blockstunFrames * 0.5f));
+			int blockstunFrames = HitResolver.ResolveBlockstun(-1, hitstunFrames, instantBlock);
+			if (instantBlock) defender.InstantBlockFlashSerial++;
 			float blockPushback = appliedPushback * BlockPushbackMultiplier;
 			defender.ApplyBlockstun(blockstunFrames, blockPushback, GuardReactionStrength.Medium,
 				crouchBlock: defender.ResolveCrouchingGuard(projectileAttackLevel));
@@ -1610,7 +1785,14 @@ public partial class FighterController : CharacterBody2D
 		}
 		_attackHasHit = true;
 		_attackHasUnblockedHit = true;
-		if (knocksDown)
+		if (launches && (!launchGroundedOnly || defender.WasGrounded))
+		{
+			int appliedLaunchHitstun = launchHitstunFrames > 0 ? launchHitstunFrames : hitstunFrames;
+			float appliedLaunchPushback = Facing * (launchPushback > 0f ? launchPushback : pushback);
+			defender.ApplyJuggleHitstun(appliedLaunchHitstun, appliedLaunchPushback, -Mathf.Max(0f, launchSpeed), true);
+			appliedPushback = appliedLaunchPushback;
+		}
+		else if (knocksDown)
 		{
 			int appliedKnockdownFrames = knockdownFrames > 0 ? knockdownFrames : hitstunFrames;
 			float downwardSpeed = !defender.WasGrounded ? HeavyAirAttackSpikeSpeed : 0f;
@@ -1904,8 +2086,14 @@ public partial class FighterController : CharacterBody2D
 		SpriteFrames fireFrames, string fireAnimationName) { }
 
 	internal void PlayMoveContactBurnPresentation(bool blackenDefender, int silhouetteFrames,
-		SpriteFrames fireFrames, string fireAnimationName) =>
+		SpriteFrames fireFrames, string fireAnimationName)
+	{
+		bool hasBurnPresentation = (blackenDefender && silhouetteFrames > 0) ||
+			(fireFrames != null && !string.IsNullOrWhiteSpace(fireAnimationName));
+		if (hasBurnPresentation)
+			GetNodeOrNull<Node>("/root/AudioController")?.Call("play_burning");
 		OnMoveContactBurnVisual(blackenDefender, silhouetteFrames, fireFrames, fireAnimationName);
+	}
 
 	private void ApplyLaunchHitstun(int frames, float horizontalPushback, float verticalLaunchSpeed, bool counterHit = false)
 	{
@@ -1915,7 +2103,9 @@ public partial class FighterController : CharacterBody2D
 
 	private void ApplyJuggleHitstun(int frames, float horizontalPushback, float verticalVelocity, bool knockdownOnLanding)
 	{
-		JuggleHitCount = HitState == FighterHitState.Juggle ? JuggleHitCount + 1 : 1;
+		bool continuingJuggle = HitState == FighterHitState.Juggle;
+		JuggleHitCount = continuingJuggle ? JuggleHitCount + 1 : 1;
+		if (!continuingJuggle) GroundNormalJuggleHitCount = 0;
 		ApplyHitReaction(frames, FighterHitState.Juggle);
 		if (knockdownOnLanding)
 			CurrentKnockdownType = KnockdownType.AirKnockdown;
@@ -2099,7 +2289,8 @@ public partial class FighterController : CharacterBody2D
 			{
 				HitState = FighterHitState.Juggle;
 				CurrentKnockdownType = KnockdownType.None;
-				JuggleHitCount = Mathf.Max(1, JuggleHitCount + 1);
+				JuggleHitCount = 1;
+				GroundNormalJuggleHitCount = 0;
 				Velocity = ResolveWallSplatFollowupVelocity(new Vector2(horizontalPushback, -resolvedBounceSpeed));
 				_pendingGroundBounceSpeed = -1f;
 				_pendingGroundBounceIntoJuggle = false;
@@ -2347,7 +2538,11 @@ public partial class FighterController : CharacterBody2D
 		bool bounceIntoJuggle = _pendingGroundBounceIntoJuggle;
 		HitState = bounceIntoJuggle ? FighterHitState.Juggle : FighterHitState.Tumble;
 		CurrentKnockdownType = KnockdownType.None;
-		if (bounceIntoJuggle) JuggleHitCount = Mathf.Max(1, JuggleHitCount + 1);
+		if (bounceIntoJuggle)
+		{
+			JuggleHitCount = 1;
+			GroundNormalJuggleHitCount = 0;
+		}
 		Velocity = new Vector2(Velocity.X, -bounceSpeed);
 		_pendingGroundBounceSpeed = -1f;
 		_pendingGroundBounceIntoJuggle = false;
@@ -2366,6 +2561,8 @@ public partial class FighterController : CharacterBody2D
 
 		float bounceSpeed = GetBlowAwaySpeed(CurrentBlowAwayStrength) * Mathf.Clamp(BlowAwayBounceScale, 0.1f, 1f);
 		HitState = FighterHitState.Juggle;
+		JuggleHitCount = 1;
+		GroundNormalJuggleHitCount = 0;
 		CurrentKnockdownType = KnockdownType.AirKnockdown;
 		CurrentBlowAwayDirection = BlowAwayDirection.Vertical;
 		CurrentBlowAwayStrength = BlowAwayStrength.Weak;
@@ -2659,8 +2856,11 @@ public partial class FighterController : CharacterBody2D
 			ClearNormalAttackInputBuffers();
 			return;
 		}
-		if (_flightUsedThisAirTime && !WasGrounded && ActiveAbility == null && IsNormalAttackName(attackName))
+		if (_flightUsedThisAirTime && !WasGrounded && ActiveAbility == null && !IsAttacking &&
+			IsNormalAttackName(attackName))
 		{
+			// Flight fall locks out a new air-normal sequence, but never interrupts a
+			// normal chain that already began during flight or boost.
 			ClearNormalAttackInputBuffers();
 			return;
 		}
@@ -2745,6 +2945,8 @@ public partial class FighterController : CharacterBody2D
 		_attackRecoveryFramesLeft = 0;
 		_attackHasHit = false;
 		_attackHasUnblockedHit = false;
+		_attackWhiffSoundPlayed = false;
+		_elementalAttackSoundPlayed = false;
 		_attackHitGroups.Clear();
 		_projectileSpawnedThisAttack = false;
 		_projectilesSpawnedThisAttack = 0;
@@ -2795,6 +2997,22 @@ public partial class FighterController : CharacterBody2D
 		ApplyAirAttackMomentum(attackName);
 	}
 
+	private void TickFootstepAudio()
+	{
+		if (_footstepFramesUntilNext > 0) _footstepFramesUntilNext--;
+		bool canStep = WasGrounded && !IsAttacking && HitState == FighterHitState.None &&
+			!IsInAirAttackLanding && !IsInFlightLanding && Mathf.Abs(Velocity.X) > 40f;
+		if (!canStep)
+		{
+			_footstepFramesUntilNext = 0;
+			return;
+		}
+		if (_footstepFramesUntilNext > 0) return;
+		bool running = ActiveAbility is RunAbility || Mathf.Abs(Velocity.X) > Definition.Tuning.WalkSpeed * 1.35f;
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("play_footstep", running);
+		_footstepFramesUntilNext = running ? 10 : 18;
+	}
+
 	private void TrySpawnProjectileForCurrentAttack()
 	{
 		if (!_projectileSpawnedThisAttack && _currentSpecialMove?.ReflectorScene != null && _attackStartupFramesLeft <= 0)
@@ -2836,6 +3054,9 @@ public partial class FighterController : CharacterBody2D
 		if (activeElapsed < _projectilesSpawnedThisAttack * spawnInterval) return;
 		int volleyIndex = _projectilesSpawnedThisAttack++;
 		_projectileSpawnedThisAttack = _projectilesSpawnedThisAttack >= projectileCount;
+		if (volleyIndex == 0 &&
+			(CurrentAttackName.Contains("MISSILE") || CurrentAttackName.Contains("FULL FIRE")))
+			GetNodeOrNull<Node>("/root/AudioController")?.Call("play_rocket");
 
 		bool heavy = CurrentAttackName == HeavyProjectileName || _currentSpecialMove?.HeavyProjectile == true || super;
 		var projectile = new BasicProjectile { Name = super ? "SuperFireball" : heavy ? "HeavyProjectile" : "LightProjectile" };
@@ -2865,6 +3086,9 @@ public partial class FighterController : CharacterBody2D
 			super ? 58f : _currentMoveData?.Damage ?? 72f);
 		if (_currentSpecialMove?.Projectile == true)
 		{
+			projectile.ConfigureLaunch(_currentSpecialMove.Launches, _currentSpecialMove.LaunchGroundedOnly,
+				_currentSpecialMove.LaunchSpeed,
+				_currentSpecialMove.LaunchPushback, _currentSpecialMove.LaunchHitstunFrames);
 			projectile.HitboxLocal = _currentSpecialMove.ProjectileHitboxLocal;
 			projectile.ConfigureVisual(_currentSpecialMove.ProjectileSpriteFrames,
 				_currentSpecialMove.ProjectileAnimationName, _currentSpecialMove.ProjectileVisualOffset,
@@ -2945,6 +3169,8 @@ public partial class FighterController : CharacterBody2D
 	{
 		Node effectHost = GetParent();
 		if (effectHost == null) return;
+		if (_currentMoveData.EffectAnimationName.Contains("explosion", System.StringComparison.OrdinalIgnoreCase))
+			GetNodeOrNull<Node>("/root/AudioController")?.Call("play_explosion");
 		var effect = new MoveVisualEffect
 		{
 			Name = $"{CurrentAttackName} Effect",
@@ -2962,6 +3188,7 @@ public partial class FighterController : CharacterBody2D
 
 	public void PlayBlueCancelPresentation()
 	{
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("play_blue_cancel");
 		SpriteFrames frames = ResourceLoader.Load<SpriteFrames>(
 			"res://Assets/Effects/BigBangCommon/blue_cancel_360_363_frames.tres");
 		Node effectHost = GetParent();
@@ -3122,37 +3349,36 @@ public partial class FighterController : CharacterBody2D
 
 	private bool CanChainBasicAttack(string nextAttackName)
 	{
-		if (IsInShortHopRoute && IsNormalAttackName(CurrentAttackName) && IsNormalAttackName(nextAttackName))
-			return false;
 		bool nextStartedCrouching = WasGrounded && ActionInput.Vertical > 0.5f;
 		bool nextStartedAirborne = !WasGrounded;
 		NormalMoveRule nextRule = GetNormalMoveRule(nextAttackName, nextStartedCrouching, nextStartedAirborne);
-		if (nextRule.MaxUsesPerCombo > 0 && GetNormalUseCount(nextAttackName) >= nextRule.MaxUsesPerCombo) return false;
-		if (nextAttackName == QcfPowerPunchRekkaName &&
+		bool isRekkaFollowup = nextAttackName == QcfPowerPunchRekkaName &&
 			(CurrentAttackName == LightProjectileName || CurrentAttackName == HeavyProjectileName ||
-			 CurrentAttackName == QcfPowerPunchLightName || CurrentAttackName == QcfPowerPunchHeavyName))
-			return CurrentAttackFrame >= _currentAttackStartupFrames;
-		if ((CurrentAttackName == CommandRunLightName || CurrentAttackName == CommandRunHeavyName) &&
-			(nextAttackName == CommandRunHopName || nextAttackName == CommandRunPunchName))
-			return true;
+			 CurrentAttackName == QcfPowerPunchLightName || CurrentAttackName == QcfPowerPunchHeavyName);
+		bool isCommandRunFollowup =
+			(CurrentAttackName == CommandRunLightName || CurrentAttackName == CommandRunHeavyName) &&
+			(nextAttackName == CommandRunHopName || nextAttackName == CommandRunPunchName);
 		SpecialMoveData nextSpecial = Definition?.SpecialMoves?.FindMove(nextAttackName,
 			nextStartedCrouching, nextStartedAirborne);
-		if (IsSpecialAttackName(nextAttackName) || nextSpecial?.CanCancelIntoFromNormals == true)
-		{
-			// Per-move normal data is the primary authoring path. Global CancelRules
-			// remain available for broad mechanics and legacy character definitions.
-			if (_currentMoveRule.CanChainToSpecial &&
-				(!_currentMoveRule.ChainRequiresContact || _attackHasHit) &&
-				IsWithinCurrentMoveCancelWindow(_currentMoveRule.CancelWindowStartFrame,
-					_currentMoveRule.CancelWindowEndFrame, _currentMoveRule.ChainEarliestActiveFramesLeft))
-				return true;
-			return CanCancelCurrentMove(CancelKind.Special, nextAttackName);
-		}
-
-		if (_currentMoveRule.ChainRequiresContact && !_attackHasHit) return false;
-		if (!IsWithinCurrentMoveCancelWindow(_currentMoveRule.CancelWindowStartFrame,
-			_currentMoveRule.CancelWindowEndFrame, _currentMoveRule.ChainEarliestActiveFramesLeft)) return false;
-		return _currentMoveRule.AllowsChainTo(nextAttackName, nextStartedCrouching, nextStartedAirborne);
+		bool nextMoveIsSpecial = nextSpecial != null || IsSpecialAttackName(nextAttackName);
+		bool insideWindow = IsWithinCurrentMoveCancelWindow(_currentMoveRule.CancelWindowStartFrame,
+			_currentMoveRule.CancelWindowEndFrame, _currentMoveRule.ChainEarliestActiveFramesLeft);
+		var context = new ChainResolutionContext(
+			IsInShortHopRoute && _currentAttackStartedAirborne &&
+				IsNormalAttackName(CurrentAttackName) && IsNormalAttackName(nextAttackName),
+			nextRule.MaxUsesPerCombo,
+			GetNormalUseCount(nextAttackName),
+			isRekkaFollowup,
+			CurrentAttackFrame >= _currentAttackStartupFrames,
+			isCommandRunFollowup,
+			nextMoveIsSpecial,
+			_currentMoveRule.CanChainToSpecial,
+			_currentMoveRule.ChainRequiresContact,
+			_attackHasHit,
+			insideWindow,
+			nextMoveIsSpecial && CanCancelCurrentMove(CancelKind.Special, nextAttackName),
+			_currentMoveRule.AllowsChainTo(nextAttackName, nextStartedCrouching, nextStartedAirborne));
+		return ChainResolver.CanChain(context);
 	}
 
 	private bool CanCancelCurrentMove(CancelKind kind, string targetMove)
@@ -3177,10 +3403,10 @@ public partial class FighterController : CharacterBody2D
 	public bool CanCancelCurrentNormalIntoSpecial(string targetMove)
 	{
 		if (!CurrentAttackIsNormal) return false;
-		if (_currentMoveRule.CanChainToSpecial &&
-			(!_currentMoveRule.ChainRequiresContact || _attackHasHit) &&
+		if (ChainResolver.CanUseAuthoredSpecialChain(_currentMoveRule.CanChainToSpecial,
+			_currentMoveRule.ChainRequiresContact, _attackHasHit,
 			IsWithinCurrentMoveCancelWindow(_currentMoveRule.CancelWindowStartFrame,
-				_currentMoveRule.CancelWindowEndFrame, _currentMoveRule.ChainEarliestActiveFramesLeft))
+				_currentMoveRule.CancelWindowEndFrame, _currentMoveRule.ChainEarliestActiveFramesLeft)))
 			return true;
 		return CanCancelCurrentMove(CancelKind.Special, targetMove);
 	}
@@ -3234,22 +3460,10 @@ public partial class FighterController : CharacterBody2D
 	}
 
 	private bool IsWithinCurrentMoveCancelWindow(int windowStartFrame, int windowEndFrame, int earliestActiveFramesLeft)
-	{
-		if (windowStartFrame >= 0 || windowEndFrame >= 0)
-		{
-			int totalFrames = _currentAttackStartupFrames + _currentAttackActiveFrames + _currentAttackRecoveryFrames;
-			int remainingFrames = _attackStartupFramesLeft + _attackActiveFramesLeft + _attackRecoveryFramesLeft;
-			int elapsedFrames = totalFrames - remainingFrames;
-			if (windowStartFrame >= 0 && elapsedFrames < windowStartFrame) return false;
-			// Negative end frames mean the cancel remains available until this move fully ends.
-			if (windowEndFrame >= 0 && elapsedFrames > windowEndFrame) return false;
-			return true;
-		}
-
-		if (_attackStartupFramesLeft > 0) return false;
-		if (_attackActiveFramesLeft > earliestActiveFramesLeft) return false;
-		return true;
-	}
+		=> ChainResolver.IsWithinCancelWindow(windowStartFrame, windowEndFrame,
+			earliestActiveFramesLeft, _currentAttackStartupFrames, _currentAttackActiveFrames,
+			_currentAttackRecoveryFrames, _attackStartupFramesLeft, _attackActiveFramesLeft,
+			_attackRecoveryFramesLeft);
 
 	private NormalMoveData GetConfiguredMoveData(string attackName, bool startedCrouching, bool startedAirborne)
 	{
@@ -3311,9 +3525,18 @@ public partial class FighterController : CharacterBody2D
 		return NormalMoveRule.None;
 	}
 
+	private bool ShouldAdvanceAttackTimeline()
+	{
+		if (!_finishingSuperTimelineSlow || !CurrentAttackTriggersHyperComboFinish) return true;
+		_finishingSuperTimelineTick++;
+		return (_finishingSuperTimelineTick & 1) == 0;
+	}
+
 	private void TickBasicAttack()
 	{
 		if (!IsAttacking) return;
+		TryPlayElementalAttackSoundOnActiveFrame();
+		TryPlayWhiffOnActiveFrame();
 		if (_currentSpecialSelfLaunchApplied && _currentSpecialMove?.SelfHorizontalDeceleration > 0f)
 			Velocity = new Vector2(Mathf.MoveToward(Velocity.X, 0f,
 				_currentSpecialMove.SelfHorizontalDeceleration / 60f), Velocity.Y);
@@ -3362,7 +3585,12 @@ public partial class FighterController : CharacterBody2D
 				_currentAttackFullyCharged = true;
 			}
 			_attackStartupFramesLeft--;
-			if (_attackStartupFramesLeft == 0) _attackActiveFramesLeft = _currentAttackActiveFrames;
+			if (_attackStartupFramesLeft == 0)
+			{
+				_attackActiveFramesLeft = _currentAttackActiveFrames;
+				TryPlayElementalAttackSoundOnActiveFrame();
+				TryPlayWhiffOnActiveFrame();
+			}
 		}
 		else if (_attackActiveFramesLeft > 0)
 		{
@@ -3396,6 +3624,23 @@ public partial class FighterController : CharacterBody2D
 		}
 	}
 
+	private void TryPlayWhiffOnActiveFrame()
+	{
+		if (_attackWhiffSoundPlayed || _attackStartupFramesLeft > 0 || _attackActiveFramesLeft <= 0 ||
+			_currentSuperMove != null || _currentSpecialMove != null ||
+			!IsNormalAttackName(CurrentAttackName) || IsRegularThrowAttackName(CurrentAttackName)) return;
+		_attackWhiffSoundPlayed = true;
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("play_whiff", CurrentAttackName);
+	}
+
+	private void TryPlayElementalAttackSoundOnActiveFrame()
+	{
+		if (_elementalAttackSoundPlayed || _attackStartupFramesLeft > 0 || _attackActiveFramesLeft <= 0 ||
+			CurrentAttackName != "MECHA ELECTRICITY") return;
+		_elementalAttackSoundPlayed = true;
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("play_electricity");
+	}
+
 	private void ApplyCurrentSpecialSelfLaunch(string attackName)
 	{
 		if (_currentSpecialMove?.SelfLaunch != true) return;
@@ -3417,6 +3662,8 @@ public partial class FighterController : CharacterBody2D
 		CurrentAttackFrame = 0;
 		_attackHasHit = false;
 		_attackHasUnblockedHit = false;
+		_attackWhiffSoundPlayed = false;
+		_elementalAttackSoundPlayed = false;
 		_attackHitGroups.Clear();
 		_projectileSpawnedThisAttack = false;
 		_projectilesSpawnedThisAttack = 0;
@@ -3640,6 +3887,9 @@ public partial class FighterController : CharacterBody2D
 		if (IsAttacking && input.LightPunchPressed &&
 			!string.IsNullOrWhiteSpace(_currentMoveRule.RepeatLightPunchChainTarget))
 			return _currentMoveRule.RepeatLightPunchChainTarget;
+		if (IsAttacking && input.LightKickPressed &&
+			!string.IsNullOrWhiteSpace(_currentMoveRule.RepeatLightKickChainTarget))
+			return _currentMoveRule.RepeatLightKickChainTarget;
 		if (_startingBlockReflector) return BlockReflectorName;
 		if (TryGetReusableMotionAttack(input, out string reusableAttackName, out MotionInputBinding reusableBinding,
 			out long reusableCompletion))
@@ -3749,12 +3999,16 @@ public partial class FighterController : CharacterBody2D
 		int bestPriority = int.MinValue;
 		bool startedCrouching = WasGrounded && input.Vertical > 0.5f;
 		bool startedAirborne = !WasGrounded;
+		int cancelBufferFrames = CurrentAttackIsNormal
+			? Mathf.Max(0, Definition?.Tuning?.SpecialCancelBufferFrames ?? 8)
+			: -1;
 
 		foreach (SuperMoveData move in Definition?.SuperMoves ?? Array.Empty<SuperMoveData>())
 		{
 			MotionInputBinding binding = move?.CommandInput;
 			if (!CanUseMotionBinding(binding) ||
-				!_motionInputBuffer.TryMatchReusableMotion(binding, input, out long candidateCompletion)) continue;
+				!_motionInputBuffer.TryMatchReusableMotion(binding, input, out long candidateCompletion,
+					cancelBufferFrames)) continue;
 			int priority = 10000 + binding.Priority;
 			if (priority <= bestPriority) continue;
 			bestPriority = priority;
@@ -3768,7 +4022,8 @@ public partial class FighterController : CharacterBody2D
 			MotionInputBinding binding = move?.CommandInput;
 			if (move == null || !move.Matches(move.AttackName, startedCrouching, startedAirborne) ||
 				!CanUseMotionBinding(binding) ||
-				!_motionInputBuffer.TryMatchReusableMotion(binding, input, out long candidateCompletion)) continue;
+				!_motionInputBuffer.TryMatchReusableMotion(binding, input, out long candidateCompletion,
+					cancelBufferFrames)) continue;
 			if (binding.Priority <= bestPriority) continue;
 			bestPriority = binding.Priority;
 			attackName = move.AttackName;

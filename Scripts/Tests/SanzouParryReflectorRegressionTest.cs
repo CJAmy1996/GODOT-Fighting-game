@@ -6,7 +6,7 @@ using ModularFighter.Demo;
 
 namespace ModularFighter.Tests;
 
-/// <summary>Locks Sanzou's L-button parry and both authored reflector variants.</summary>
+/// <summary>Locks Sanzou's S2/L Trait 2 parry and both authored reflector variants.</summary>
 public partial class SanzouParryReflectorRegressionTest : Node2D
 {
 	private SanzoKongoumaruFighter _parryFighter;
@@ -28,7 +28,7 @@ public partial class SanzouParryReflectorRegressionTest : Node2D
 
 	private SanzoKongoumaruFighter Spawn(string name, float x, int facing, int team)
 	{
-		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn")
+		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
 			.Instantiate<SanzoKongoumaruFighter>();
 		fighter.Name = name;
 		fighter.ReadLocalInput = false;
@@ -64,7 +64,7 @@ public partial class SanzouParryReflectorRegressionTest : Node2D
 						lightKickPressed: true, heavyKickPressed: true));
 					Expect(_parryFighter.CurrentAttackName == FighterController.SanzoParryName,
 						$"L resolved as '{_parryFighter.CurrentAttackName}'");
-					Expect(_parryFighter.CurrentAttackAnimationName == "stand_block", "L parry did not use standing block animation");
+					Expect(_parryFighter.CurrentAttackAnimationName == "trait_2", "S2/L parry did not use the Trait 2 animation");
 					Expect(_parryFighter.IsParryWindowActive, "L did not open its parry window");
 					Expect(!_parryFighter.IsPerformingSuperMove && !_parryFighter.SuperActivationFreezeRequested,
 						"L parry still triggers super classification or activation effects");
@@ -100,7 +100,7 @@ public partial class SanzouParryReflectorRegressionTest : Node2D
 						"Super Reflector is not classified as a real super");
 					Expect(GetNodeOrNull<Sprite2D>("SuperAfterimage1")?.Visible == true,
 						"Super Reflector never displayed shared super afterimages");
-					GD.Print("SANZOU PARRY/REFLECTOR TEST PASSED: L is a non-super parry; Super Reflector uses universal activation/afterimages.");
+					GD.Print("SANZOU PARRY/REFLECTOR TEST PASSED: S2/L Trait 2 is a non-super parry; Super Reflector uses universal activation/afterimages.");
 					GetTree().Quit();
 					break;
 			}
@@ -116,15 +116,24 @@ public partial class SanzouParryReflectorRegressionTest : Node2D
 	{
 		SpecialMoveData parry = _parryFighter.Definition.SpecialMoves.FindMove(
 			FighterController.SanzoParryName, false, false);
+		SpecialMoveData blockReflector = _parryFighter.Definition.SpecialMoves.FindMove(
+			FighterController.BlockReflectorName, false, false);
 		SuperMoveData superReflector = Array.Find(_parryFighter.Definition.SuperMoves,
 			move => move?.AttackName == FighterController.SanzoSuperReflectorName);
 		Expect(parry?.Parry == true && parry.StartupFrames == 0 && parry.ActiveFrames == 30,
 			"L parry resource is missing its 30-frame window");
+		Expect(parry.AnimationName == "trait_2",
+			"S2/L parry resource is not assigned to the Trait 2 source animation");
 		Expect(Array.Find(_parryFighter.Definition.SuperMoves,
 			move => move?.AttackName == FighterController.SanzoParryName) == null,
 			"L parry is still registered in Sanzou's super list");
-		Expect(superReflector?.ProjectileScene != null && superReflector.HitCount == 8,
+		Expect(superReflector?.ProjectileScene != null && superReflector.HitCount == 8 &&
+			superReflector.HitstopFrames == 1 && superReflector.ProjectileHitCooldownFrames == 5 &&
+			superReflector.HitstunFrames > superReflector.ProjectileHitCooldownFrames,
 			"super reflector resource is not configured for eight hits and its authored scene");
+		Expect(blockReflector?.ReflectorSpawnOffset.IsEqualApprox(new Vector2(62f, 48f)) == true &&
+			superReflector.ProjectileSpawnOffset.IsEqualApprox(new Vector2(62f, 48f)),
+			"reflector is not anchored at Sanzou's forward hand at source-sized height");
 
 		PackedScene scene = ResourceLoader.Load<PackedScene>("res://Assets/TestFighter/Sanzo/sanzo_reflector.tscn");
 		var block = scene.Instantiate<ProjectileReflector>();
@@ -137,6 +146,17 @@ public partial class SanzouParryReflectorRegressionTest : Node2D
 			"block reflector does not push back and knock down");
 		Expect(block.Visual?.SpriteFrames?.GetFrameCount("reflector") == 8,
 			"321-328 reflector animation does not contain eight frames");
+		Expect(block.Visual != null && block.Visual.Scale.IsEqualApprox(new Vector2(1.15f, 1.15f)),
+			"reflector visual is not larger than Sanzou like the source Aegis shield");
+		Texture2D reflectorFrame = block.Visual?.SpriteFrames?.GetFrameTexture(block.Visual.Animation, block.Visual.Frame);
+		Expect(reflectorFrame != null && Mathf.IsZeroApprox(block.Visual.Position.Y +
+			reflectorFrame.GetHeight() * Mathf.Abs(block.Visual.Scale.Y) * 0.5f),
+			"reflector frame is not bottom-aligned to ground level");
+		Expect(block.Visual.Material is CanvasItemMaterial reflectorMaterial &&
+			reflectorMaterial.BlendMode == CanvasItemMaterial.BlendModeEnum.Add,
+			"reflector does not use additive rendering to remove its opaque black pixels");
+		Expect(block.ReflectBox.IsEqualApprox(new Rect2(-46f, -286f, 92f, 286f)),
+			"reflector collision does not cover the enlarged source-sized shield");
 
 		var super = scene.Instantiate<ProjectileReflector>();
 		super.ProcessMode = ProcessModeEnum.Disabled;
@@ -144,7 +164,9 @@ public partial class SanzouParryReflectorRegressionTest : Node2D
 		AddChild(super);
 		Expect(super.IsSuperReflector && super.Super && super.LifetimeFrames == 600,
 			"super reflector does not last exactly 600 frames (10 seconds at 60 Hz)");
-		Expect(super.HitsRemaining == 8 && !super.LatchOnMultiHit && Mathf.IsEqualApprox(super.Speed, 18f),
+		Expect(super.HitsRemaining == 8 && !super.LatchOnMultiHit && Mathf.IsEqualApprox(super.Speed, 18f) &&
+			super.HitstopFrames == 1 && super.HitCooldownFrames == 5 &&
+			super.HitstunFrames > super.HitCooldownFrames,
 			"super reflector is not an eight-hit, slowly sliding projectile");
 
 		var incoming = new BasicProjectile { ProcessMode = ProcessModeEnum.Disabled, GlobalPosition = super.GlobalPosition };

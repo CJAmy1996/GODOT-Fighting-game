@@ -69,6 +69,9 @@ public partial class JumpAbility : MovementAbility
 		if (runtime.FramesRemaining-- <= 0) return false;
 		if (!fighter.CurrentInput.JumpHeld)
 		{
+			// Down-to-up is a committed super-jump command, never a variable-height
+			// normal jump. A one-frame Up+Jump press must retain the full launch.
+			if (fighter.IsInSuperJumpRoute) return false;
 			bool shortHopAllowed = runtime.BoolValue ||
 				(AllowAirShortHop && fighter.Definition.Tuning.AllowAirShortHops);
 			// Releasing jump early cuts upward momentum: a tap produces a true short hop.

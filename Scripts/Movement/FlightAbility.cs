@@ -13,10 +13,8 @@ public partial class FlightAbility : MovementAbility
 	private const int DirectionMoved = 1 << 4;
 	private const int BoostCancel = 1 << 5;
 	private const int ButtonActivation = 1 << 6;
-	private const int ActivationUndecided = 1 << 7;
 	private const int BlueRecoveryCancel = 1 << 8;
 	private const int GroundButtonLift = 1 << 9;
-	private const int QuickReleaseFrames = 5;
 
 	[Export] public float FlightSpeed { get; set; } = 400f;
 	[Export] public float Acceleration { get; set; } = 1800f;
@@ -24,6 +22,7 @@ public partial class FlightAbility : MovementAbility
 	[Export] public bool UseSpecial1Input { get; set; }
 	[Export] public float GasCostPerFrame { get; set; }
 	[Export] public float GroundButtonFlightLiftSpeed { get; set; } = 240f;
+	[Export(PropertyHint.Range, "1,60,1")] public int NegativeEdgeHoldFrames { get; set; } = 20;
 	[Export] public bool UseDirectionalAnimations { get; set; }
 	[Export(PropertyHint.Range, "0.1,1.0,0.05")] public float DirectionThreshold { get; set; } = 0.35f;
 	[Export] public bool DirectVelocityControl { get; set; }
@@ -90,7 +89,7 @@ public partial class FlightAbility : MovementAbility
 	public bool IsNegativeEdgeFlight(FighterController fighter) =>
 		(GetRuntimeFlags(fighter) & (ButtonActivation | BoostMode)) == 0;
 	public bool ShouldPersistThroughNormal(FighterController fighter, string attackName) =>
-		IsButtonActivatedFlight(fighter) && !InputHeld(fighter) && FighterController.IsNormalAttackName(attackName);
+		IsButtonActivatedFlight(fighter) && FighterController.IsNormalAttackName(attackName);
 	public bool ShouldTickDuringAttack(FighterController fighter) => IsButtonActivatedFlight(fighter);
 	public bool WantsManualDeactivation(FighterController fighter) => IsButtonActivatedFlight(fighter)
 		? InputPressed(fighter)
@@ -169,9 +168,9 @@ public partial class FlightAbility : MovementAbility
 			return true;
 		}
 		if (!fighter.HasPlaceholderSpecialMeter(GasCostPerFrame)) return false;
-		// Start provisionally as tap/button flight. Holding beyond the tap window
-		// converts this same activation into the original negative-edge flight.
-		runtime.IntValue2 = ButtonActivation | ActivationUndecided;
+		// A press is immediately toggle flight. Holding it long enough converts
+		// this same flight to negative-edge (hold/release) mode.
+		runtime.IntValue2 = ButtonActivation | (fighter.WasGrounded ? GroundButtonLift : 0);
 		runtime.VectorValue = Vector2.Zero;
 		return true;
 	}
@@ -184,9 +183,9 @@ public partial class FlightAbility : MovementAbility
 		if (authoredSpecialCancel && (!UseDirectionalBoosts || direction.IsZeroApprox()))
 		{
 			if (!fighter.HasPlaceholderSpecialMeter(GasCostPerFrame)) return false;
-			// A cancellable normal enters the same five-frame tap/hold resolver as
-			// neutral activation; it is a true special cancel, not a hit-only flight cancel.
-			runtime.IntValue2 = ButtonActivation | ActivationUndecided |
+			// This is a true special cancel, not a hit-only flight cancel.
+			runtime.IntValue2 = ButtonActivation |
+				(fighter.WasGrounded ? GroundButtonLift : 0) |
 				(RequireNeutralBeforeCancelledFlightMovement ? AwaitingNeutral : 0);
 			runtime.VectorValue = Vector2.Zero;
 			return true;
@@ -228,13 +227,9 @@ public partial class FlightAbility : MovementAbility
 		if (LockAirNormalsDuringPostFlightFall) fighter.MarkFlightUsedThisAirTime();
 		runtime.IntValue = 0;
 		fighter.Velocity = Vector2.Zero;
-		if ((runtime.IntValue2 & ActivationUndecided) != 0 && !InputHeld(fighter))
-		{
-			runtime.IntValue2 &= ~ActivationUndecided;
-			if (fighter.WasGrounded) runtime.IntValue2 |= GroundButtonLift;
-		}
 		if ((runtime.IntValue2 & BoostMode) != 0)
 		{
+			CallAudio(fighter, "play_mecha_boost");
 			float cost = BoostGasCost + ((runtime.IntValue2 & BoostCancel) != 0 ? Mathf.Max(0f, BoostCancelExtraGasCost) : 0f);
 			fighter.TrySpendPlaceholderSpecialMeter(cost);
 			runtime.FramesRemaining = Mathf.Max(1, BoostFrames);
@@ -247,6 +242,7 @@ public partial class FlightAbility : MovementAbility
 			fighter.Velocity = runtime.VectorValue * ResolveBoostSpeed(fighter, runtime.VectorValue);
 			return;
 		}
+		CallAudio(fighter, "play_mecha_boost");
 		if ((runtime.IntValue2 & CancelEntry) != 0)
 			fighter.TrySpendPlaceholderSpecialMeter(FlightCancelGasCost);
 	}
@@ -259,24 +255,9 @@ public partial class FlightAbility : MovementAbility
 			fighter.Velocity = runtime.VectorValue * ResolveBoostSpeed(fighter, runtime.VectorValue);
 			return runtime.IntValue < Mathf.Max(1, BoostFrames);
 		}
-		if ((runtime.IntValue2 & ActivationUndecided) != 0)
-		{
-			if (InputReleased(fighter))
-			{
-				if (runtime.IntValue <= QuickReleaseFrames)
-				{
-					runtime.IntValue2 &= ~ActivationUndecided;
-					if (fighter.WasGrounded) runtime.IntValue2 |= GroundButtonLift;
-				}
-				else
-				{
-					runtime.IntValue2 &= ~(ActivationUndecided | ButtonActivation);
-					return false;
-				}
-			}
-			else if (runtime.IntValue > QuickReleaseFrames && InputHeld(fighter))
-				runtime.IntValue2 &= ~(ActivationUndecided | ButtonActivation);
-		}
+		if (IsButtonActivatedFlight(fighter) && InputHeld(fighter) &&
+			runtime.IntValue >= Mathf.Max(1, NegativeEdgeHoldFrames))
+			runtime.IntValue2 &= ~ButtonActivation;
 		if (IsButtonActivatedFlight(fighter))
 		{
 			// Ignore the original activation edge, then use the next press as a toggle-off.
@@ -290,18 +271,19 @@ public partial class FlightAbility : MovementAbility
 			!fighter.TrySpendPlaceholderSpecialMeter(GasCostPerFrame)) return false;
 		if ((runtime.IntValue2 & GroundButtonLift) != 0)
 		{
-			runtime.IntValue2 &= ~GroundButtonLift;
+			// A grounded flight cancel is not complete until the body has actually
+			// separated from the floor. Keep commanding lift across collision frames.
+			if (!fighter.WasGrounded) runtime.IntValue2 &= ~GroundButtonLift;
 			fighter.Velocity = new Vector2(fighter.Velocity.X, -Mathf.Max(1f, GroundButtonFlightLiftSpeed));
 			return true;
 		}
-		if ((runtime.IntValue2 & ActivationUndecided) != 0)
+		if (fighter.IsAttacking && IsButtonActivatedFlight(fighter))
 		{
-			// The five-frame startup resolves tap versus hold before flight becomes
-			// actionable, preventing its cancel rules from changing mid-movement.
+			// Toggle flight is a fixed aerial platform during normals. Clear both axes
+			// every tick so neither prior flight input nor attack momentum can slide it.
 			fighter.Velocity = Vector2.Zero;
 			return true;
 		}
-		if (fighter.IsAttacking && IsButtonActivatedFlight(fighter)) return true;
 
 		Vector2 inputDirection = InputDirection(fighter);
 		if (!inputDirection.IsZeroApprox()) runtime.IntValue2 |= DirectionMoved;
@@ -327,7 +309,6 @@ public partial class FlightAbility : MovementAbility
 	{
 		if ((runtime.IntValue2 & BoostMode) != 0)
 			return runtime.IntValue >= Mathf.Max(0, BoostAttackDelayFrames);
-		if ((runtime.IntValue2 & ActivationUndecided) != 0) return false;
 		// Toggle flight must leave the floor before normals are accepted so the
 		// attack resolver always selects airborne move data. Ground boosts are exempt.
 		if (IsButtonActivatedFlight(fighter) && fighter.WasGrounded) return false;
@@ -348,5 +329,11 @@ public partial class FlightAbility : MovementAbility
 		runtime.IntValue = 0;
 		runtime.IntValue2 = 0;
 		runtime.VectorValue = Vector2.Zero;
+	}
+
+	private static void CallAudio(FighterController fighter, string method)
+	{
+		if (fighter?.IsInsideTree() != true) return;
+		fighter.GetNodeOrNull<Node>("/root/AudioController")?.Call(method);
 	}
 }

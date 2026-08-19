@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://yaoqd5nh2bir"
+path="res://.godot/imported/SE_078 (metal hit 1).mp3-c35e0bca34cef0800f661ddcf46d80c2.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_078 (metal hit 1).mp3"
+dest_files=["res://.godot/imported/SE_078 (metal hit 1).mp3-c35e0bca34cef0800f661ddcf46d80c2.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

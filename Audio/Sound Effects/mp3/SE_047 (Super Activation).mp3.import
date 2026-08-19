@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dpk1ay5byytf5"
+path="res://.godot/imported/SE_047 (Super Activation).mp3-069071e2985f7c7c1e4b1ee77b705216.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_047 (Super Activation).mp3"
+dest_files=["res://.godot/imported/SE_047 (Super Activation).mp3-069071e2985f7c7c1e4b1ee77b705216.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

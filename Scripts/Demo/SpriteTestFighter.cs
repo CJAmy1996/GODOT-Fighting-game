@@ -11,6 +11,7 @@ public partial class SpriteTestFighter : FighterController
 	[Export] public AnimatedSprite2D CharacterSprite { get; set; }
 	[ExportGroup("Heavy Walk Presentation")]
 	[Export] public bool HeavyWalkFootstepShake { get; set; }
+	[Export(PropertyHint.Range, "0.1,2.0,0.05")] public float WalkAnimationSpeedScale { get; set; } = 1f;
 	[Export] public float HeavyWalkShakeStrength { get; set; } = 1.1f;
 	[Export] public int HeavyWalkShakeFrames { get; set; } = 3;
 	[Export] public bool HeavyLandingShake { get; set; }
@@ -45,6 +46,10 @@ public partial class SpriteTestFighter : FighterController
 	private Color _burnRestoreSelfModulate = Colors.White;
 	private int _burnFlameSerial;
 	private readonly List<AnimatedSprite2D> _activeBurnFlames = new();
+	private static Shader _instantBlockWhiteShader;
+	private ulong _lastInstantBlockFlashSerial;
+	private int _instantBlockWhiteFramesLeft;
+	private Material _instantBlockRestoreMaterial;
 	private static readonly StringName[] SuperOneAttackCycle =
 	{
 		"heavy_punch", "standing_light_kick", "light_punch", "standing_heavy_kick",
@@ -76,6 +81,39 @@ public partial class SpriteTestFighter : FighterController
 		UpdateHeavyLandingShake();
 		UpdateSuperShadows();
 		UpdateBurnHitPresentation();
+		UpdateInstantBlockWhiteFlash();
+	}
+
+	private void UpdateInstantBlockWhiteFlash()
+	{
+		if (CharacterSprite == null) return;
+		if (_lastInstantBlockFlashSerial != InstantBlockFlashSerial)
+		{
+			_lastInstantBlockFlashSerial = InstantBlockFlashSerial;
+			if (_instantBlockWhiteFramesLeft <= 0)
+				_instantBlockRestoreMaterial = CharacterSprite.Material;
+			_instantBlockWhiteShader ??= CreateInstantBlockWhiteShader();
+			CharacterSprite.Material = new ShaderMaterial { Shader = _instantBlockWhiteShader };
+			_instantBlockWhiteFramesLeft = 4;
+		}
+		if (_instantBlockWhiteFramesLeft <= 0) return;
+		_instantBlockWhiteFramesLeft--;
+		if (_instantBlockWhiteFramesLeft == 0)
+			CharacterSprite.Material = _instantBlockRestoreMaterial;
+	}
+
+	private static Shader CreateInstantBlockWhiteShader()
+	{
+		var shader = new Shader();
+		shader.Code = """
+			shader_type canvas_item;
+
+			void fragment() {
+				vec4 texel = texture(TEXTURE, UV);
+				COLOR = vec4(1.0, 1.0, 1.0, texel.a);
+			}
+			""";
+		return shader;
 	}
 
 	protected override void OnMoveContactBurnVisual(bool blackenDefender, int silhouetteFrames,
@@ -192,6 +230,8 @@ public partial class SpriteTestFighter : FighterController
 		float floorCompensation = AuthoredSpriteFloorOffset * (1f - selectedFactor) * Mathf.Abs(_baseCharacterSpriteScale.Y);
 		Vector2 authoredOffset = IsAttacking ? CurrentAttackCharacterVisualOffset : Vector2.Zero;
 		authoredOffset.X *= Facing;
+		if (sanzou && (CharacterSprite.Animation == "knockdown" || CharacterSprite.Animation == "ground_bounce"))
+			authoredOffset.Y += 1f;
 		Vector2 drawingOffset = Vector2.Zero;
 		Vector2[] drawingOffsets = CurrentAttackAnimationDrawingOffsets;
 		if (IsAttacking && drawingOffsets.Length > 0)
@@ -221,7 +261,7 @@ public partial class SpriteTestFighter : FighterController
 		_lastFootstepDrawing = drawing;
 		bool impactDrawing = animation == "walk"
 			? drawing == 1 || drawing == 7       // authored ticks 8 and 56
-			: drawing == 3 || drawing == 6;      // authored ticks 24 and 48
+			: drawing == 0 || drawing == 6;      // source 078/084; cycle ticks 0 and 18
 		if (!impactDrawing) return;
 		if (GetViewport().GetCamera2D() is StageCamera camera)
 			camera.Shake(HeavyWalkShakeStrength, HeavyWalkShakeFrames);
@@ -241,6 +281,7 @@ public partial class SpriteTestFighter : FighterController
 	private void UpdateAnimation()
 	{
 		if (CharacterSprite?.SpriteFrames == null) return;
+		bool sanzou = string.Equals(Definition?.FighterName, "Sanzou Kongoumaru", System.StringComparison.OrdinalIgnoreCase);
 		// SpeedScale freezes the exact displayed sprite frame without resetting animation state.
 		// Attack drawings are selected manually from the deterministic combat
 		// frame below; AnimatedSprite must not independently advance between ticks.
@@ -266,6 +307,7 @@ public partial class SpriteTestFighter : FighterController
 		JetEscapeAbility activeJetEscape = ActiveAbility as JetEscapeAbility;
 		if (jetEscaping) _awaitingJetEscapeLanding = true;
 		bool forwardShortHopping = ActiveAbility?.Id == "forward_short_hop";
+		bool backDashing = ActiveAbility?.Id == "backdash";
 		bool airDashing = ActiveAbility?.Id == "air_dash";
 		bool holdingCrouch = WasGrounded && CurrentInput.Vertical > 0.5f;
 		bool leavingCrouchForAnotherAction = !holdingCrouch &&
@@ -484,6 +526,13 @@ public partial class SpriteTestFighter : FighterController
 				: SuperJumpPresentationDirection < 0
 					? "super_jump_backward"
 					: "super_jump_neutral";
+			// Imported characters such as Sanzou predate the dedicated Mecha
+			// super-jump aliases. Fall back to their authored jump animation instead
+			// of asking AnimatedSprite2D to play a missing animation name.
+			if (!CharacterSprite.SpriteFrames.HasAnimation(superJumpAnimation))
+				superJumpAnimation = CharacterSprite.SpriteFrames.HasAnimation("neutral_jump")
+					? "neutral_jump"
+					: CharacterSprite.Animation;
 			if (CharacterSprite.Animation != superJumpAnimation) CharacterSprite.Play(superJumpAnimation);
 			return;
 		}
@@ -555,14 +604,22 @@ public partial class SpriteTestFighter : FighterController
 		else if (IsAttacking) nextAnimation = "attack";
 		else if (jetEscaping && !string.IsNullOrWhiteSpace(activeJetEscape.AnimationName))
 			nextAnimation = activeJetEscape.AnimationName;
+		else if (backDashing) nextAnimation = "back_dash";
 		else if (forwardShortHopping) nextAnimation = "forward_dash";
 		else if (airDashing) nextAnimation = "air_dash";
-		else if (!WasGrounded) nextAnimation = Velocity.Y < 0f ? "neutral_jump" : "fall";
+		else if (!WasGrounded)
+		{
+			bool sanzouNeutralJump = sanzou && !IsInSuperJumpRoute && Mathf.Abs(Velocity.X) <= 25f;
+			nextAnimation = sanzouNeutralJump || Velocity.Y < 0f ? "neutral_jump" : "fall";
+		}
 		else if (ActiveAbility is RunAbility) nextAnimation = "run";
 		else if (IsInRunStopSlide && CharacterSprite.SpriteFrames.HasAnimation("run_stop")) nextAnimation = "run_stop";
 		else if (Mathf.Abs(Velocity.X) > 25f)
 			nextAnimation = Velocity.X * Facing < 0f ? "walk_back" : "walk";
 		else nextAnimation = "idle";
+
+		if (!IsInHitstop && !IsAttacking && (nextAnimation == "walk" || nextAnimation == "walk_back"))
+			CharacterSprite.SpeedScale = Mathf.Max(0.1f, WalkAnimationSpeedScale);
 
 		if (IsCurrentSpecialLandingRecovery && !string.IsNullOrEmpty(CurrentAttackLandingAnimationName) &&
 			CharacterSprite.SpriteFrames.HasAnimation(CurrentAttackLandingAnimationName))

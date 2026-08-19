@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dqvr5dfrfjjxn"
+path="res://.godot/imported/SE_002 (Change cursor 1).mp3-03b45a33a351a8d3c86308deda8f5354.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_002 (Change cursor 1).mp3"
+dest_files=["res://.godot/imported/SE_002 (Change cursor 1).mp3-03b45a33a351a8d3c86308deda8f5354.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

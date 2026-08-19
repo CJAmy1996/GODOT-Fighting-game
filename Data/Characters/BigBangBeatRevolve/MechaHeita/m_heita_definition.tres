@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="FighterDefinition" load_steps=18 format=3 uid="uid://dsetnqhur88du"]
+[gd_resource type="Resource" script_class="FighterDefinition" load_steps=25 format=3 uid="uid://dsetnqhur88du"]
 
 [ext_resource type="Script" uid="uid://p3g6dew2wiky" path="res://Scripts/Core/FighterDefinition.cs" id="1_def"]
 [ext_resource type="Script" uid="uid://s1q2kuukuw7h" path="res://Scripts/Core/MovementTuning.cs" id="2_tuning"]
@@ -16,6 +16,40 @@
 [ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_run.tres" id="18_run"]
 [ext_resource type="Resource" uid="uid://b5uuxymmwh8hh" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_full_fire.tres" id="19_full_fire"]
 [ext_resource type="Texture2D" uid="uid://cn0hfwwpnj0hj" path="res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/super_portrait.png" id="20_portrait"]
+[ext_resource type="Script" uid="uid://ccpi48jqc0xq" path="res://Scripts/Core/CancelRule.cs" id="21_cancel_rule"]
+
+[sub_resource type="Resource" id="CancelRule_mecha_light_kick_jump"]
+script = ExtResource("21_cancel_rule")
+FromMove = "LIGHT KICK"
+Kind = 2
+AllowedTargets = PackedStringArray("JUMP")
+
+[sub_resource type="Resource" id="CancelRule_mecha_ground_medium_kick_jump"]
+script = ExtResource("21_cancel_rule")
+FromMove = "CROUCHING MEDIUM KICK"
+Kind = 2
+AllowedTargets = PackedStringArray("JUMP")
+
+[sub_resource type="Resource" id="CancelRule_mecha_air_medium_kick_jump"]
+script = ExtResource("21_cancel_rule")
+FromMove = "MEDIUM KICK AIR BACK"
+Kind = 2
+AllowedTargets = PackedStringArray("JUMP")
+
+[sub_resource type="Resource" id="CancelRule_mecha_ground_medium_punch_jump"]
+script = ExtResource("21_cancel_rule")
+FromMove = "MEDIUM PUNCH BACK"
+Kind = 2
+AllowedTargets = PackedStringArray("JUMP")
+
+[sub_resource type="Resource" id="CancelRule_mecha_air_medium_punch_jump"]
+script = ExtResource("21_cancel_rule")
+FromMove = "MEDIUM PUNCH AIR BACK"
+Kind = 2
+AllowedTargets = PackedStringArray("JUMP")
+
+[sub_resource type="Resource" id="CancelRule_mecha_normal_to_special"]
+script = ExtResource("21_cancel_rule")
 
 [sub_resource type="Resource" id="MovementTuning_imported"]
 script = ExtResource("2_tuning")
@@ -29,7 +63,8 @@ AirAcceleration = 2200.0
 AirDeceleration = 1500.0
 AllowAirControl = false
 NonFlightLandingLagMultiplier = 0.5
-InputBufferFrames = 4
+InputBufferFrames = 8
+SpecialCancelBufferFrames = 10
 
 [resource]
 script = ExtResource("1_def")
@@ -43,3 +78,4 @@ NormalMoves = ExtResource("11_normals")
 StateBoxes = ExtResource("14_states")
 SpecialMoves = ExtResource("12_specials")
 SuperMoves = [ExtResource("19_full_fire")]
+CancelRules = [SubResource("CancelRule_mecha_light_kick_jump"), SubResource("CancelRule_mecha_ground_medium_kick_jump"), SubResource("CancelRule_mecha_air_medium_kick_jump"), SubResource("CancelRule_mecha_ground_medium_punch_jump"), SubResource("CancelRule_mecha_air_medium_punch_jump"), SubResource("CancelRule_mecha_normal_to_special")]

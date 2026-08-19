@@ -169,6 +169,7 @@ public partial class NormalMoveData : Resource
 	[Export] public string[] AllowedChainTargets { get; set; } = Array.Empty<string>();
 	/// <summary>Optional MVC-style second LP result, used to expose a medium without a direction chord.</summary>
 	[Export] public string RepeatLightPunchChainTarget { get; set; } = "";
+	[Export] public string RepeatLightKickChainTarget { get; set; } = "";
 	[Export] public int MaxUsesPerCombo { get; set; }
 	[Export] public bool ChainRequiresContact { get; set; } = true;
 	[Export] public int ChainEarliestActiveFramesLeft { get; set; }
@@ -229,6 +230,8 @@ public partial class NormalMoveData : Resource
 
 	[ExportGroup("Launcher / Jump Cancel")]
 	[Export] public bool Launches { get; set; }
+	/// <summary>Applies the authored launch only when the defender was grounded on contact.</summary>
+	[Export] public bool LaunchGroundedOnly { get; set; }
 	[Export] public float LaunchSpeed { get; set; } = 1820f;
 	[Export] public float LaunchPushback { get; set; } = 180f;
 	[Export] public int LaunchHitstunFrames { get; set; } = 72;

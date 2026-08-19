@@ -31,14 +31,14 @@ public partial class SanzouJabRegressionTest : Node2D
 		var floor = new StaticBody2D { Position = new Vector2(0f, 10f) };
 		floor.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = new Vector2(1000f, 20f) } });
 		AddChild(floor);
-		var scene = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn");
+		var scene = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn");
 		_fighter = scene.Instantiate<SpriteTestFighter>();
 		_fighter.ReadLocalInput = false;
 		_fighter.TeamId = 1;
 		_fighter.Position = Vector2.Zero;
 		AddChild(_fighter);
 		_fighter.SetExternalInput(default);
-		_defender = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/KungFuManTest.tscn")
+		_defender = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/KungFuMan.tscn")
 			.Instantiate<FighterController>();
 		_defender.Name = "JabTestDefender";
 		_defender.TeamId = 2;
@@ -122,8 +122,7 @@ public partial class SanzouJabRegressionTest : Node2D
 					Expect(_fighter.CharacterSprite.Frame == 2, $"active jab displayed drawing {_fighter.CharacterSprite.Frame}, not 2");
 					Expect(_fighter.TryApplyBasicAttackHit(_defender, out int standingHitstop, out _, out _, out _, out _),
 						"jab hitbox exists but failed the real defender collision path");
-					int expectedStandingJabHitstun = _fighter.Definition.NormalMoves
-						.FindRule("LIGHT PUNCH", false, false)?.HitstunFrames ?? -1;
+					int expectedStandingJabHitstun = _fighter.GroundedLightNormalHitstunFrames;
 					Expect(_defender.HitstunFramesLeft == expectedStandingJabHitstun,
 						$"standing jab applied {_defender.HitstunFramesLeft} hitstun frames instead of {expectedStandingJabHitstun}");
 					GD.Print("SANZOU JAB TEST PASSED: LP resolves, frame 0 exists, active frame 4 drawing/hitbox align, defender is hit.");
@@ -161,7 +160,7 @@ public partial class SanzouJabRegressionTest : Node2D
 						if (_crouchMashHits == 1)
 						{
 							NormalMoveData crouchJab = _fighter.Definition.NormalMoves.FindRule("LIGHT PUNCH", true, false);
-							int expectedCrouchJabHitstun = crouchJab.HitstunFrames;
+							int expectedCrouchJabHitstun = _fighter.GroundedLightNormalHitstunFrames;
 							Expect(_defender.HitstunFramesLeft == expectedCrouchJabHitstun,
 								$"crouching low jab applied {_defender.HitstunFramesLeft} hitstun frames instead of {expectedCrouchJabHitstun}");
 						}
@@ -219,7 +218,7 @@ public partial class SanzouJabRegressionTest : Node2D
 	{
 		RemoveChild(_defender);
 		_defender.QueueFree();
-		_defender = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn")
+		_defender = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
 			.Instantiate<FighterController>();
 		_defender.Name = "SanzouJabTestDefender";
 		_defender.ReadLocalInput = false;

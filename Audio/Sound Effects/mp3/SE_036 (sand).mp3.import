@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bde3r6ef3825s"
+path="res://.godot/imported/SE_036 (sand).mp3-5ef0df449c0bcb5c6e6de3b5654a97c1.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_036 (sand).mp3"
+dest_files=["res://.godot/imported/SE_036 (sand).mp3-5ef0df449c0bcb5c6e6de3b5654a97c1.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

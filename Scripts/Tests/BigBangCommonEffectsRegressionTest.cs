@@ -412,6 +412,9 @@ public partial class BigBangCommonEffectsRegressionTest : Node2D
 			Expect(superCancel.CurrentInnerFrame == 0 && superCancel.CurrentOuterFrame == 8 &&
 				superCancel.CurrentCoreFrame == 17 && superCancel.TotalTicks == 20,
 				"super-cancel composite did not begin at lightning 000/008 and core 017");
+			Expect(Mathf.IsEqualApprox(superCancel.GetNode<Sprite2D>("InnerLightningOpposite").Rotation, Mathf.Pi) &&
+				Mathf.IsEqualApprox(superCancel.GetNode<Sprite2D>("OuterLightningQuarterTurn").Rotation, Mathf.Pi * 0.5f),
+				"super-cancel lightning is no longer arranged radially around its source core");
 			for (int tick = 0; tick < 16; tick++)
 			{
 				Expect(superCancel.LightningVisible, $"super-cancel lightning disappeared on source tick {tick}");

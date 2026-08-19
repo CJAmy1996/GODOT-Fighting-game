@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://01v4h0kcjcfy"
+path="res://.godot/imported/SE_118 (electricity.mp3-2b9c69e0012baa028c515538e458c2c9.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_118 (electricity.mp3"
+dest_files=["res://.godot/imported/SE_118 (electricity.mp3-2b9c69e0012baa028c515538e458c2c9.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

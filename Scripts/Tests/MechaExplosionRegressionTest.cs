@@ -21,7 +21,7 @@ public partial class MechaExplosionRegressionTest : Node2D
 		floor.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = new Vector2(1000f, 20f) } });
 		AddChild(floor);
 
-		_mecha = GD.Load<PackedScene>("res://Scenes/TestCharacters/MechaHeitaTest.tscn")
+		_mecha = GD.Load<PackedScene>("res://Scenes/Characters/MechaHeita.tscn")
 			.Instantiate<SpriteTestFighter>();
 		_mecha.ReadLocalInput = false;
 		_mecha.TeamId = 1;
@@ -30,7 +30,7 @@ public partial class MechaExplosionRegressionTest : Node2D
 		AddChild(_mecha);
 		_mecha.SetExternalInput(default);
 
-		_defender = GD.Load<PackedScene>("res://Scenes/TestCharacters/KungFuManTest.tscn")
+		_defender = GD.Load<PackedScene>("res://Scenes/Characters/KungFuMan.tscn")
 			.Instantiate<SpriteTestFighter>();
 		_defender.ReadLocalInput = false;
 		_defender.TeamId = 2;

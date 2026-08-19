@@ -35,7 +35,7 @@ public partial class ContactLayeringRegressionTest : Node2D
 
 	private FighterController Spawn(string name, float x, int facing)
 	{
-		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn")
+		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
 			.Instantiate<FighterController>();
 		fighter.Name = name;
 		fighter.ReadLocalInput = false;

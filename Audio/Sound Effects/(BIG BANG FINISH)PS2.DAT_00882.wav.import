@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://f1bvpf3cdtfu"
+path="res://.godot/imported/(BIG BANG FINISH)PS2.DAT_00882.wav-8156ecdfca22e513b17152885be530ee.sample"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/(BIG BANG FINISH)PS2.DAT_00882.wav"
+dest_files=["res://.godot/imported/(BIG BANG FINISH)PS2.DAT_00882.wav-8156ecdfca22e513b17152885be530ee.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

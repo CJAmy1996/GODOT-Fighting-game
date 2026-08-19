@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cbthgri7fj378"
+path="res://.godot/imported/SE_061 (light step 2).mp3-2bc99fc6370061d5c84ffa0fa84c9e17.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_061 (light step 2).mp3"
+dest_files=["res://.godot/imported/SE_061 (light step 2).mp3-2bc99fc6370061d5c84ffa0fa84c9e17.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

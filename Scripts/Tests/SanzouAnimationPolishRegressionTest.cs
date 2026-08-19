@@ -86,17 +86,33 @@ public partial class SanzouAnimationPolishRegressionTest : Node
 			ExpectSlice(superReflector.AnimationSourceTimeline, cycle * 3, 6, 7, 8);
 
 		Expect(Mathf.IsEqualApprox(definition.Tuning.WalkSpeed, 165f), "walk speed is not halved to 165");
+		var walkProbe = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
+			.Instantiate<SpriteTestFighter>();
+		Expect(Mathf.IsEqualApprox(walkProbe.WalkAnimationSpeedScale, 0.5f),
+			"walk animation playback is not matched to Sanzou's halved movement speed");
+		walkProbe.Free();
+		Expect(frames.GetFrameCount("walk_back") == 12 &&
+			Enumerable.Range(0, 12).All(index => Mathf.IsEqualApprox((float)frames.GetFrameDuration("walk_back", index), 3f)) &&
+			Enumerable.Range(0, 12).All(index => Mathf.IsEqualApprox((float)frames.GetFrameDuration("walk", index), 3f)),
+			"walk visuals are not the anti-slide three ticks per drawing");
 		Expect(Mathf.IsEqualApprox(definition.Tuning.Gravity, 1807f), "jump gravity is not reduced by 35 percent");
 		var neutralJump = ResourceLoader.Load<ModularFighter.Movement.JumpAbility>("res://Data/Characters/Sanzo/sanzo_neutral_jump.tres");
+		var forwardJump = ResourceLoader.Load<ModularFighter.Movement.JumpAbility>("res://Data/Characters/Sanzo/sanzo_forward_jump.tres");
 		var superJump = ResourceLoader.Load<ModularFighter.Movement.SuperJumpAbility>("res://Data/Characters/Sanzo/sanzo_super_jump.tres");
 		var forwardDash = ResourceLoader.Load<ModularFighter.Movement.DashAbility>("res://Data/Characters/Sanzo/sanzo_forward_short_hop.tres");
 		var backDash = ResourceLoader.Load<ModularFighter.Movement.DashAbility>("res://Data/Characters/Sanzo/sanzo_backdash.tres");
 		Expect(Mathf.IsEqualApprox(neutralJump.InitialSpeed, 643.5f), "neutral jump launch is not reduced by 35 percent");
+		float forwardJumpFlightTicks = 2f * forwardJump.InitialSpeed / definition.Tuning.Gravity * 60f;
+		Expect(Mathf.IsEqualApprox(forwardJumpFlightTicks, 54f),
+			$"forward jump flight is {forwardJumpFlightTicks:0.###} ticks instead of its 54-tick CSV sequence");
 		NormalMoveData crouchingLauncher = Normal(definition, FighterController.CrouchingHeavyPunchName, NormalMoveStance.Crouching);
-		Expect(Mathf.IsEqualApprox(superJump.InitialSpeed, crouchingLauncher.ChaseJumpSpeed),
+		Expect(Mathf.IsEqualApprox(superJump.InitialSpeed, crouchingLauncher.ChaseJumpSpeed) &&
+			Mathf.IsEqualApprox(superJump.ForwardSpeed, 385f),
 			"raw super jump does not match the down+HP chase super-jump height");
 		Expect(Mathf.IsEqualApprox(forwardDash.Speed, 295f) && Mathf.IsEqualApprox(backDash.Speed, 250f),
 			"forward/back dash speeds are not halved");
+		Expect(backDash.ActiveFrames == 24,
+			"backdash does not remain active for its exact four-drawing, 24-tick CSV animation");
 
 		SpecialMoveData stomp = Special(definition, FighterController.StompSpecialName);
 		float riseSeconds = stomp.ForceDownwardStartFrame / 60f;
@@ -129,7 +145,7 @@ public partial class SanzouAnimationPolishRegressionTest : Node
 			"life-bar height or under-bar combo counter anchor is wrong");
 		hud.Free();
 
-		var scene = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn");
+		var scene = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn");
 		var fighter = scene.Instantiate<SpriteTestFighter>();
 		Expect(fighter.HeavyWalkFootstepShake && fighter.HeavyLandingShake,
 			"Sanzou walk/landing shakes are not enabled");

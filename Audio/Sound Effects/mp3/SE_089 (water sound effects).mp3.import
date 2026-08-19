@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://coyf4do7op06n"
+path="res://.godot/imported/SE_089 (water sound effects).mp3-b20052fcef21d6d18296cfb9a16b8ba2.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_089 (water sound effects).mp3"
+dest_files=["res://.godot/imported/SE_089 (water sound effects).mp3-b20052fcef21d6d18296cfb9a16b8ba2.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=215 format=3 uid="uid://cpa0pwly2qtf"]
+[gd_resource type="SpriteFrames" load_steps=214 format=3 uid="uid://cpa0pwly2qtf"]
 
 [ext_resource type="Texture2D" uid="uid://dhown18oib6l2" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_05.png" id="6_idle_05"]
 [ext_resource type="Texture2D" uid="uid://c5dwvawkn0r1l" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_01/line_01_04.png" id="7_idle_04"]
@@ -192,7 +192,6 @@
 [ext_resource type="Texture2D" uid="uid://copyjd0id4r28" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_05.png" id="469_super_one_finisher_05"]
 [ext_resource type="Texture2D" uid="uid://cex2dsn76jua3" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_06.png" id="470_super_one_finisher_06"]
 [ext_resource type="Texture2D" uid="uid://dqjse7pfm33hj" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_07.png" id="471_super_one_finisher_07"]
-[ext_resource type="Texture2D" uid="uid://baqmlltnen1ao" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_27/line_27_08.png" id="472_super_one_finisher_08"]
 [ext_resource type="Texture2D" uid="uid://buucfvov7nsdm" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_31/line_31_00.png" id="473_stand_block_00"]
 [ext_resource type="Texture2D" uid="uid://d1cvry3w7dkcy" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_31/line_31_01.png" id="474_stand_block_01"]
 [ext_resource type="Texture2D" uid="uid://v74vj3ymxm81" path="res://Assets/TestFighter/KungFuMan/AnimationLines/line_31/line_31_02.png" id="475_stand_block_02"]
@@ -2625,6 +2624,9 @@ animations = [{
 "texture": ExtResource("465_super_one_finisher_01")
 }, {
 "duration": 1.0,
+"texture": ExtResource("471_super_one_finisher_07")
+}, {
+"duration": 1.0,
 "texture": ExtResource("466_super_one_finisher_02")
 }, {
 "duration": 1.0,
@@ -2638,12 +2640,6 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": ExtResource("470_super_one_finisher_06")
-}, {
-"duration": 1.0,
-"texture": ExtResource("471_super_one_finisher_07")
-}, {
-"duration": 1.0,
-"texture": ExtResource("472_super_one_finisher_08")
 }],
 "loop": false,
 "name": &"super_one_finisher",

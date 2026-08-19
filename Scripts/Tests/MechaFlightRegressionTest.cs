@@ -55,7 +55,7 @@ public partial class MechaFlightRegressionTest : Node2D
 
 	private void ValidateStandaloneBoostAndFlight()
 	{
-		var probe = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/MechaHeitaTest.tscn")
+		var probe = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/MechaHeita.tscn")
 			.Instantiate<SpriteTestFighter>();
 		probe.ReadLocalInput = false;
 		probe.ResetPlaceholderGauges();
@@ -74,13 +74,13 @@ public partial class MechaFlightRegressionTest : Node2D
 			if (use == 0)
 			{
 				Expect(!flight.CanStartAttack(probe, runtime), "boost allowed an attack on frame zero");
-				for (int frame = 0; frame < 6; frame++)
+				for (int frame = 0; frame < 2; frame++)
 				{
 					flight.Tick(probe, runtime, 1f / 60f);
-					Expect(!flight.CanStartAttack(probe, runtime), $"boost allowed an attack before frame 7 ({frame + 1})");
+					Expect(!flight.CanStartAttack(probe, runtime), $"boost allowed an attack before frame 3 ({frame + 1})");
 				}
 				flight.Tick(probe, runtime, 1f / 60f);
-				Expect(flight.CanStartAttack(probe, runtime), "boost did not allow attacks on frame 7");
+				Expect(flight.CanStartAttack(probe, runtime), "boost did not allow attacks on frame 3");
 			}
 			flight.Stop(probe, runtime);
 		}
@@ -107,7 +107,7 @@ public partial class MechaFlightRegressionTest : Node2D
 		flight.Stop(probe, runtime);
 		probe.Free();
 
-		var backwardProbe = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/MechaHeitaTest.tscn")
+		var backwardProbe = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/MechaHeita.tscn")
 			.Instantiate<SpriteTestFighter>();
 		backwardProbe.ReadLocalInput = false;
 		backwardProbe.SetFacing(1);
@@ -154,11 +154,52 @@ public partial class MechaFlightRegressionTest : Node2D
 		Expect(!backwardFlight.CanStart(backwardProbe, backwardRuntime),
 			"flight was restored before landing after a backward boost");
 		backwardProbe.Free();
+
+		var modeProbe = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/MechaHeita.tscn")
+			.Instantiate<SpriteTestFighter>();
+		modeProbe.ReadLocalInput = false;
+		modeProbe.ResetPlaceholderGauges();
+		FlightAbility modeFlight = ResolveFlight(modeProbe);
+		AbilityRuntime modeRuntime = modeProbe.GetRuntime(modeFlight);
+
+		modeProbe.SetExternalInput(FlightInput(0f, 0f, pressed: true));
+		Expect(modeFlight.CanStart(modeProbe, modeRuntime), "button flight press was rejected");
+		modeFlight.Start(modeProbe, modeRuntime);
+		Expect(modeFlight.IsButtonActivatedFlight(modeProbe), "flight press did not activate toggle mode immediately");
+		Expect(modeFlight.ShouldPersistThroughNormal(modeProbe, "LIGHT PUNCH") &&
+			modeFlight.ShouldTickDuringAttack(modeProbe),
+			"button flight does not persist as the fixed-position normal-attack platform");
+		modeProbe.SetExternalInput(FlightInput(0f, 0f, held: false, released: true));
+		Expect(modeFlight.Tick(modeProbe, modeRuntime, 1f / 60f) && modeFlight.IsButtonActivatedFlight(modeProbe),
+			"quick release did not remain in button-toggle flight");
+		modeProbe.SetExternalInput(FlightInput(0f, 0f, pressed: true));
+		Expect(!modeFlight.Tick(modeProbe, modeRuntime, 1f / 60f), "second press did not toggle button flight off");
+		modeFlight.Stop(modeProbe, modeRuntime);
+
+		modeProbe.SetExternalInput(FlightInput(0f, 0f, pressed: true));
+		Expect(modeFlight.CanStart(modeProbe, modeRuntime), "held flight press was rejected");
+		modeFlight.Start(modeProbe, modeRuntime);
+		modeProbe.SetExternalInput(FlightInput(0f, 0f));
+		for (int frame = 1; frame < 20; frame++)
+		{
+			Expect(modeFlight.Tick(modeProbe, modeRuntime, 1f / 60f), $"held flight ended on frame {frame}");
+			Expect(modeFlight.IsButtonActivatedFlight(modeProbe), $"negative edge armed before frame 20 ({frame})");
+		}
+		Expect(modeFlight.Tick(modeProbe, modeRuntime, 1f / 60f) && modeFlight.IsNegativeEdgeFlight(modeProbe),
+			"20-frame hold did not arm negative-edge flight");
+		Expect(!modeFlight.ShouldPersistThroughNormal(modeProbe, "LIGHT PUNCH") &&
+			!modeFlight.ShouldTickDuringAttack(modeProbe),
+			"negative-edge flight incorrectly persists through a normal attack");
+		modeProbe.SetExternalInput(FlightInput(0f, 0f, held: false, released: true));
+		Expect(!modeFlight.Tick(modeProbe, modeRuntime, 1f / 60f),
+			"negative-edge flight did not end on release");
+		modeFlight.Stop(modeProbe, modeRuntime);
+		modeProbe.Free();
 	}
 
 	private SpriteTestFighter Spawn(string name, float x, int facing, int team)
 	{
-		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/MechaHeitaTest.tscn")
+		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/MechaHeita.tscn")
 			.Instantiate<SpriteTestFighter>();
 		fighter.Name = name;
 		fighter.ReadLocalInput = false;
@@ -346,12 +387,14 @@ public partial class MechaFlightRegressionTest : Node2D
 	private void TryFinish()
 	{
 		if (!_mainDone || !_fallDone || !_superFallDone) return;
-		GD.Print("MECHA_FLIGHT_REGRESSION_PASS boosts=3 boost_attack=7f flight_cancel=15f neutral_gate=false hit_boost_cost=16 backward_flight_speed=126 backward_boost_speed=450 backward_boost_cost=2 post_backward_only_forward=true non_flight_landing=2f flight_landing=full normal_jump_fall_normals_locked=true super_jump_fall_normals_locked=true");
+		GD.Print("MECHA_FLIGHT_REGRESSION_PASS press=immediate_toggle hold=20f_negative_edge release=off boosts=3 boost_attack=3f flight_cancel=15f neutral_gate=false hit_boost_cost=16 backward_flight_speed=126 backward_boost_speed=450 backward_boost_cost=2 post_backward_only_forward=true non_flight_landing=2f flight_landing=full normal_jump_fall_normals_locked=true super_jump_fall_normals_locked=true");
 		GetTree().Quit();
 	}
 
-	private static FighterInput FlightInput(float horizontal, float vertical, bool pressed = false) =>
-		new(horizontal, vertical, false, false, false, false, special1Pressed: pressed, special1Held: true);
+	private static FighterInput FlightInput(float horizontal, float vertical, bool pressed = false,
+		bool held = true, bool released = false) =>
+		new(horizontal, vertical, false, false, false, false,
+			special1Pressed: pressed, special1Held: held, special1Released: released);
 
 	private static void Expect(bool condition, string message)
 	{

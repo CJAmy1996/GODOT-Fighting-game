@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ce7wn1k0cc3x7"
+path="res://.godot/imported/SE_025 (Level up super).mp3-6a1d9c1a3d2eab2f2fb3e723a3b6feec.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_025 (Level up super).mp3"
+dest_files=["res://.godot/imported/SE_025 (Level up super).mp3-6a1d9c1a3d2eab2f2fb3e723a3b6feec.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

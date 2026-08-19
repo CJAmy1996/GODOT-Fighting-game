@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://fm6xbpwyvhnb" path="res://Scripts/Core/SuperMoveData.cs" id="1_super"]
 [ext_resource type="Script" uid="uid://b60x15w1xhb6k" path="res://Scripts/Core/MotionInputBinding.cs" id="2_binding"]
 [ext_resource type="Resource" path="res://Data/Motions/double_quarter_circle_forward.tres" id="3_motion"]
-[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/m_heita_sprite_frames.tres" id="4_frames"]
+[ext_resource type="SpriteFrames" uid="uid://cr7hqa3fqrdxh" path="res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/m_heita_sprite_frames.tres" id="4_frames"]
 [ext_resource type="PackedScene" uid="uid://c3rola7qcu05q" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_full_fire_paths.tscn" id="5_paths"]
 [ext_resource type="SpriteFrames" path="res://Assets/Effects/BigBangSystemFire/bigbang_system_fire_frames.tres" id="6_system_fire"]
 

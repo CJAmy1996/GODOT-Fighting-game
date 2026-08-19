@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dq3dr7ff5uuyn"
+path="res://.godot/imported/SE_120 (electricuted).mp3-df51da96319690a9298f7fc64b3405a0.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_120 (electricuted).mp3"
+dest_files=["res://.godot/imported/SE_120 (electricuted).mp3-df51da96319690a9298f7fc64b3405a0.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -8,6 +8,7 @@ public partial class SuperMoveData : Resource
 {
 	[Export] public string AttackName { get; set; } = "";
 	[Export] public string AnimationName { get; set; } = "";
+	[Export(PropertyHint.Range, "1,3,1")] public int Level { get; set; } = 1;
 	[ExportGroup("Command Input")]
 	[Export] public MotionInputBinding CommandInput { get; set; }
 	[ExportGroup("Timeline / Hit Data")]

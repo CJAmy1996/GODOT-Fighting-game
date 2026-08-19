@@ -33,4 +33,6 @@ public partial class MovementTuning : Resource
 	[ExportGroup("Timing (frames at 60 fps)")]
 	[Export] public int CoyoteFrames { get; set; } = 3;
 	[Export] public int InputBufferFrames { get; set; } = 3;
+	/// <summary>How long a completed motion may wait for a buffered normal-to-special cancel.</summary>
+	[Export] public int SpecialCancelBufferFrames { get; set; } = 8;
 }

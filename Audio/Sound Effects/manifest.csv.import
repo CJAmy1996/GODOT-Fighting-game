@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://blnv804xmdx8t"
+
+[deps]
+
+files=["res://Audio/Sound Effects/manifest.filename.translation", "res://Audio/Sound Effects/manifest.source.translation", "res://Audio/Sound Effects/manifest.source.translation", "res://Audio/Sound Effects/manifest.clip.translation", "res://Audio/Sound Effects/manifest.clip.translation", "res://Audio/Sound Effects/manifest.clip.translation"]
+
+source_file="res://Audio/Sound Effects/manifest.csv"
+dest_files=["res://Audio/Sound Effects/manifest.filename.translation", "res://Audio/Sound Effects/manifest.source.translation", "res://Audio/Sound Effects/manifest.source.translation", "res://Audio/Sound Effects/manifest.clip.translation", "res://Audio/Sound Effects/manifest.clip.translation", "res://Audio/Sound Effects/manifest.clip.translation"]
+
+[params]
+
+compress=true
+delimiter=0

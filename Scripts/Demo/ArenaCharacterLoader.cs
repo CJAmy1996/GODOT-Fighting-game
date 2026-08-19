@@ -1,83 +1,72 @@
 using Godot;
+using ModularFighter.Characters;
+using ModularFighter.Core;
 
 namespace ModularFighter.Demo;
 
-/// <summary>Replaces the arena's Player 1 placeholder before dependent children enter the tree.</summary>
+/// <summary>Loads only the two fighters participating in the current match.</summary>
 public partial class ArenaCharacterLoader : Node2D
 {
-	public enum CharacterChoice
-	{
-		KungFuMan,
-		Sanzou,
-		Kinako,
-		Senna,
-		MechaHeita,
-		Kunagi,
-		Daigo,
-		Rouga,
-		Kamui,
-		Heita,
-		Agito
-	}
+	private const string KungFuManPath = "res://Scenes/Characters/KungFuMan.tscn";
+	private const string SanzouPath = "res://Scenes/Characters/SanzoKongoumaru.tscn";
 
+	public enum CharacterChoice { KungFuMan, Sanzou, Kinako, Senna, MechaHeita, Kunagi, Daigo, Rouga, Kamui, Heita, Agito }
 	public static CharacterChoice SelectedCharacter { get; set; } = CharacterChoice.KungFuMan;
+	// Kept as a non-exported test injection seam; production scenes never preload it.
+	public PackedScene SanzouScene { get; set; }
 
-	[Export] public PackedScene KungFuManScene { get; set; }
-	[Export] public PackedScene SanzouScene { get; set; }
-	[Export] public PackedScene KinakoScene { get; set; }
-	[Export] public PackedScene SennaScene { get; set; }
-	[Export] public PackedScene MechaHeitaScene { get; set; }
-	[Export] public PackedScene KunagiScene { get; set; }
-	[Export] public PackedScene DaigoScene { get; set; }
-	[Export] public PackedScene RougaScene { get; set; }
-	[Export] public PackedScene KamuiScene { get; set; }
-	[Export] public PackedScene HeitaScene { get; set; }
-	[Export] public PackedScene AgitoScene { get; set; }
+	public override void _Ready() => GetNodeOrNull<Node>("/root/AudioController")?.Call("play_music");
 
 	public override void _EnterTree()
 	{
-		if (SelectedCharacter != CharacterChoice.KungFuMan)
+		PackedScene selectedScene = SelectedCharacter == CharacterChoice.Sanzou && SanzouScene != null
+			? SanzouScene
+			: ResourceLoader.Load<PackedScene>(GetSelectedScenePath());
+		PackedScene opponentScene = SanzouScene ?? ResourceLoader.Load<PackedScene>(SanzouPath);
+		if (selectedScene == null || opponentScene == null)
 		{
-			// The arena clone prototype belongs only to Kung Fu Man. Imported
-			// fighters are independent staging characters and must not inherit it.
-			Node cloneController = GetNodeOrNull("NarutoCloneController");
-			if (cloneController != null)
-			{
-				RemoveChild(cloneController);
-				cloneController.Free();
-			}
+			GD.PushError("The selected match fighters could not be loaded.");
+			return;
 		}
-
-		Node oldFighter = GetNodeOrNull("Fighter");
-		if (oldFighter == null) return;
-
-		PackedScene selectedScene = GetSelectedScene();
-		if (selectedScene == null) return;
-
-		int siblingIndex = oldFighter.GetIndex();
-		Vector2 spawnPosition = oldFighter is Node2D oldNode ? oldNode.Position : new Vector2(420, 570);
-		RemoveChild(oldFighter);
-		oldFighter.Free();
 
 		Node2D fighter = selectedScene.Instantiate<Node2D>();
 		fighter.Name = "Fighter";
-		fighter.Position = spawnPosition;
+		fighter.Position = new Vector2(420, 570);
 		AddChild(fighter);
-		MoveChild(fighter, siblingIndex);
+
+		Node2D opponent = opponentScene.Instantiate<Node2D>();
+		opponent.Name = "Opponent";
+		opponent.Position = new Vector2(860, 570);
+		if (opponent is FighterController opponentController) opponentController.ReadLocalInput = false;
+		AddChild(opponent);
+
+		Node cloneNode = GetNodeOrNull("NarutoCloneController");
+		if (SelectedCharacter != CharacterChoice.KungFuMan)
+		{
+			if (cloneNode != null)
+			{
+				RemoveChild(cloneNode);
+				cloneNode.Free();
+			}
+		}
+		else if (cloneNode is NarutoCloneController clones)
+		{
+			clones.CloneScene = selectedScene;
+		}
 	}
 
-	private PackedScene GetSelectedScene() => SelectedCharacter switch
+	private static string GetSelectedScenePath() => SelectedCharacter switch
 	{
-		CharacterChoice.Sanzou => SanzouScene,
-		CharacterChoice.Kinako => KinakoScene,
-		CharacterChoice.Senna => SennaScene,
-		CharacterChoice.MechaHeita => MechaHeitaScene,
-		CharacterChoice.Kunagi => KunagiScene,
-		CharacterChoice.Daigo => DaigoScene,
-		CharacterChoice.Rouga => RougaScene,
-		CharacterChoice.Kamui => KamuiScene,
-		CharacterChoice.Heita => HeitaScene,
-		CharacterChoice.Agito => AgitoScene,
-		_ => KungFuManScene
+		CharacterChoice.Sanzou => SanzouPath,
+		CharacterChoice.Kinako => "res://Scenes/Characters/Kinako.tscn",
+		CharacterChoice.Senna => "res://Scenes/Characters/Senna.tscn",
+		CharacterChoice.MechaHeita => "res://Scenes/Characters/MechaHeita.tscn",
+		CharacterChoice.Kunagi => "res://Scenes/Characters/Kunagi.tscn",
+		CharacterChoice.Daigo => "res://Scenes/Characters/Daigo.tscn",
+		CharacterChoice.Rouga => "res://Scenes/Characters/Rouga.tscn",
+		CharacterChoice.Kamui => "res://Scenes/Characters/Kamui.tscn",
+		CharacterChoice.Heita => "res://Scenes/Characters/Heita.tscn",
+		CharacterChoice.Agito => "res://Scenes/Characters/Agito.tscn",
+		_ => KungFuManPath
 	};
 }

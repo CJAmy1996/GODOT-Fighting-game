@@ -10,7 +10,7 @@ public partial class MechaWinAnimationRegressionTest : Node
 	{
 		try
 		{
-			SpriteTestFighter fighter = GD.Load<PackedScene>("res://Scenes/TestCharacters/MechaHeitaTest.tscn")
+			SpriteTestFighter fighter = GD.Load<PackedScene>("res://Scenes/Characters/MechaHeita.tscn")
 				.Instantiate<SpriteTestFighter>();
 			AddChild(fighter);
 			fighter.BeginWinAnimation();
@@ -19,7 +19,7 @@ public partial class MechaWinAnimationRegressionTest : Node
 				fighter.CharacterSprite.IsPlaying() && Mathf.IsEqualApprox(fighter.CharacterSprite.SpeedScale, 1f),
 				"Mecha win animation did not start before KO physics was disabled");
 
-			SpriteTestFighter defeated = GD.Load<PackedScene>("res://Scenes/TestCharacters/MechaHeitaTest.tscn")
+			SpriteTestFighter defeated = GD.Load<PackedScene>("res://Scenes/Characters/MechaHeita.tscn")
 				.Instantiate<SpriteTestFighter>();
 			AddChild(defeated);
 			defeated.BeginDefeatedKoState();

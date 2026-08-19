@@ -27,7 +27,7 @@ public partial class VersusStageRules : Node
 	[Export] public float UniversalSuperShakeStrength { get; set; } = 8.5f;
 	[Export(PropertyHint.Range, "0.1,3.0,0.05")] public float UniversalSuperCancelEffectScale { get; set; } = 1f;
 	[Export(PropertyHint.Range, "1.0,8.0,0.1")] public float HyperComboFinishMinimumSeconds { get; set; } = 4f;
-	[Export(PropertyHint.Range, "0.1,1.0,0.05")] public float FinishingSuperTimeScale { get; set; } = 0.5f;
+	[Export(PropertyHint.Range, "0.1,1.0,0.05")] public float FinishingSuperTimeScale { get; set; } = 0.2f;
 	[Export] public float StageWidth { get; set; } = 3360f;
 	[Export] public float ViewportWidth { get; set; } = 1280f;
 	[Export] public float CornerPushbackTransferStartDistance { get; set; } = 28f;
@@ -94,14 +94,17 @@ public partial class VersusStageRules : Node
 	private readonly List<FighterController> _primaryTeam = new();
 	private double _koResetCountdown;
 	private FighterController _koWinner;
+	private FighterController _koDefeated;
 	private HyperComboFinishOverlay _hyperComboFinishOverlay;
 	private FighterController _pendingSuperKoAttacker;
 	private bool _pendingSuperKo;
+	private bool _pendingDefeatedKoStarted;
 	private float _fighterOneRecoveryDelay;
 	private float _fighterTwoRecoveryDelay;
 	private float _fighterOneLastLife;
 	private float _fighterTwoLastLife;
 	private bool _finishingSuperSlowMotionActive;
+	private FighterController _finishingSuperTimelineAttacker;
 	private double _timeScaleBeforeFinishingSuper = 1.0;
 
 	public void SetPrimaryFighter(FighterController fighter)
@@ -174,7 +177,7 @@ public partial class VersusStageRules : Node
 				!_pendingSuperKoAttacker.CurrentAttackTriggersHyperComboFinish;
 			if (superMoveDone)
 			{
-				RestoreFinishingSuperTimeScale();
+				StartPendingDefeatedKo();
 				_hyperComboFinishOverlay?.RequestOutro();
 			}
 			bool finishAnimationDone = _hyperComboFinishOverlay?.IsFinished == true;
@@ -187,6 +190,7 @@ public partial class VersusStageRules : Node
 			_koResetCountdown -= delta;
 			if (_koResetCountdown <= 0.0 &&
 				(_koWinner == null || _koWinner.WinAnimationFinished) &&
+				(_koDefeated == null || _koDefeated.DefeatedKoSettled) &&
 				(_hyperComboFinishOverlay == null || _hyperComboFinishOverlay.IsFinished))
 				GetTree().ReloadCurrentScene();
 			return;
@@ -298,13 +302,14 @@ public partial class VersusStageRules : Node
 
 		// Presentation rules belong to the match, not to an individual character.
 		// Move data may request a longer backdrop for a long cinematic, but every
-		// super receives the same ignition freeze, portrait, rings, and backdrop.
+		// super receives the same ignition freeze, portrait, source impact, and backdrop.
 		int freezeFrames = Mathf.Max(1, UniversalSuperFreezeFrames);
 		int backdropFrames = Mathf.Max(UniversalSuperBackdropMinimumFrames,
 			Mathf.Max(firstBackdropFrames, secondBackdropFrames));
 		FighterController activatingFighter = firstSuper ? _fighterOne : _fighterTwo;
 		FighterController otherFighter = activatingFighter == _fighterOne ? _fighterTwo : _fighterOne;
-		// Portrait ignition and its collapsing spark rings are shared by every
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("play_super_activation");
+		// Portrait ignition and the source-authored BBB impact are shared by every
 		// super, including supers with a zero-frame gameplay freeze.
 		SpawnSuperPortrait(activatingFighter, otherFighter, Mathf.Max(1, freezeFrames));
 		SpawnBigBangSuperCancelEffect(activatingFighter);
@@ -414,10 +419,10 @@ public partial class VersusStageRules : Node
 
 	private bool CanAutoFaceOpponent(FighterController fighter, FighterController opponent)
 	{
-		// Preserve facing through a cross-up. A grounded defender must manually
-		// switch from back to the opposite direction when an airborne attacker
-		// passes over them; both sides may auto-correct once that attacker lands.
-		if (!IsGroundedForPushbox(opponent)) return false;
+		// The match resolver must obey the same action lock as the fighter. In particular,
+		// run -> normal is one continuous committed sequence and cannot turn at the handoff.
+		if (!fighter.CanAdoptFacingTowardOpponent(fighter.CurrentInput, IsGroundedForPushbox(opponent)))
+			return false;
 		return fighter.WasGrounded || fighter.JustLanded ||
 			!fighter.SuppressesGroundedPushWhileAirborne || fighter.EnablesAirControlWhileAirborne;
 	}
@@ -583,7 +588,10 @@ public partial class VersusStageRules : Node
 			TryApplyJuggleWallSplat(attacker, defender, pushback);
 		if (!attacker.IsPerformingThrow) ApplyCornerPushbackTransfer(attacker, defender, pushback);
 		if (attacker.LastContactWasBlocked)
+		{
 			_hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing, attacker.LastContactWasInstantBlocked);
+			PlayBlockSound(defender, attacker.LastContactWasInstantBlocked);
+		}
 		else
 		{
 			if (!attacker.IsPerformingThrow) _hitSparkLayer?.Spawn(hitPoint, heavySpark, attacker.CurrentHitSparkScene, attacker.Facing);
@@ -744,6 +752,8 @@ public partial class VersusStageRules : Node
 			if (!projectile.OwnerFighter.TryApplyProjectileHit(defender, projectile.WorldHitbox, projectile.HitstunFrames, projectile.Pushback,
 				projectile.HitstopFrames, projectile.ShakeStrength,
 				finalProjectileHit && projectile.FinalHitKnocksDown, projectile.FinalKnockdownType, projectile.FinalKnockdownFrames,
+				projectile.Launches, projectile.LaunchGroundedOnly, projectile.LaunchSpeed,
+				projectile.LaunchPushback, projectile.LaunchHitstunFrames,
 				out int hitstop, out float shake, out _, out Vector2 hitPoint, out bool heavySpark)) continue;
 
 			if (hitstop > 0) defender.RequestHitstop(hitstop);
@@ -759,8 +769,11 @@ public partial class VersusStageRules : Node
 			else if (shake > 0f)
 				_fightCamera?.Shake(shake, hitstop);
 			if (projectile.OwnerFighter.LastContactWasBlocked)
+			{
 				_hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing,
 					projectile.OwnerFighter.LastContactWasInstantBlocked);
+				PlayBlockSound(defender, projectile.OwnerFighter.LastContactWasInstantBlocked);
+			}
 			else
 			{
 				_hitSparkLayer?.Spawn(hitPoint, heavySpark, projectile.OwnerFighter.Facing);
@@ -769,6 +782,12 @@ public partial class VersusStageRules : Node
 			}
 			projectile.MarkHit(defender, hitPoint);
 		}
+	}
+
+	private void PlayBlockSound(FighterController defender, bool instantBlock)
+	{
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("play_block",
+			(int)(defender?.CurrentGuardReactionStrength ?? GuardReactionStrength.Weak), instantBlock);
 	}
 
 	private void CheckForKo(bool killedBySuper, FighterController superAttacker = null)
@@ -785,13 +804,15 @@ public partial class VersusStageRules : Node
 				_hyperComboFinishOverlay = new HyperComboFinishOverlay
 				{
 					Name = HyperComboFinishOverlayName,
-					MinimumPresentationSeconds = Mathf.Max(0.1f, HyperComboFinishMinimumSeconds)
+					MinimumPresentationSeconds = Mathf.Max(0.1f, HyperComboFinishMinimumSeconds),
+					UseLevel3Palette = superAttacker?.CurrentSuperLevel >= 3
 				};
 				_hyperComboFinishOverlay.SetArenaBackdrop(
 					GetParent().GetNodeOrNull<CanvasItem>("ArenaBackdrop"));
 				_hyperComboFinishOverlay.SetFightCamera(_fightCamera);
 				GetParent().AddChild(_hyperComboFinishOverlay);
 			}
+			_hyperComboFinishOverlay.TunnelEnded += RestoreFinishingSuperTimeScale;
 			if (GodotObject.IsInstanceValid(_superBackdrop))
 			{
 				_superBackdrop.QueueFree();
@@ -802,16 +823,30 @@ public partial class VersusStageRules : Node
 		}
 		_pendingSuperKo = true;
 		_pendingSuperKoAttacker = null;
+		_pendingDefeatedKoStarted = false;
 		_hyperComboFinishOverlay = GetParent().GetNodeOrNull<HyperComboFinishOverlay>(HyperComboFinishOverlayName);
 		if (_hyperComboFinishOverlay == null)
 		{
-			_hyperComboFinishOverlay = new HyperComboFinishOverlay { Name = HyperComboFinishOverlayName };
+			_hyperComboFinishOverlay = new HyperComboFinishOverlay
+			{
+				Name = HyperComboFinishOverlayName,
+				PlayAnnouncerVoice = false
+			};
 			_hyperComboFinishOverlay.SetArenaBackdrop(
 				GetParent().GetNodeOrNull<CanvasItem>("ArenaBackdrop"));
 			_hyperComboFinishOverlay.SetFightCamera(_fightCamera);
 			GetParent().AddChild(_hyperComboFinishOverlay);
 		}
 		_hyperComboFinishOverlay.StartNormalKoImpact();
+		StartPendingDefeatedKo();
+	}
+
+	private void StartPendingDefeatedKo()
+	{
+		if (_pendingDefeatedKoStarted) return;
+		_pendingDefeatedKoStarted = true;
+		FighterController defeated = _fighterOne.PlaceholderLife <= 0f ? _fighterOne : _fighterTwo;
+		defeated?.BeginDefeatedKoState();
 	}
 
 	private void BeginOfficialKo()
@@ -821,17 +856,18 @@ public partial class VersusStageRules : Node
 		_pendingSuperKoAttacker = null;
 		IsKoActive = true;
 		_koWinner = _fighterOne.PlaceholderLife > 0f ? _fighterOne : _fighterTwo;
-		FighterController defeated = _koWinner == _fighterOne ? _fighterTwo : _fighterOne;
-		defeated?.BeginDefeatedKoState();
+		_koDefeated = _koWinner == _fighterOne ? _fighterTwo : _fighterOne;
+		StartPendingDefeatedKo();
 		_koWinner?.BeginWinAnimation();
 		_koResetCountdown = Mathf.Max(0.1f, KoResetDelaySeconds);
-		_fighterOne.SetPhysicsProcess(false);
-		_fighterTwo.SetPhysicsProcess(false);
+		_koWinner?.SetPhysicsProcess(false);
 	}
 
 	private void BeginFinishingSuperSlowMotion()
 	{
 		if (_finishingSuperSlowMotionActive) return;
+		_finishingSuperTimelineAttacker = _pendingSuperKoAttacker;
+		_finishingSuperTimelineAttacker?.SetFinishingSuperTimelineSlow(true);
 		_timeScaleBeforeFinishingSuper = Engine.TimeScale;
 		Engine.TimeScale = Mathf.Clamp(FinishingSuperTimeScale, 0.1f, 1f);
 		_finishingSuperSlowMotionActive = true;
@@ -839,6 +875,8 @@ public partial class VersusStageRules : Node
 
 	private void RestoreFinishingSuperTimeScale()
 	{
+		_finishingSuperTimelineAttacker?.SetFinishingSuperTimelineSlow(false);
+		_finishingSuperTimelineAttacker = null;
 		if (!_finishingSuperSlowMotionActive) return;
 		Engine.TimeScale = _timeScaleBeforeFinishingSuper;
 		_finishingSuperSlowMotionActive = false;
@@ -872,7 +910,8 @@ public partial class VersusStageRules : Node
 
 	internal static void ApplyHitstopForHit(FighterController attacker, FighterController defender, int attackerHitlag)
 	{
-		bool jumpInHitGroundedDefender = attacker.CurrentAttackStartedAirborne && defender.WasGrounded;
+		bool jumpInHitGroundedDefender = attacker.CurrentAttackStartedAirborne && defender.WasGrounded &&
+			!attacker.IsInButtonFlight;
 		if (attackerHitlag > 0)
 			attacker.RequestHitstop(attackerHitlag, continueVerticalPhysics: jumpInHitGroundedDefender);
 		int defenderHitstop = attacker.LastContactDefenderHitstopFrames;

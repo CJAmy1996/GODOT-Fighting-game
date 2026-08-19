@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://b6ueeunbrnur7"
+path="res://.godot/imported/SE_057 (heavy footstep).mp3-11a88d0f4de068dd20ac2130b515db81.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_057 (heavy footstep).mp3"
+dest_files=["res://.godot/imported/SE_057 (heavy footstep).mp3-11a88d0f4de068dd20ac2130b515db81.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

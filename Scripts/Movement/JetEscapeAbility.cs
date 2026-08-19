@@ -36,6 +36,8 @@ public partial class JetEscapeAbility : MovementAbility
 	{
 		if (!fighter.TrySpendPlaceholderSpecialMeter(GasCost)) return;
 		base.Start(fighter, runtime);
+		if (fighter.IsInsideTree())
+			fighter.GetNodeOrNull<Node>("/root/AudioController")?.Call("play_mecha_boost");
 		runtime.FramesRemaining = Mathf.Max(1, ActiveFrames);
 		float direction = Direction == JetEscapeDirection.Forward ? fighter.Facing : -fighter.Facing;
 		fighter.Velocity = new Vector2(direction * Speed, -Mathf.Abs(VerticalSpeed));

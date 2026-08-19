@@ -39,7 +39,7 @@ public partial class SanzouTimingAndJumpRegressionTest : Node2D
 
 	private FighterController Spawn(string name, float x, int facing, int team)
 	{
-		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn")
+		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
 			.Instantiate<FighterController>();
 		fighter.Name = name;
 		fighter.ReadLocalInput = false;
@@ -145,9 +145,17 @@ public partial class SanzouTimingAndJumpRegressionTest : Node2D
 	{
 		var definition = ResourceLoader.Load<FighterDefinition>("res://Data/Characters/Sanzo/sanzo_kongoumaru.tres");
 		var rawSuperJump = ResourceLoader.Load<SuperJumpAbility>("res://Data/Characters/Sanzo/sanzo_super_jump.tres");
+		var mechaSuperJump = ResourceLoader.Load<SuperJumpAbility>(
+			"res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_super_jump.tres");
 		NormalMoveData downHeavy = definition.NormalMoves.FindRule(FighterController.CrouchingHeavyPunchName, true, false);
 		Expect(downHeavy != null && Mathf.IsEqualApprox(rawSuperJump.InitialSpeed, downHeavy.ChaseJumpSpeed),
 			"raw super-jump speed does not equal the down+HP chase jump speed");
+		Expect(Mathf.IsEqualApprox(rawSuperJump.ForwardSpeed, 385f),
+			$"Sanzou super-jump forward speed leaked to {rawSuperJump.ForwardSpeed:0.##}");
+		Expect(mechaSuperJump != null && !ReferenceEquals(rawSuperJump, mechaSuperJump) &&
+			Mathf.IsEqualApprox(mechaSuperJump.InitialSpeed, 1440f) &&
+			Mathf.IsEqualApprox(rawSuperJump.InitialSpeed, 1265f),
+			"Sanzou and Mecha Heita no longer have independent super-jump tuning");
 	}
 
 	private static void Expect(bool condition, string message)

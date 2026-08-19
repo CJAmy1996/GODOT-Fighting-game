@@ -29,4 +29,8 @@ public partial class SuperJumpAbility : MovementAbility
 		fighter.QueueGroundJumpStartEffect(isSuperJump: true);
 		fighter.Velocity = new Vector2(fighter.CurrentInput.Horizontal * ForwardSpeed, -InitialSpeed);
 	}
+
+	// Super jumps are command launches, not held-button variable-height jumps.
+	// The launch speed is committed in Start even if Jump is released next frame.
+	public override bool Tick(FighterController fighter, AbilityRuntime runtime, float delta) => false;
 }

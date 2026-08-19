@@ -70,7 +70,7 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 
 	private FighterController Spawn(string name, float x, int facing, int team)
 	{
-		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn")
+		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
 			.Instantiate<FighterController>();
 		fighter.Name = name;
 		fighter.ReadLocalInput = false;
@@ -89,7 +89,7 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 		{
 			Name = "SanzouLoaderProbe",
 			ProcessMode = ProcessModeEnum.Disabled,
-			SanzouScene = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn")
+			SanzouScene = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
 		};
 		loader.AddChild(new Node2D { Name = "Fighter" });
 		loader.AddChild(new Node { Name = "NarutoCloneController" });
@@ -140,7 +140,7 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 						"res://Assets/TestFighter/Sanzo/sanzou_kongoumaru/9999.png"),
 						"Sanzou Super 1 did not select 9999.png for its activation cut-in");
 					Expect(portrait.GetNodeOrNull<SuperActivationRings>("ForegroundActivationRings") != null,
-						"Sanzou's super did not receive the universal Kung Fu Man activation spark/rings");
+						"Sanzou's super did not retain its portrait-container border");
 					BigBangSuperCancelEffect superCancel = GetNodeOrNull<BigBangSuperCancelEffect>(
 						"UniversalBigBangSuperCancelEffect");
 					Expect(superCancel != null && superCancel.CurrentInnerFrame is >= 0 and <= 7 &&

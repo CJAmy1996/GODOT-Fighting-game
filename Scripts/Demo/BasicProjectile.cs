@@ -28,6 +28,11 @@ public partial class BasicProjectile : Node2D
 	public KnockdownType FinalKnockdownType { get; private set; } = KnockdownType.SoftKnockdown;
 	public int FinalKnockdownFrames { get; private set; }
 	public bool LatchOnMultiHit { get; private set; } = true;
+	public bool Launches { get; private set; }
+	public bool LaunchGroundedOnly { get; private set; }
+	public float LaunchSpeed { get; private set; }
+	public float LaunchPushback { get; private set; }
+	public int LaunchHitstunFrames { get; private set; }
 	public Rect2 WorldHitbox
 	{
 		get
@@ -99,6 +104,15 @@ public partial class BasicProjectile : Node2D
 		if (Super) HitboxLocal = new Rect2(-36f, -34f, 72f, 68f);
 	}
 
+	public void ConfigureLaunch(bool launches, bool groundedOnly, float launchSpeed, float launchPushback, int launchHitstunFrames)
+	{
+		Launches = launches;
+		LaunchGroundedOnly = groundedOnly;
+		LaunchSpeed = Mathf.Max(0f, launchSpeed);
+		LaunchPushback = Mathf.Max(0f, launchPushback);
+		LaunchHitstunFrames = Mathf.Max(1, launchHitstunFrames);
+	}
+
 	public override void _PhysicsProcess(double delta)
 	{
 		_ageFrames++;
@@ -125,7 +139,6 @@ public partial class BasicProjectile : Node2D
 		UpdateAuthoredVisualTransform();
 		LifetimeFrames--;
 		if (LifetimeFrames <= 0) QueueFree();
-		QueueRedraw();
 	}
 
 	public void MarkHit(FighterController defender = null, Vector2? contactPoint = null)
@@ -173,6 +186,8 @@ public partial class BasicProjectile : Node2D
 	{
 		if (_impactFrames == null || string.IsNullOrWhiteSpace(_impactAnimationName) ||
 			!_impactFrames.HasAnimation(_impactAnimationName)) return;
+		if (_impactAnimationName.Contains("explosion", System.StringComparison.OrdinalIgnoreCase))
+			GetNodeOrNull<Node>("/root/AudioController")?.Call("play_explosion");
 		Node effectHost = GetParent();
 		if (effectHost == null) return;
 		var effect = new MoveVisualEffect
@@ -277,16 +292,4 @@ public partial class BasicProjectile : Node2D
 		_hitCooldownFramesLeft = 2;
 	}
 
-	public override void _Draw()
-	{
-		if (_authoredVisual != null) return;
-		Color core = Super ? new Color(0.68f, 0.92f, 1f, 0.96f) : Heavy ? new Color(0.35f, 0.72f, 1f, 0.95f) : new Color(1f, 0.82f, 0.2f, 0.95f);
-		Color edge = Super ? new Color(1f, 1f, 1f, 0.82f) : Heavy ? new Color(0.82f, 0.95f, 1f, 0.75f) : new Color(1f, 0.35f, 0.08f, 0.75f);
-		float radius = Super ? 36f : Heavy ? 17f : 13f;
-		DrawCircle(Vector2.Zero, radius, core);
-		DrawArc(Vector2.Zero, radius + (Super ? 10f : 5f), 0f, Mathf.Tau, Super ? 36 : 24, edge, Super ? 7f : Heavy ? 4f : 3f, true);
-		DrawLine(new Vector2(-Direction * (radius + (Super ? 42f : 16f)), 0f), new Vector2(-Direction * radius * 0.35f, 0f), edge, Super ? 10f : Heavy ? 5f : 3f, true);
-		if (Super)
-			DrawArc(Vector2.Zero, radius * 0.62f, 0f, Mathf.Tau, 28, new Color(0.25f, 0.55f, 1f, 0.9f), 5f, true);
-	}
 }

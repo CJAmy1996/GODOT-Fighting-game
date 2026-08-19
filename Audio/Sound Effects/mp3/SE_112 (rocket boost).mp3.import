@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dpmaydnnvopye"
+path="res://.godot/imported/SE_112 (rocket boost).mp3-714146d4d33ba500842f1061cc54510d.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_112 (rocket boost).mp3"
+dest_files=["res://.godot/imported/SE_112 (rocket boost).mp3-714146d4d33ba500842f1061cc54510d.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

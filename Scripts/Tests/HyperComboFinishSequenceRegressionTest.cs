@@ -10,12 +10,25 @@ public partial class HyperComboFinishSequenceRegressionTest : Node
 	{
 		try
 		{
+			SpriteFrames normalFrames = ResourceLoader.Load<SpriteFrames>(
+				"res://Assets/Effects/BigBangCommon/hyper_combo_finish_frames.tres");
+			SpriteFrames level3Frames = ResourceLoader.Load<SpriteFrames>(
+				"res://Assets/Effects/BigBangCommon/hyper_combo_finish_level3_frames.tres");
+			Expect(normalFrames.HasAnimation("hyper_combo_finish_activation") &&
+				!normalFrames.HasAnimation("hyper_combo_finish_explosion"),
+				"normal hyper finish still contains the Level 3-only explosion");
+			Expect(level3Frames.HasAnimation("hyper_combo_finish_activation") &&
+				level3Frames.HasAnimation("hyper_combo_finish_explosion"),
+				"Level 3 hyper finish lost its explosion sequence");
+
 			var arena = new ColorRect { Name = "ArenaBackdrop", Modulate = new Color(0.8f, 0.9f, 1f, 0.75f) };
 			AddChild(arena);
-			var finish = new HyperComboFinishOverlay { Name = "Finish" };
+			var finish = new HyperComboFinishOverlay { Name = "Finish", UseLevel3Palette = true };
 			finish.SetArenaBackdrop(arena);
 			AddChild(finish);
 			finish.SetProcess(false);
+			AudioStreamPlayer announcer = finish.GetNode<AudioStreamPlayer>("HyperComboFinishAnnouncer");
+			Expect(announcer.Stream != null, "hyper-combo finish announcer voice was not loaded");
 			Expect(Mathf.IsZeroApprox(arena.Modulate.A), "arena was not hidden beneath the finish background");
 
 			for (int tick = 0; tick < 50; tick++) finish._Process(1.0 / 60.0);

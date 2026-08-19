@@ -26,7 +26,7 @@ public partial class SanzouStompRegressionTest : Node2D
 		floor.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = new Vector2(1200f, 20f) } });
 		AddChild(floor);
 
-		_sanzou = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn")
+		_sanzou = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
 			.Instantiate<SanzoKongoumaruFighter>();
 		_sanzou.Name = "Sanzou";
 		_sanzou.ReadLocalInput = false;
@@ -37,7 +37,7 @@ public partial class SanzouStompRegressionTest : Node2D
 		AddChild(_sanzou);
 		_sanzou.ResetPlaceholderGauges();
 
-		_defender = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/KungFuManTest.tscn")
+		_defender = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/KungFuMan.tscn")
 			.Instantiate<FighterController>();
 		_defender.Name = "Defender";
 		_defender.ReadLocalInput = false;

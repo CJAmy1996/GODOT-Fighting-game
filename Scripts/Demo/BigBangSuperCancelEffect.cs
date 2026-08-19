@@ -20,7 +20,9 @@ public partial class BigBangSuperCancelEffect : Node2D
 	private readonly Texture2D[] _outerTextures = new Texture2D[LightningDrawingCount];
 	private readonly Texture2D[] _coreTextures = new Texture2D[CoreDrawingCount];
 	private Sprite2D _inner;
+	private Sprite2D _innerOpposite;
 	private Sprite2D _outer;
+	private Sprite2D _outerQuarterTurn;
 	private Sprite2D _core;
 	private int _age;
 
@@ -43,7 +45,11 @@ public partial class BigBangSuperCancelEffect : Node2D
 
 		_greenKeyShader ??= CreateGreenKeyShader();
 		_inner = CreateLayer("InnerLightning", zIndex: 0);
-		_outer = CreateLayer("OuterLightning", zIndex: 1);
+		_innerOpposite = CreateLayer("InnerLightningOpposite", zIndex: 0);
+		_innerOpposite.Rotation = Mathf.Pi;
+		_outer = CreateLayer("OuterLightning", zIndex: 1, scale: 0.5f);
+		_outerQuarterTurn = CreateLayer("OuterLightningQuarterTurn", zIndex: 1, scale: 0.5f);
+		_outerQuarterTurn.Rotation = Mathf.Pi * 0.5f;
 		_core = CreateLayer("ImpactRing", zIndex: 2);
 		ApplyTick();
 	}
@@ -64,7 +70,7 @@ public partial class BigBangSuperCancelEffect : Node2D
 		ApplyTick();
 	}
 
-	private Sprite2D CreateLayer(string name, int zIndex)
+	private Sprite2D CreateLayer(string name, int zIndex, float scale = 1f)
 	{
 		var layer = new Sprite2D
 		{
@@ -72,12 +78,10 @@ public partial class BigBangSuperCancelEffect : Node2D
 			Centered = true,
 			TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
 			ZIndex = zIndex,
+			Scale = Vector2.One * scale,
 			Material = new ShaderMaterial { Shader = _greenKeyShader }
 		};
 		AddChild(layer);
-		// PNG 008-015 are extracted on doubled 512x512 canvases. kir.txt records
-		// their authored presentation near 256px, paired with rotated 000-007.
-		if (name == "OuterLightning") layer.Scale = Vector2.One * 0.5f;
 		return layer;
 	}
 
@@ -85,11 +89,15 @@ public partial class BigBangSuperCancelEffect : Node2D
 	{
 		int lightningIndex = Mathf.Min(7, _age / LightningHoldTicks);
 		_inner.Texture = _innerTextures[lightningIndex];
+		_innerOpposite.Texture = _innerTextures[lightningIndex];
 		_outer.Texture = _outerTextures[lightningIndex];
+		_outerQuarterTurn.Texture = _outerTextures[lightningIndex];
 		_core.Texture = _coreTextures[Mathf.Min(19, _age)];
 		bool showLightning = LightningVisible;
 		_inner.Visible = showLightning;
+		_innerOpposite.Visible = showLightning;
 		_outer.Visible = showLightning;
+		_outerQuarterTurn.Visible = showLightning;
 	}
 
 	private static Shader CreateGreenKeyShader()

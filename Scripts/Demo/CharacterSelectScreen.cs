@@ -36,12 +36,14 @@ public partial class CharacterSelectScreen : Control
 
 	public override void _Ready()
 	{
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("stop_music");
 		_choiceLabel = GetNode<Label>("Center/Panel/Layout/Choice");
 		for (int index = 0; index < CharacterButtonNodes.Length; index++)
 		{
 			int rosterIndex = index;
 			Button button = GetNode<Button>($"Center/Panel/Layout/Roster/{CharacterButtonNodes[index]}");
 			button.Pressed += () => Confirm(rosterIndex);
+			button.MouseEntered += () => SelectFromPointer(rosterIndex);
 			_rosterButtons[index] = button;
 		}
 		RefreshChoice();
@@ -75,6 +77,15 @@ public partial class CharacterSelectScreen : Control
 	private void MoveSelection(int amount)
 	{
 		_selectedIndex = (_selectedIndex + amount + CharacterNames.Length) % CharacterNames.Length;
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("play_cursor");
+		RefreshChoice();
+	}
+
+	private void SelectFromPointer(int index)
+	{
+		if (index == _selectedIndex) return;
+		_selectedIndex = index;
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("play_cursor");
 		RefreshChoice();
 	}
 
@@ -90,7 +101,8 @@ public partial class CharacterSelectScreen : Control
 
 	private void Confirm(int index)
 	{
+		GetNodeOrNull<Node>("/root/AudioController")?.Call("play_select");
 		ArenaCharacterLoader.SelectedCharacter = CharacterChoices[index];
-		GetTree().ChangeSceneToFile("res://TestArena.tscn");
+		GetTree().ChangeSceneToFile("res://Arena.tscn");
 	}
 }

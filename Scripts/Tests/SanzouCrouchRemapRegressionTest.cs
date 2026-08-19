@@ -39,7 +39,7 @@ public partial class SanzouCrouchRemapRegressionTest : Node2D
 
 	private SpriteTestFighter Spawn(string name, float x)
 	{
-		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/TestCharacters/SanzoKongoumaruTest.tscn")
+		var fighter = ResourceLoader.Load<PackedScene>("res://Scenes/Characters/SanzoKongoumaru.tscn")
 			.Instantiate<SpriteTestFighter>();
 		fighter.Name = name;
 		fighter.ReadLocalInput = false;
@@ -91,8 +91,8 @@ public partial class SanzouCrouchRemapRegressionTest : Node2D
 				"new crouching light kick does not contain five drawings");
 			Expect(_lightKick.TryApplyBasicAttackHit(_lowKickTarget, out _, out _, out _, out _, out _),
 				"crouching light kick did not contact its grounded regression target");
-			Expect(_lowKickTarget.HitstunFramesLeft == _lightKick.LightAttackHitstunFrames + 4,
-				$"non-jab low applied {_lowKickTarget.HitstunFramesLeft} hitstun frames instead of {_lightKick.LightAttackHitstunFrames + 4}");
+			Expect(_lowKickTarget.HitstunFramesLeft == _lightKick.GroundedLightNormalHitstunFrames + 4,
+				$"non-jab low applied {_lowKickTarget.HitstunFramesLeft} hitstun frames instead of {_lightKick.GroundedLightNormalHitstunFrames + 4}");
 
 			Expect(_medium.CurrentAttackName == FighterController.CrouchingMediumJabName,
 				$"down-forward+LP resolved as '{_medium.CurrentAttackName}'");

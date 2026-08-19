@@ -70,9 +70,9 @@ public sealed class MotionInputBuffer
 	public bool HasChargedBackForwardCommand => _chargedBackForwardCommandFramesLeft > 0;
 
 	/// <summary>Samples reusable motions once per 60 Hz fighter simulation frame.</summary>
-	public void RecordReusableInput(FighterInput input, int facing)
+	public void RecordReusableInput(FighterInput input, int facing, bool advanceFrame = true)
 	{
-		_reusableInputFrame++;
+		if (advanceFrame) _reusableInputFrame++;
 		MotionDirection direction = ResolveRelativeDirection(input.Horizontal, input.Vertical, facing);
 		if (_directionHistory.Count == 0 || _directionHistory[^1].Direction != direction)
 			_directionHistory.Add(new DirectionEvent(direction, _reusableInputFrame));
@@ -84,7 +84,8 @@ public sealed class MotionInputBuffer
 		TrimReusableHistory();
 	}
 
-	public bool TryMatchReusableMotion(MotionInputBinding binding, FighterInput buttonInput, out long completionFrame)
+	public bool TryMatchReusableMotion(MotionInputBinding binding, FighterInput buttonInput, out long completionFrame,
+		int buttonLeniencyFramesOverride = -1)
 	{
 		completionFrame = -1;
 		MotionInputDefinition definition = binding?.Motion;
@@ -94,8 +95,8 @@ public sealed class MotionInputBuffer
 		{
 			MotionInputKind.ButtonMash => TryMatchButtonMash(definition, binding.Buttons,
 				binding.MashWindowFramesOverride, out completionFrame),
-			MotionInputKind.ChargeSequence => TryMatchChargeSequence(definition, out completionFrame),
-			_ => TryMatchDirectionSequence(definition, out completionFrame, out _)
+			MotionInputKind.ChargeSequence => TryMatchChargeSequence(definition, buttonLeniencyFramesOverride, out completionFrame),
+			_ => TryMatchDirectionSequence(definition, buttonLeniencyFramesOverride, out completionFrame, out _)
 		};
 		if (!matched) return false;
 
@@ -325,10 +326,12 @@ public sealed class MotionInputBuffer
 		return false;
 	}
 
-	private bool TryMatchChargeSequence(MotionInputDefinition definition, out long completionFrame)
+	private bool TryMatchChargeSequence(MotionInputDefinition definition, int buttonLeniencyFramesOverride,
+		out long completionFrame)
 	{
 		completionFrame = -1;
-		if (!TryMatchDirectionSequence(definition, out long sequenceCompletion, out int firstSequenceIndex)) return false;
+		if (!TryMatchDirectionSequence(definition, buttonLeniencyFramesOverride,
+			out long sequenceCompletion, out int firstSequenceIndex)) return false;
 		long firstSequenceFrame = _directionHistory[firstSequenceIndex].Frame;
 		for (int index = firstSequenceIndex - 1; index >= 0; index--)
 		{
@@ -347,7 +350,8 @@ public sealed class MotionInputBuffer
 		return false;
 	}
 
-	private bool TryMatchDirectionSequence(MotionInputDefinition definition, out long completionFrame,
+	private bool TryMatchDirectionSequence(MotionInputDefinition definition, int buttonLeniencyFramesOverride,
+		out long completionFrame,
 		out int firstSequenceIndex)
 	{
 		completionFrame = -1;
@@ -355,7 +359,8 @@ public sealed class MotionInputBuffer
 		foreach (string notation in definition.DirectionSequences ?? Array.Empty<string>())
 		{
 			if (!TryParseSequence(notation, out MotionDirection[] sequence) || sequence.Length == 0) continue;
-			if (!TryMatchSequenceVariant(sequence, definition, out long candidateCompletion, out int candidateFirst)) continue;
+			if (!TryMatchSequenceVariant(sequence, definition, buttonLeniencyFramesOverride,
+				out long candidateCompletion, out int candidateFirst)) continue;
 			if (candidateCompletion <= completionFrame) continue;
 			completionFrame = candidateCompletion;
 			firstSequenceIndex = candidateFirst;
@@ -364,11 +369,15 @@ public sealed class MotionInputBuffer
 	}
 
 	private bool TryMatchSequenceVariant(MotionDirection[] sequence, MotionInputDefinition definition,
+		int buttonLeniencyFramesOverride,
 		out long completionFrame, out int firstSequenceIndex)
 	{
 		completionFrame = -1;
 		firstSequenceIndex = -1;
-		long completionCutoff = _reusableInputFrame - Math.Max(0, definition.ButtonLeniencyFrames);
+		int buttonLeniencyFrames = buttonLeniencyFramesOverride >= 0
+			? buttonLeniencyFramesOverride
+			: definition.ButtonLeniencyFrames;
+		long completionCutoff = _reusableInputFrame - Math.Max(0, buttonLeniencyFrames);
 		for (int endIndex = _directionHistory.Count - 1; endIndex >= 0; endIndex--)
 		{
 			DirectionEvent end = _directionHistory[endIndex];

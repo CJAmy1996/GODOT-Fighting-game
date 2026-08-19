@@ -1,0 +1,168 @@
+[gd_scene load_steps=28 format=3 uid="uid://ciow3n1bav52p"]
+
+[ext_resource type="Script" uid="uid://boevkce46a3wv" path="res://Audio/audio_controller.gd" id="1_3rbmd"]
+[ext_resource type="AudioStream" uid="uid://b2mhk2k2u6qg4" path="res://Audio/Music/08. Londo Stage.mp3" id="2_5ea0b"]
+[ext_resource type="AudioStream" uid="uid://cg4mc4603isw1" path="res://Audio/Sound Effects/mp3/SE_008 (Light Sound Effect).mp3" id="2_yenca"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_009 (Heavy Punch).mp3" id="3_heavy"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_047 (Super Activation).mp3" id="4_super"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_040 (Rocket Launcher).mp3" id="5_rocket"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_041 (Explosion).mp3" id="6_explosion"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_010 (Light Kick).mp3" id="7_light_kick"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_011 (Heavy Kick).mp3" id="8_heavy_kick"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_015 (light whiff).mp3" id="9_light_whiff"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_016 (Medium Whiff).mp3" id="10_medium_whiff"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_017 (Heavy Whiff).mp3" id="11_heavy_whiff"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_018 (Kick whiff).mp3" id="12_kick_whiff"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_019 (Heavy kick whiff).mp3" id="13_heavy_kick_whiff"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_058 (Footstep).mp3" id="14_footstep"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_060 (running footstep).mp3" id="15_run_footstep"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_002 (Change cursor 1).mp3" id="16_cursor"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_003 (Select).mp3" id="17_select"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_053 (possible blue cancel).mp3" id="18_blue_cancel"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/BBB Perfect Block 0016.wav" id="19_perfect_block"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/BBB Block Medium 0034.wav" id="21_medium_block"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/BBB Block Strong 0031.wav" id="22_strong_block"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/BBB Block Special Strong 0032.wav" id="23_special_strong_block"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_112 (rocket boost).mp3" id="24_mecha_jet"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_046 (burn).mp3" id="26_burning"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_045 (electricity).mp3" id="27_electricity"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_120 (electricuted).mp3" id="28_electrocuted"]
+
+[node name="AudioController" type="Node2D"]
+script = ExtResource("1_3rbmd")
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_5ea0b")
+volume_db = -4.0
+bus = &"Master"
+
+[node name="LightPunchHit" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_yenca")
+volume_db = 0.0
+bus = &"Master"
+max_polyphony = 4
+
+[node name="HeavyPunchHit" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_heavy")
+volume_db = 0.0
+bus = &"Master"
+max_polyphony = 4
+
+[node name="LightKickHit" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_light_kick")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="KnockAway" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_heavy_kick")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="MechaBoost" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("24_mecha_jet")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="LightWhiff" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("9_light_whiff")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="MediumWhiff" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("10_medium_whiff")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="HeavyWhiff" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("11_heavy_whiff")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="KickWhiff" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("12_kick_whiff")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="HeavyKickWhiff" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("13_heavy_kick_whiff")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="Footstep" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("14_footstep")
+volume_db = -5.0
+bus = &"Master"
+max_polyphony = 4
+
+[node name="RunFootstep" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("15_run_footstep")
+volume_db = -4.0
+bus = &"Master"
+max_polyphony = 4
+
+[node name="Cursor" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("16_cursor")
+bus = &"Master"
+max_polyphony = 2
+
+[node name="Select" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("17_select")
+bus = &"Master"
+max_polyphony = 2
+
+[node name="BlueCancel" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("18_blue_cancel")
+bus = &"Master"
+max_polyphony = 2
+
+[node name="PerfectBlock" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("19_perfect_block")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="MediumBlock" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("21_medium_block")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="StrongBlock" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("22_strong_block")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="SpecialStrongBlock" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("23_special_strong_block")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="SuperActivation" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_super")
+bus = &"Master"
+max_polyphony = 2
+
+[node name="Rocket" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_rocket")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="Explosion" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_explosion")
+bus = &"Master"
+max_polyphony = 8
+
+[node name="Burning" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("26_burning")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="Electricity" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("27_electricity")
+bus = &"Master"
+max_polyphony = 2
+
+[node name="Electrocuted" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("28_electrocuted")
+bus = &"Master"
+max_polyphony = 4
+
+[node name="Winner" type="AudioStreamPlayer" parent="."]

@@ -98,7 +98,7 @@ Tag = "reflector-cast-body"
 [sub_resource type="Resource" id="Resource_sanzo_block_reflector"]
 script = ExtResource("2_i2gei")
 ReflectorScene = ExtResource("4_reflector")
-ReflectorSpawnOffset = Vector2(78, -62)
+ReflectorSpawnOffset = Vector2(62, 48)
 AttackName = "BLOCK REFLECTOR"
 AnimationName = "reflector_cast"
 Stance = 1
@@ -318,7 +318,7 @@ Tag = "body"
 script = ExtResource("2_i2gei")
 Parry = true
 AttackName = "SANZOU PARRY"
-AnimationName = "stand_block"
+AnimationName = "trait_2"
 Stance = 1
 StartupFrames = 0
 ActiveFrames = 30

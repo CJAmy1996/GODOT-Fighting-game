@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Core/ProjectileReflector.cs" id="1_script"]
 [ext_resource type="Texture2D" path="res://Assets/TestFighter/Sanzo/Effects/reflector_0.png" id="2_frame0"]
@@ -18,18 +18,24 @@ animations = [{
 "speed": 60.0
 }]
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_additive"]
+blend_mode = 1
+
 [node name="SanzoReflector" type="Node2D"]
 script = ExtResource("1_script")
-ReflectBox = Rect2(-25, -78, 50, 156)
+ReflectBox = Rect2(-46, -286, 92, 286)
 OneCycleLifetimeFrames = 8
 SuperLifetimeFrames = 600
 SuperHitCount = 8
-SuperHitCooldownFrames = 30
+SuperHitCooldownFrames = 5
 SuperSlideSpeed = 18.0
+SuperHitstopFrames = 1
+HoverAmplitude = 0.0
 
 [node name="Visual" type="AnimatedSprite2D" parent="."]
 texture_filter = 2
-scale = Vector2(0.68, 0.68)
+material = SubResource("CanvasItemMaterial_additive")
+scale = Vector2(1.15, 1.15)
 sprite_frames = SubResource("SpriteFrames_reflector")
 animation = &"reflector"
 autoplay = "reflector"

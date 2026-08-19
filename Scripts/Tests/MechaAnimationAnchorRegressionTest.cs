@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using ModularFighter.Core;
+using ModularFighter.Movement;
 
 namespace ModularFighter.Tests;
 
@@ -100,6 +101,14 @@ public partial class MechaAnimationAnchorRegressionTest : Node
 			"light missile");
 		failures += ValidateMissileExplosion(definition?.SpecialMoves?.FindMove("HEAVY MECHA MISSILE", false, false),
 			"heavy missile");
+		failures += ValidateAirNormalCancels(definition);
+		SuperJumpAbility superJump = GD.Load<SuperJumpAbility>(
+			"res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_super_jump.tres");
+		if (superJump?.InitialSpeed != 1440f)
+		{
+			GD.PushError("Mecha anchor regression: super jump lost its launcher-chase height");
+			failures++;
+		}
 		SuperMoveData fullFire = Array.Find(definition?.SuperMoves ?? Array.Empty<SuperMoveData>(),
 			move => move?.AttackName == "SUPER FULL FIRE");
 		failures += ValidateFullFireExplosion(fullFire);
@@ -123,14 +132,34 @@ public partial class MechaAnimationAnchorRegressionTest : Node
 
 	private static int ValidateMissileExplosion(SpecialMoveData move, string label)
 	{
+		bool lightMissileJuggle = label != "light missile" ||
+			move is { StartupFrames: 15, Launches: true, LaunchGroundedOnly: true, LaunchSpeed: 760f,
+				LaunchPushback: 85f, LaunchHitstunFrames: 38, ProjectileSpawnOffset: { X: -16f, Y: -57f },
+				ProjectilePathTravelFrames: 60 } && move.ProjectilePath?.PointCount == 6;
+		bool heavyMissileOrigin = label != "heavy missile" ||
+			move is { StartupFrames: 25, ProjectileSpawnOffset: { X: -19f, Y: -71f },
+				ProjectilePathTravelFrames: 60 } && move.ProjectilePath?.PointCount == 6;
 		if (move is { Projectile: true, ProjectileImpactAdditiveBlend: true, ProjectileImpactBlackKey: true,
 			ProjectileImpactBlackensDefender: true, ProjectileImpactBlackSilhouetteFrames: 8 } &&
+			lightMissileJuggle && heavyMissileOrigin &&
 			move.ProjectileImpactAnimationName == "system_explosion" &&
 			move.ProjectileImpactVisualOffset == Vector2.Zero &&
 			move.ProjectileImpactDefenderFireSpriteFrames == move.ProjectileImpactSpriteFrames &&
 			move.ProjectileImpactDefenderFireAnimationName == "system_burn_flame") return 0;
 		GD.PushError($"Mecha anchor regression: {label} lost its contact-centered system explosion/burn presentation");
 		return 1;
+	}
+
+	private static int ValidateAirNormalCancels(FighterDefinition definition)
+	{
+		int failures = 0;
+		foreach (NormalMoveData move in definition?.NormalMoves?.Rules ?? System.Array.Empty<NormalMoveData>())
+		{
+			if (move?.Stance != NormalMoveStance.Airborne || move.CanChainToSpecial) continue;
+			GD.PushError($"Mecha anchor regression: airborne normal '{move.AttackName}' lost special/super cancels");
+			failures++;
+		}
+		return failures;
 	}
 
 	private static int ValidateFullFireExplosion(SuperMoveData move)
@@ -175,7 +204,7 @@ public partial class MechaAnimationAnchorRegressionTest : Node
 	{
 		if (move is { Launches: true, LaunchSpeed: 1265f, LaunchPushback: 180f,
 			LaunchHitstunFrames: 30, JumpCancelWindowFrames: 30,
-			ChaseJumpSpeed: 1265f, ChaseForwardSpeed: 360f }) return 0;
+			ChaseJumpSpeed: 1440f, ChaseForwardSpeed: 360f }) return 0;
 		GD.PushError("Mecha anchor regression: down+HP is no longer a standard jump-cancelable launcher");
 		return 1;
 	}

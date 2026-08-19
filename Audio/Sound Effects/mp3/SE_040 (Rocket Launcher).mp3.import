@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://4uii8g2yfyq3"
+path="res://.godot/imported/SE_040 (Rocket Launcher).mp3-01bc3391e258d1c81e925ce53a6d64ca.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_040 (Rocket Launcher).mp3"
+dest_files=["res://.godot/imported/SE_040 (Rocket Launcher).mp3-01bc3391e258d1c81e925ce53a6d64ca.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
