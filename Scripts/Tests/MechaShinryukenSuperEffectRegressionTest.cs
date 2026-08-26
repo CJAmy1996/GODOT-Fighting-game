@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using ModularFighter.Core;
 using ModularFighter.Demo;
@@ -43,7 +44,11 @@ public partial class MechaShinryukenSuperEffectRegressionTest : Node2D
 				case 0:
 					if (--_settleFrames > 0) return;
 					Expect(_fighter.IsOnFloor(), "Mecha Heita did not settle on the test floor");
-					SpecialMoveData shinryuken = _fighter.Definition.SpecialMoves.FindMove(ShinryukenName, false, false);
+					Expect(_fighter.Definition.SpecialMoves.FindMove(ShinryukenName, false, false) == null,
+						"Shinryuken is still registered as a special move");
+					SuperMoveData shinryuken = Array.Find(_fighter.Definition.SuperMoves,
+						move => move?.AttackName == ShinryukenName);
+					SpecialMoveData timeline = shinryuken?.AuthoredMoveData;
 					Expect(shinryuken?.CommandInput is
 					{
 						Buttons: MotionAttackButton.AnyKick,
@@ -51,15 +56,21 @@ public partial class MechaShinryukenSuperEffectRegressionTest : Node2D
 					}, "Shinryuken is not bound to the LK+HK chord");
 					Expect(shinryuken.CommandInput.Motion?.MotionName == "Quarter Circle Forward",
 						"Shinryuken is not bound to quarter-circle forward");
-					Expect(shinryuken.TriggersSuperPresentation &&
-						shinryuken.SuperActivationFreezeFrames == 45 && shinryuken.SuperBackdropFrames == 95,
-						"Shinryuken is missing its configured super presentation");
-					Expect(shinryuken.Launches && Mathf.IsEqualApprox(shinryuken.LaunchSpeed, 520f) &&
-						Mathf.IsEqualApprox(shinryuken.LaunchPushback, 25f) &&
+					Expect(shinryuken.ActivationFreezeFrames == 45 && shinryuken.BackdropFrames == 95,
+						"Shinryuken is missing its real super presentation");
+					Expect(timeline is { Launches: true } && Mathf.IsEqualApprox(timeline.LaunchSpeed, 520f) &&
+						Mathf.IsEqualApprox(timeline.LaunchPushback, 25f) &&
 						!shinryuken.AddsGlobalHitstopBonus &&
-						Mathf.IsEqualApprox(shinryuken.ContactHitstopMultiplier, 0.4f),
+						Mathf.IsEqualApprox(timeline.ContactHitstopMultiplier, 0.4f),
 						"Shinryuken does not compensate its repeated lift for combo gravity with reduced hitstop");
-					FighterBoxFrame finalHit = shinryuken.BoxTimeline[^1];
+					FighterBoxFrame finalHit = timeline.BoxTimeline[^1];
+					FighterBoxFrame[] twistHits = Array.FindAll(timeline.BoxTimeline,
+						box => box?.Kind == FighterBoxKind.Hitbox);
+					Expect(twistHits.Length == 17 &&
+						Array.TrueForAll(twistHits, box => box.HitGroup > 0) &&
+						Array.ConvertAll(twistHits, box => box.HitGroup).Distinct().Count() == 17 &&
+						shinryuken.HitCount == 17 && shinryuken.HitIntervalFrames == 1,
+						"Shinryuken does not preserve one unique hitbox per authored twist");
 					Expect(finalHit.BlowAwayDirection != BlowAwayDirection.None && finalHit.KnocksDown,
 						"Shinryuken's final hit does not knock the opponent away");
 					Expect(_fighter.Definition.SuperPortrait != null,
@@ -78,8 +89,9 @@ public partial class MechaShinryukenSuperEffectRegressionTest : Node2D
 					_fighter.SetExternalInput(default);
 					Expect(_fighter.CurrentAttackName == ShinryukenName,
 						$"QCF+LK+HK resolved as '{_fighter.CurrentAttackName}'");
-					Expect(_fighter.CurrentAttackIsSpecial && _fighter.CurrentAttackAnimationName == "anim_145",
-						"QCF+LK+HK did not preserve Mecha Shinryuken's authored move behavior");
+					Expect(_fighter.IsPerformingSuperMove && !_fighter.CurrentAttackIsSpecial &&
+						_fighter.CurrentAttackAnimationName == "anim_145",
+						"QCF+LK+HK is not executing Mecha Shinryuken as a real super");
 					Expect(_fighter.CurrentAttackTriggersHyperComboFinish,
 						"Shinryuken is not classified for Hyper Combo Finish on KO");
 					Expect(_fighter.ConsumeSuperActivationData(out int freezeFrames, out int backdropFrames),

@@ -16,10 +16,13 @@ Already extracted:
 - `FacingResolver`: neutral/action facing policy and cross-up/cross-under decisions.
 - `ChainResolver`: normal-chain and special-cancel decision order.
 - `HitResolver`: deterministic hitstun, pushback, blockstun, juggle, and reaction-selection policy.
+- `HitReactionController` (phase 1, slices 1–5): owns shared hit/block state, launch/pop/spike
+  velocity rules, juggle counters, knockdown/bounce runtime state, wakeup counters, hitstun
+  expiration, landing transitions, and recovery clearing. Final compatibility-wrapper cleanup remains.
 
 Still concentrated in `FighterController`:
 
-- Hit-reaction state mutation.
+- Advanced hit-reaction mutation (launch, juggle, bounce, knockdown, recovery, and wakeup).
 - Attack lifecycle and move runtime state.
 - Input buffering and command-to-action coordination.
 - Jump, flight, and landing route state.
@@ -33,7 +36,9 @@ Still concentrated in `FighterController`:
 
 1. Do not intentionally rebalance gameplay during an extraction.
 2. Preserve rule precedence, frame counters, and mutation order exactly.
-3. Do not add character-name checks to new core components.
+3. Character-specific behavior must live with the character: in its definition, move data,
+   abilities, or character-owned command mapping. Shared controllers and resolvers must not
+   contain fighter-name checks, character move names, or character-only tuning.
 4. Do not create multiple components that can independently mutate the same state.
 5. `FighterController` remains the authoritative fighter and simulation orchestrator.
 6. Each extraction must compile and pass focused regressions before the next begins.
@@ -47,7 +52,7 @@ Still concentrated in `FighterController`:
 | `FighterController` | Godot lifecycle, authoritative identity/state, simulation order, component coordination | Detailed combat policy |
 | Resolvers | Pure deterministic decisions and calculations | Fighter mutation, nodes, effects, logging |
 | Runtime controllers | One cohesive state machine and its counters | Unrelated fighter state or character-specific routing |
-| Abilities/move data | Character and move-specific behavior | Global combat rules |
+| Character definition, abilities, and move data | Character commands, move quirks, presentation hooks, and character-only tuning | Global combat rules |
 | Presentation controller | Animation/effect requests and visual state | Combat outcomes |
 
 ## Phase 0: strengthen the safety net
@@ -96,18 +101,23 @@ controller applies it.
 
 ### Implementation slices
 
-1. Introduce `HitReactionState` containing only reaction-owned fields.
-2. Move simple hitstun/blockstun transitions.
-3. Move launch/juggle transitions.
-4. Move knockdown/bounce/wakeup transitions.
-5. Move landing recovery and state clearing.
-6. Replace compatibility wrappers only after all callers use the component.
+1. Introduce `HitReactionState` containing only reaction-owned fields. **Complete.**
+2. Move simple hitstun/blockstun transitions. **Complete.**
+3. Move launch/juggle transitions. **Complete.**
+4. Move knockdown/bounce/wakeup transitions. **Complete.**
+5. Move landing recovery and state clearing. **Complete.**
+6. Replace compatibility mutation setters after all callers use the component. **Complete.**
 
 ### Exit criteria
 
 - `FighterController` contains no direct assignments to reaction-owned fields outside delegation/setup.
 - Reaction precedence remains in `HitResolver`.
 - Ground, air, juggle, bounce, block, parry-adjacent, and knockdown regressions pass.
+
+**Phase 1 status: complete.** `FighterController` exposes reaction state as read-only queries and
+coordinates explicit `HitReactionController` commands; it no longer writes reaction-owned fields.
+Reaction application, velocity selection, knockdown/bounce routing, and blow-away naming now live
+in the component as well. This correction reduced `FighterController` from 4,690 to 4,509 lines.
 
 ## Phase 2: extract AttackStateMachine
 
@@ -142,6 +152,14 @@ read-only queries such as `IsActive`, `ElapsedFrames`, and `HasConfirmedHit`.
 - One component owns all attack timeline counters.
 - No duplicate current-move state exists in controller and component.
 - Ground, air, flight, boost, charge, projectile, super, and chain regressions pass.
+
+**Phase 2 timeline slice: complete.** `AttackStateMachine` now exclusively owns authored and
+remaining startup/active/recovery time plus the displayed attack frame. Forced recovery, landing
+recovery, parry recovery, sustained-mash termination, super active extension, and clear operations
+all use explicit state-machine commands. The compatibility timing is pinned by
+`AttackStateMachineRegressionTest`. This removed 54 more lines from `FighterController`, reducing
+it from 4,485 to 4,431 lines. Remaining Phase 2 work is per-attack contact/runtime bookkeeping,
+spawn state, and normal-use/air-landing metadata—not another copy of the timeline state.
 
 ## Phase 3: extract InputCoordinator
 
@@ -275,6 +293,20 @@ Reduce controller configuration surface and eliminate character-specific core br
 - Replace the private `NormalMoveRule` duplication with a shared immutable runtime move model.
 - Make the public ability-runtime dictionary read-only outside its owner.
 
+### Known character coupling to remove
+
+- ~~The Sanzou fighter-name exclusion in clone-call routing.~~ **Moved to `SanzoKongoumaruFighter`.**
+- ~~Sanzou command-button and super fallback selection.~~ **Moved to `SanzoKongoumaruFighter`.**
+- ~~Sanzou SPD constants, exported tuning, and attack-name classification.~~ **Moved to
+  `SanzoKongoumaruFighter`; core now exposes only generic character-grab hooks/state.**
+- ~~Mecha electricity's attack-name-based sound and grey-body presentation.~~ **Moved to
+  `MechaHeitaFighter`.**
+- ~~Character move-name classification in shared special/projectile/super helpers.~~ **Replaced
+  with character-owned classification hooks.**
+
+Comments that merely explain why a general authored rule exists are acceptable; executable
+branches based on a particular fighter or character-only move name are not.
+
 ### Exit criteria
 
 - Core components contain no character-name checks.
@@ -325,13 +357,24 @@ The project is sufficiently clean when:
 - Adding a normal, special, jump type, or hit reaction does not require editing unrelated systems.
 - All required smoke tests pass and remaining known failures are documented.
 
+## Post-decoupling vestigial-class cleanup
+
+Only begin this after component boundaries and regressions are stable. A class is not safe to
+delete merely because C# has no direct constructor call: Godot scenes, resources, scripts,
+autoload configuration, and reflection can reference types indirectly.
+
+For every deletion candidate:
+
+1. Verify no C# references, inheritance, generic construction, or reflection/string lookup.
+2. Verify no `.tscn`, `.tres`, `.res`, project setting, autoload, UID, or imported resource reference.
+3. Verify it is not an editor/tool script or serialization compatibility type.
+4. Delete one cohesive group at a time and remove stale UID/resource artifacts only when verified safe.
+5. Build, import the project headlessly, and run the required smoke suite.
+
+Produce an inventory first, grouped as confirmed dead, compatibility-only, editor-only, and
+still live. Delete only the confirmed-dead group without an explicit migration plan.
+
 ## Recommended next milestone
 
-Begin Phase 0 and Phase 1 together in a narrow slice:
-
-1. Add deterministic tests for ordinary hitstun, launch, juggle, knockdown, and wakeup transitions.
-2. Introduce `HitReactionState`.
-3. Move only `ApplyHitstun`, `ApplyBlockstun`, and `ApplyHitReaction` behind `HitReactionController`.
-4. Verify, then move launch and juggle behavior in the following slice.
-
-Do not begin `AttackStateMachine` until hit-reaction ownership is complete.
+Continue Phase 2 by moving per-attack contact flags, hit groups, and hit cooldown into the existing
+attack runtime owner. Keep move selection and `ChainResolver` coordination in `FighterController`.

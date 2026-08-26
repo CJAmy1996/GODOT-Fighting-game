@@ -6,10 +6,10 @@
 script = ExtResource("1")
 MaxLife = 1000
 StartingLife = 1000
-SpecialMeterName = "GAS"
-MaxSpecialMeter = 100
-StartingSpecialMeter = 100
-SpecialMeterRecoveryPerSecond = 15.0
-SpecialMeterRecoveryDelayFrames = 30
+SpecialMeterName = "SUPER"
+MaxSpecialMeter = 300
+StartingSpecialMeter = 0
+SpecialMeterRecoveryPerSecond = 0.0
+SpecialMeterRecoveryDelayFrames = 0
 LifeColor = Color(0.28, 0.88, 0.32, 1)
-SpecialMeterColor = Color(1, 0.58, 0.12, 1)
+SpecialMeterColor = Color(0.15, 0.58, 1, 1)

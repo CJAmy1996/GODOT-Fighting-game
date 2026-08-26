@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://cyjmpus0k7hdy"]
 
-[ext_resource type="Script" uid="uid://do0dkb2cosh1p" path="res://Scripts/Demo/SpriteTestFighter.cs" id="1_script"]
+[ext_resource type="Script" path="res://Scripts/Characters/KinakoFighter.cs" id="1_script"]
 [ext_resource type="Resource" uid="uid://cbpo8sk0fquxp" path="res://Data/Characters/BigBangBeatRevolve/Kinako/kinako_definition.tres" id="2_definition"]
-[ext_resource type="SpriteFrames" uid="uid://c65fpjigx2tcv" path="res://Assets/TestFighter/BigBangBeatRevolve/Kinako/kinako_sprite_frames.tres" id="3_frames"]
+[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/Kinako/kinako_sprite_frames.tres" id="3_frames"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(56, 100)
@@ -17,9 +17,8 @@ Definition = ExtResource("2_definition")
 texture_filter = 1
 position = Vector2(0, -58)
 sprite_frames = ExtResource("3_frames")
-animation = &"qcf_power_punch"
+animation = &"idle"
 autoplay = "idle"
-frame = 7
 
 [node name="BodyCollision" type="CollisionShape2D" parent="."]
 position = Vector2(0, -50)

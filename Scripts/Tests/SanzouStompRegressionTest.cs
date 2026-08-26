@@ -73,7 +73,7 @@ public partial class SanzouStompRegressionTest : Node2D
 					break;
 				case 2:
 					_sanzou.SetExternalInput(default);
-					Expect(_sanzou.CurrentAttackName == FighterController.StompSpecialName,
+					Expect(_sanzou.CurrentAttackName == SanzoKongoumaruFighter.StompName,
 						$"charge down-up+LK resolved as '{_sanzou.CurrentAttackName}'");
 					_stage = 3;
 					break;

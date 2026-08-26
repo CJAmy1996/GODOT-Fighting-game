@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AirWalkAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/AirWalkAbility.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Id = "kamui_air_walk"
+Priority = 90
+WalkSpeed = 210.8
+RunSpeed = 403.0
+HorizontalAcceleration = 1364.0
+ExitInputGraceFrames = 2
+InfiniteDuration = true
+StartsWithTrait2Input = true

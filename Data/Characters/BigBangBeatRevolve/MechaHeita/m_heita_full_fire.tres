@@ -10,7 +10,7 @@
 [sub_resource type="Resource" id="FullFireBinding"]
 script = ExtResource("2_binding")
 Motion = ExtResource("3_motion")
-Buttons = 10
+Buttons = 3
 ButtonMatchMode = 1
 Priority = 90
 

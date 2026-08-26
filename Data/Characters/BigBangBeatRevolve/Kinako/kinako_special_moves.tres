@@ -1,7 +1,173 @@
-[gd_resource type="Resource" script_class="SpecialMoveSet" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="SpecialMoveSet" load_steps=15 format=3]
 
-[ext_resource type="Script" path="res://Scripts/Core/SpecialMoveSet.cs" id="1"]
+[ext_resource type="Script" path="res://Scripts/Core/SpecialMoveSet.cs" id="1_set"]
+[ext_resource type="Script" path="res://Scripts/Core/SpecialMoveData.cs" id="2_move"]
+[ext_resource type="Script" path="res://Scripts/Core/FighterBoxFrame.cs" id="3_box"]
+[ext_resource type="Script" path="res://Scripts/Core/MotionInputBinding.cs" id="4_binding"]
+[ext_resource type="Resource" path="res://Data/Motions/half_circle_forward.tres" id="5_hcf"]
+[ext_resource type="Resource" path="res://Data/Motions/quarter_circle_forward.tres" id="6_qcf"]
+[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/Kinako/kinako_sprite_frames.tres" id="7_frames"]
+
+[sub_resource type="Resource" id="KinakoRushBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("5_hcf")
+Buttons = 3
+Priority = 35
+
+[sub_resource type="Resource" id="KinakoRushBody"]
+script = ExtResource("3_box")
+EndFrame = 35
+LocalRect = Rect2(-40, -112, 80, 112)
+Tag = "kinako-rush-body"
+
+[sub_resource type="Resource" id="KinakoRushHitOne"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 12
+EndFrame = 17
+LocalRect = Rect2(22, -112, 126, 76)
+Tag = "kinako-rush-hit-1"
+HitGroup = 1
+Damage = 30
+
+[sub_resource type="Resource" id="KinakoRushHitTwo"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 18
+EndFrame = 23
+LocalRect = Rect2(30, -118, 132, 82)
+Tag = "kinako-rush-hit-2"
+HitGroup = 2
+Damage = 30
+
+[sub_resource type="Resource" id="KinakoRushHitThree"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 24
+EndFrame = 29
+LocalRect = Rect2(24, -116, 130, 84)
+Tag = "kinako-rush-hit-3"
+HitGroup = 3
+Damage = 40
+KnocksDown = true
+KnockdownType = 2
+KnockdownFrames = 42
+
+[sub_resource type="Resource" id="KinakoStandingRush"]
+script = ExtResource("2_move")
+CommandInput = SubResource("KinakoRushBinding")
+CanCancelIntoFromNormals = true
+AttackName = "KINAKO RUSH"
+AnimationName = "standing_rush"
+Stance = 1
+StartupFrames = 12
+ActiveFrames = 18
+RecoveryFrames = 6
+SuppressFallbackHitbox = true
+SelfLaunch = true
+SelfLaunchStartFrame = 8
+SelfLaunchSpeed = 1000.0
+SelfHorizontalSpeed = 1100.0
+SelfLaunchUsesFacing = true
+HoldUntilLanding = true
+LandingRecoveryFrames = 33
+LandingAnimationName = "rush_landing"
+Damage = 30
+HitstunFrames = 19
+BlockstunFrames = 12
+HitstopFrames = 8
+Pushback = 80.0
+BoxTimeline = [SubResource("KinakoRushBody"), SubResource("KinakoRushHitOne"), SubResource("KinakoRushHitTwo"), SubResource("KinakoRushHitThree")]
+
+[sub_resource type="Resource" id="KinakoRedGhostBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("6_qcf")
+Buttons = 1
+Priority = 32
+
+[sub_resource type="Resource" id="KinakoRedGhostSummon"]
+script = ExtResource("2_move")
+CommandInput = SubResource("KinakoRedGhostBinding")
+CanCancelIntoFromNormals = true
+Projectile = true
+ProjectileSpeed = 700.0
+ProjectileSpawnOffset = Vector2(60, -20)
+ProjectileHitboxLocal = Rect2(-30, -55, 60, 60)
+ProjectileSpriteFrames = ExtResource("7_frames")
+ProjectileAnimationName = "red_ghost"
+ProjectileHitStartFrame = 500
+ProjectileLifetimeFrames = 501
+EmitsAssistProjectile = true
+AssistProjectileSpawnFrame = 20
+AssistProjectileSpawnOffset = Vector2(18, -8)
+AssistProjectileSpeed = 430.0
+AssistProjectileVerticalSpeed = -260.0
+AssistProjectileGravity = 900.0
+AssistProjectileHitboxLocal = Rect2(-25, -25, 50, 50)
+AssistProjectileSpriteFrames = ExtResource("7_frames")
+AssistProjectileAnimationName = "yellow_ghost"
+AssistProjectileGroundAnimationName = "yellow_ghost_hit"
+AssistProjectileGroundContactOffset = 58.0
+AssistProjectileLifetimeFrames = 150
+AssistProjectileGroundLifetimeFrames = 69
+AttackName = "RED GHOST SUMMON"
+AnimationName = "red_ghost_summon"
+Stance = 1
+StartupFrames = 9
+ActiveFrames = 4
+RecoveryFrames = 12
+Damage = 75
+HitstunFrames = 22
+BlockstunFrames = 14
+HitstopFrames = 8
+Pushback = 140.0
+
+[sub_resource type="Resource" id="KinakoBlueGhostBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("6_qcf")
+Buttons = 4
+Priority = 32
+
+[sub_resource type="Resource" id="KinakoBlueGhostSummon"]
+script = ExtResource("2_move")
+CommandInput = SubResource("KinakoBlueGhostBinding")
+CanCancelIntoFromNormals = true
+Projectile = true
+ProjectileSpeed = 100.0
+ProjectileSecondarySpeed = -500.0
+ProjectileSecondarySpeedFrame = 44
+ProjectileSpawnOffset = Vector2(23, -55)
+ProjectileHitboxLocal = Rect2(-28, -48, 82, 58)
+ProjectileSpriteFrames = ExtResource("7_frames")
+ProjectileAnimationName = "blue_ghost"
+ProjectileHitStartFrame = 500
+ProjectileLifetimeFrames = 84
+EmitsAssistProjectile = true
+AssistProjectileSpawnFrame = 44
+AssistProjectileSpawnOffset = Vector2(28, 0)
+AssistProjectileSpeed = 0.0
+AssistProjectileVerticalSpeed = 0.0
+AssistProjectileGravity = 0.0
+AssistProjectileHitboxLocal = Rect2(0, -66, 474, 133)
+AssistProjectileSpriteFrames = ExtResource("7_frames")
+AssistProjectileAnimationName = "blue_ghost_attack"
+AssistProjectileVisualOffset = Vector2(237, 0)
+AssistProjectileVisualScale = Vector2(6, 1)
+AssistProjectileDirectionalHitbox = true
+AssistProjectileLifetimeFrames = 13
+AssistProjectileGroundLifetimeFrames = 1
+AttackName = "BLUE GHOST SUMMON"
+AnimationName = "blue_ghost_summon"
+Stance = 1
+StartupFrames = 9
+ActiveFrames = 4
+RecoveryFrames = 12
+Damage = 70
+HitstunFrames = 20
+BlockstunFrames = 13
+HitstopFrames = 8
+Pushback = 120.0
 
 [resource]
-script = ExtResource("1")
-Moves = []
+script = ExtResource("1_set")
+Moves = [SubResource("KinakoStandingRush"), SubResource("KinakoRedGhostSummon"), SubResource("KinakoBlueGhostSummon")]

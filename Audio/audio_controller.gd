@@ -72,6 +72,18 @@ func play_hit(attack_name: String = "LIGHT PUNCH", is_super: bool = false) -> vo
 			player = $HeavyPunchHit if heavy else $LightPunchHit
 		player.play(0.0)
 
+func play_sword_slash(attack_name: String = "LIGHT PUNCH", strength_override: int = 0) -> void:
+	if mute:
+		return
+	if strength_override == 4:
+		$HeaviestSlash.play(0.0)
+	elif strength_override == 3 or (strength_override == 0 and attack_name.contains("HEAVY")):
+		$HeavySlash.play(0.0)
+	elif strength_override == 2 or (strength_override == 0 and attack_name.contains("MEDIUM")):
+		$MediumSlash.play(0.0)
+	else:
+		$LightSlash.play(0.0)
+
 func play_knock_away() -> void:
 	_play_effect($KnockAway)
 

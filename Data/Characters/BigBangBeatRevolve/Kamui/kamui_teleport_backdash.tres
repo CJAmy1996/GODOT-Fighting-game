@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TeleportDashAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/TeleportDashAbility.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Id = "backward_air_dash"
+Priority = 21
+Distance = 180.0
+DirectionRequirement = 2
+RequireDirectionalDoubleTap = true
+DisallowDownInput = true
+StartupFrames = 8
+ActiveFrames = 18
+MaxAirUses = 1
+InvulnerabilityFrames = 8

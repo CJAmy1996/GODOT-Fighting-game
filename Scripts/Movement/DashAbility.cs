@@ -11,6 +11,8 @@ public partial class DashAbility : MovementAbility
 	[Export] public bool AirOnly { get; set; }
 	[Export] public bool GroundOnly { get; set; }
 	[Export] public DashDirectionRequirement DirectionRequirement { get; set; } = DashDirectionRequirement.Any;
+	[Export] public bool RequireDirectionalDoubleTap { get; set; }
+	[Export] public bool DisallowDownInput { get; set; }
 	[Export] public int MaxAirUses { get; set; } = 1;
 	[Export] public int ActiveFrames { get; set; } = 12;
 	[Export] public int RecoveryFrames { get; set; } = 0;
@@ -38,6 +40,8 @@ public partial class DashAbility : MovementAbility
 			return false;
 		}
 		if (!fighter.ActionInput.DashPressed) return false;
+		if (RequireDirectionalDoubleTap && !fighter.HasBufferedDashCommand) return false;
+		if (DisallowDownInput && fighter.CurrentInput.Vertical > 0.5f) return false;
 		if (AirOnly && fighter.WasGrounded) return false;
 		if (GroundOnly && !fighter.WasGrounded) return false;
 		if (!fighter.WasGrounded && ConsumesAirAction && !fighter.CanUseAirDashAction()) return false;

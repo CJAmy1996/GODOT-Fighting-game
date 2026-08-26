@@ -119,6 +119,20 @@ public partial class TrainingBlockControls : Control
 
 		AddToggle(content, "Allow health to empty / KO", _stageRules?.AllowHealthToReachZero ?? false,
 			enabled => { if (_stageRules != null) _stageRules.AllowHealthToReachZero = enabled; });
+		AddToggle(content, "Infinite B-POWER", (_fighterOne?.InfiniteSpecialMeter ?? false) ||
+			(_opponent?.InfiniteSpecialMeter ?? false), enabled =>
+			{
+				if (_fighterOne != null)
+				{
+					_fighterOne.InfiniteSpecialMeter = enabled;
+					if (enabled) _fighterOne.RefillPlaceholderSpecialMeter();
+				}
+				if (_opponent != null)
+				{
+					_opponent.InfiniteSpecialMeter = enabled;
+					if (enabled) _opponent.RefillPlaceholderSpecialMeter();
+				}
+			});
 		CheckButton block = AddToggle(content, "Opponent auto-block", _opponent?.TrainingAutoBlock ?? false, enabled =>
 		{
 			if (_opponent != null) _opponent.TrainingAutoBlock = enabled;

@@ -863,7 +863,7 @@ public partial class ImportedRosterRegressionTest : Node
 			boosterAbility is not { CanStartGrounded: true, MaxFrames: 0, UseSpecial1Input: true,
 				GasCostPerFrame: 0.5f, UseDirectionalAnimations: true, DirectVelocityControl: true,
 				BackwardFlightSpeedMultiplier: 0.3f,
-				UseDirectionalBoosts: true, BoostSpeed: 900f, BoostFrames: 12, MaxAirBoosts: 3,
+				UseDirectionalBoosts: true, BoostSpeed: 750f, BoostFrames: 12, MaxAirBoosts: 3,
 				BoostGasCost: 12f, BoostCancelExtraGasCost: 4f, BoostAttackDelayFrames: 7,
 				BackwardBoostSpeedMultiplier: 0.5f, BackwardBoostAirUseCost: 2,
 				CommitAfterBackwardAirBoost: true,

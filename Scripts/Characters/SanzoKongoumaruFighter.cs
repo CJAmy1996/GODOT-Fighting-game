@@ -10,6 +10,15 @@ namespace ModularFighter.Characters;
 /// </summary>
 public partial class SanzoKongoumaruFighter : SpriteTestFighter
 {
+	public const string ParryName = "SANZOU PARRY";
+	public const string SuperReflectorName = "SUPER REFLECTOR";
+	public const string SpdName = "SANZOU SPD";
+	public const string SuperSpdName = "SANZOU SUPER SPD";
+	public const string StompName = "STOMP SPECIAL";
+	public const string CommandRunLightName = "COMMAND RUN LIGHT";
+	public const string CommandRunHeavyName = "COMMAND RUN HEAVY";
+	public const string CommandRunHopName = "COMMAND RUN HOP";
+	public const string CommandRunPunchName = "COMMAND RUN PUNCH";
 	private const string ParryGuardFlashPath = "res://Assets/TestFighter/Sanzo/Effects/parry_guard_flash.png";
 	private static readonly string[] ParrySparkPaths =
 	{
@@ -29,6 +38,95 @@ public partial class SanzoKongoumaruFighter : SpriteTestFighter
 	{
 		base._Ready();
 		_baseCharacterMaterial = CharacterSprite?.Material;
+	}
+
+	protected override bool AllowsCloneCall => false;
+	[ExportGroup("Sanzou SPD")]
+	[Export] public float SpdRiseSpeed { get; set; } = 1450f;
+	[Export] public int SpdSlamKnockdownFrames { get; set; } = 90;
+	[Export] public int SpdLandingRecoveryFrames { get; set; } = 18;
+	[Export] public float SuperSpdRiseSpeed { get; set; } = 3600f;
+	[Export] public float SuperSpdDescentSpeed { get; set; } = 4200f;
+	[Export] public int SuperSpdSlamKnockdownFrames { get; set; } = 150;
+	[Export] public int SuperSpdLandingRecoveryFrames { get; set; } = 30;
+	[ExportGroup("Selected Move Presentation")]
+	[Export(PropertyHint.Range, "0.1,1.0,0.01")]
+	public float SweepAndSpdVisualScale { get; set; } = 1f;
+
+	protected override bool IsCharacterGrabAttack(string attackName) =>
+		attackName == SpdName || attackName == SuperSpdName;
+	protected override bool IsCharacterSuperGrabAttack(string attackName) => attackName == SuperSpdName;
+	protected override bool IsCharacterSpecialAttack(string attackName) => attackName is
+		ParryName or StompName or CommandRunLightName or CommandRunHeavyName or CommandRunHopName or CommandRunPunchName;
+	protected override bool IsCharacterProjectileAttack(string attackName) => attackName == SuperReflectorName;
+	protected override bool IsCharacterSuperAttack(string attackName) =>
+		attackName == SuperReflectorName || attackName == SuperSpdName;
+	protected override bool IsCharacterRunFollowup(string currentAttack, string nextAttack) =>
+		(currentAttack == CommandRunLightName || currentAttack == CommandRunHeavyName) &&
+		(nextAttack == CommandRunHopName || nextAttack == CommandRunPunchName);
+	protected override bool CharacterSelfLaunchUsesFacing(string attackName) => attackName == CommandRunHopName;
+	protected override float CharacterGrabRiseSpeed(bool super) => super ? SuperSpdRiseSpeed : SpdRiseSpeed;
+	protected override float CharacterGrabDescentSpeed(bool super) => super ? SuperSpdDescentSpeed : 0f;
+	protected override int CharacterGrabKnockdownFrames(bool super) =>
+		super ? SuperSpdSlamKnockdownFrames : SpdSlamKnockdownFrames;
+	protected override int CharacterGrabLandingRecoveryFrames(bool super) =>
+		super ? SuperSpdLandingRecoveryFrames : SpdLandingRecoveryFrames;
+	protected override int CharacterGrabConnectedRecoveryFrames(bool super) => super ? 360 : 180;
+	protected override string CharacterGrabAirAnimationName => "spd_air_grab";
+	protected override float CharacterSelectedVisualScale => SweepAndSpdVisualScale;
+	protected override bool UsesCharacterSelectedVisualScale(string attackName, StringName animation) =>
+		attackName == CrouchingHeavyKickName || attackName == SpdName || attackName == SuperSpdName ||
+		animation == "crouching_heavy_kick" || animation == "spd_grab" || animation == "spd_air_grab";
+
+	protected override bool TrySyncCharacterAttackDrawing(StringName animation)
+	{
+		if (!CharacterGrabConnected || animation != "spd_air_grab") return false;
+		int drawings = CharacterSprite.SpriteFrames.GetFrameCount(animation);
+		int flightTick = Mathf.Max(0, CurrentAttackFrame - CurrentAttackStartupFrames);
+		CharacterSprite.SetFrameAndProgress((flightTick / 4) % Mathf.Max(1, drawings), 0f);
+		return true;
+	}
+
+	protected override float CharacterReactionVerticalOffset(StringName animation) =>
+		animation == "knockdown" || animation == "ground_bounce" ? 1f : 0f;
+	protected override float CharacterLandingShakeMultiplier => CurrentAttackName == StompName ? 1.8f : 1f;
+	protected override int CharacterLandingShakeExtraFrames => CurrentAttackName == StompName ? 3 : 0;
+	protected override int CharacterLandingShakeMinimumFrames => CurrentAttackName == StompName ? 10 : 0;
+	protected override bool UsesNeutralJumpAtLowHorizontalSpeed => true;
+
+	protected override string ResolveCharacterSpecificAttack(FighterInput input)
+	{
+		if (input.Special2Pressed && WasGrounded &&
+			Definition?.SpecialMoves?.FindMove(ParryName, false, false)?.Parry == true)
+			return ParryName;
+		if (input.Special1Pressed && WasGrounded &&
+			Definition?.SpecialMoves?.FindMove(SpdName, false, false) != null)
+			return SpdName;
+		if (IsAttacking && (CurrentAttackName == CommandRunLightName || CurrentAttackName == CommandRunHeavyName))
+		{
+			if (CurrentInput.HeavyPunchPressed) return CommandRunPunchName;
+			if (CurrentInput.LightPunchPressed) return CommandRunHopName;
+		}
+		if (HasChargedBackForwardCommand && WasGrounded)
+		{
+			if (input.HeavyPunchPressed) return CommandRunHeavyName;
+			if (input.LightPunchPressed) return CommandRunLightName;
+		}
+		if (HasChargedDownUpCommand && (input.LightKickPressed || input.HeavyKickPressed)) return StompName;
+		bool punchSuperChord = input.LightPunchPressed && input.HeavyPunchPressed;
+		bool kickSuperChord = input.LightKickPressed && input.HeavyKickPressed;
+		if (HasQuarterCircleForwardCommand && punchSuperChord && IsOnFloor() && FindSuperMove(SuperSpdName) != null)
+			return SuperSpdName;
+		if (HasQuarterCircleForwardCommand && kickSuperChord && FindSuperMove(SuperReflectorName) != null)
+			return SuperReflectorName;
+		return "";
+	}
+
+	protected override void OnCharacterAttackStarted(string attackName)
+	{
+		if (attackName == StompName) ConsumeChargedDownUpCommand();
+		if (attackName == CommandRunLightName || attackName == CommandRunHeavyName)
+			ConsumeChargedBackForwardCommand();
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -64,7 +162,7 @@ public partial class SanzoKongoumaruFighter : SpriteTestFighter
 		// The activation freeze is real hitstop, so gameplay's attack frame does
 		// not advance. Give only Sanzou's reflector a separate presentation clock
 		// that ping-pongs authored ticks 3→4→5→4 throughout that freeze.
-		bool reflectorActivationFreeze = CurrentAttackName == SanzoSuperReflectorName &&
+		bool reflectorActivationFreeze = CurrentAttackName == SuperReflectorName &&
 			CurrentAttackFrame <= 0 && IsInHitstop;
 		if (!reflectorActivationFreeze)
 		{

@@ -25,7 +25,7 @@ public partial class JetEscapeAbility : MovementAbility
 	public override bool CanStart(FighterController fighter, AbilityRuntime runtime)
 	{
 		if (!fighter.WasGrounded || !fighter.ActionInput.Special1Pressed ||
-			!fighter.HasPlaceholderSpecialMeter(GasCost)) return false;
+			!fighter.HasGasMeter(GasCost)) return false;
 		float relativeHorizontal = fighter.CurrentInput.Horizontal * fighter.Facing;
 		return Direction == JetEscapeDirection.Forward
 			? relativeHorizontal >= DirectionThreshold
@@ -34,7 +34,7 @@ public partial class JetEscapeAbility : MovementAbility
 
 	public override void Start(FighterController fighter, AbilityRuntime runtime)
 	{
-		if (!fighter.TrySpendPlaceholderSpecialMeter(GasCost)) return;
+		if (!fighter.TrySpendGasMeter(GasCost)) return;
 		base.Start(fighter, runtime);
 		if (fighter.IsInsideTree())
 			fighter.GetNodeOrNull<Node>("/root/AudioController")?.Call("play_mecha_boost");

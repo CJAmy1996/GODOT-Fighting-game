@@ -44,6 +44,16 @@ public partial class HitResolverRegressionTest : Node
 				"instant-block rounding/fallback changed");
 			Expect(Mathf.IsEqualApprox(HitResolver.ResolveJuggleBounceSpeed(220f, 3, 24f, 60f), 172f),
 				"juggle bounce decay changed");
+			Expect(Mathf.IsEqualApprox(HitResolver.ResolveJuggleBounceSpeed(250f, 3, 20f, 60f), 210f),
+				"lenient grounded juggle bounce changed");
+			Expect(Mathf.IsEqualApprox(HitResolver.ResolveJuggleGravityScale(10, 10, 0.20f, 2.75f), 1f) &&
+				Mathf.IsEqualApprox(HitResolver.ResolveJuggleGravityScale(11, 10, 0.20f, 2.75f), 1.2f),
+				"delayed juggle gravity scaling changed");
+			Expect(HitResolver.CanApplyJuggleWallSplat(true, true, false) &&
+				!HitResolver.CanApplyJuggleWallSplat(true, false, false) &&
+				!HitResolver.CanApplyJuggleWallSplat(true, true, true) &&
+				!HitResolver.CanApplyJuggleWallSplat(false, true, false),
+				"juggle wall splat was not restricted to unblocked grounded heavies");
 			Expect(HitResolver.SelectReaction(BaseReactionRequest with
 			{
 				IsLauncher = true,
@@ -55,7 +65,7 @@ public partial class HitResolverRegressionTest : Node
 				DefenderAlreadyInJuggle = true
 			}) == ResolvedHitReaction.ContinuingJuggle, "continuing juggle selection changed");
 
-			GD.Print("HIT_RESOLVER_TEST_PASS grounded_light=12 counter=16 air_normal=18 pushback_order=42.25 instant_block=3 bounce=172 reaction_precedence=preserved");
+			GD.Print("HIT_RESOLVER_TEST_PASS grounded_light=12 counter=16 air_normal=18 pushback_order=42.25 instant_block=3 bounce=210 gravity_delay=10 wall_splat=grounded_heavy_only reaction_precedence=preserved");
 			GetTree().Quit();
 		}
 		catch (Exception exception)

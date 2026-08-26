@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://ciow3n1bav52p"]
+[gd_scene load_steps=35 format=3 uid="uid://ciow3n1bav52p"]
 
 [ext_resource type="Script" uid="uid://boevkce46a3wv" path="res://Audio/audio_controller.gd" id="1_3rbmd"]
 [ext_resource type="AudioStream" uid="uid://b2mhk2k2u6qg4" path="res://Audio/Music/08. Londo Stage.mp3" id="2_5ea0b"]
@@ -27,6 +27,10 @@
 [ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_046 (burn).mp3" id="26_burning"]
 [ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_045 (electricity).mp3" id="27_electricity"]
 [ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_120 (electricuted).mp3" id="28_electrocuted"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_028 (light slash).mp3" id="29_light_slash"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_029 (medium slash).mp3" id="30_medium_slash"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_030 (heavy slash 1).mp3" id="31_heavy_slash"]
+[ext_resource type="AudioStream" path="res://Audio/Sound Effects/mp3/SE_031 (heavy slash 2).mp3" id="32_heaviest_slash"]
 
 [node name="AudioController" type="Node2D"]
 script = ExtResource("1_3rbmd")
@@ -52,6 +56,26 @@ max_polyphony = 4
 stream = ExtResource("7_light_kick")
 bus = &"Master"
 max_polyphony = 4
+
+[node name="LightSlash" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("29_light_slash")
+bus = &"Master"
+max_polyphony = 6
+
+[node name="MediumSlash" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("30_medium_slash")
+bus = &"Master"
+max_polyphony = 6
+
+[node name="HeavySlash" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("31_heavy_slash")
+bus = &"Master"
+max_polyphony = 6
+
+[node name="HeaviestSlash" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("32_heaviest_slash")
+bus = &"Master"
+max_polyphony = 6
 
 [node name="KnockAway" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("8_heavy_kick")

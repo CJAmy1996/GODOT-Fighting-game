@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://Scripts/Demo/SpriteTestFighter.cs" id="1_script"]
+[ext_resource type="Script" path="res://Scripts/Characters/MechaHeitaFighter.cs" id="1_script"]
 [ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_definition.tres" id="2_definition"]
 [ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/m_heita_sprite_frames.tres" id="3_frames"]
 

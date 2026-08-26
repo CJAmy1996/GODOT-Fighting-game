@@ -113,7 +113,7 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 					Expect(_attacker.IsOnFloor() && _victim.IsOnFloor(), "Super SPD fighters did not settle");
 					Expect(!_attacker.TryBeginCloneCall(), "Sanzou still accepts clone calls through FighterController");
 					Expect(Array.Exists(_attacker.Definition.SuperMoves,
-						move => move?.AttackName == FighterController.SanzoSuperSpdName),
+						move => move?.AttackName == SanzoKongoumaruFighter.SuperSpdName),
 						"Sanzou Super 1 resource is not the Super SPD");
 					LatchMotionEvent(_attacker, "move_down");
 					_attacker.SetExternalInput(new FighterInput(0f, 1f, false, false, false, false));
@@ -127,7 +127,7 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 					break;
 				case 2:
 					_attacker.SetExternalInput(default);
-					Expect(_attacker.CurrentAttackName == FighterController.SanzoSuperSpdName,
+					Expect(_attacker.CurrentAttackName == SanzoKongoumaruFighter.SuperSpdName,
 						$"QCF+LP+HP resolved as '{_attacker.CurrentAttackName}'");
 					Expect(_attacker.CurrentAttackAnimationName == "spd_grab",
 						"Super SPD did not reuse the SPD grab animation");
@@ -183,7 +183,7 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 					if (!_attacker.IsAttackActive) return;
 					Expect(_attacker.TryApplyBasicAttackHit(_victim, out int hitstop, out _, out _, out _, out _),
 						"Super SPD did not capture its grounded victim");
-					Expect(hitstop == 0 && _attacker.SpdGrabConnected, "Super SPD did not enter capture flight");
+					Expect(hitstop == 0 && _attacker.CharacterGrabConnected, "Super SPD did not enter capture flight");
 					Expect(_attacker.CurrentAttackAnimationName == "spd_air_grab", "Super SPD did not use airborne SPD art");
 					Expect(_attacker.Velocity.Y <= -3500f, "Super SPD did not begin its ultra-high ascent");
 					_highestY = _attacker.GlobalPosition.Y;
@@ -193,7 +193,7 @@ public partial class SanzouSuperSpdRegressionTest : Node2D
 					_highestY = Mathf.Min(_highestY, _attacker.GlobalPosition.Y);
 					_sawForcedDescent |= _attacker.Velocity.Y >= 4000f;
 					_sawSuperAfterimage |= GetNodeOrNull<Sprite2D>("SuperAfterimage1")?.Visible == true;
-					if (!_attacker.TryConsumeSpdSlamImpact(out FighterController victim, out _, out int damage, out bool wasSuper)) return;
+					if (!_attacker.TryConsumeCharacterGrabImpact(out FighterController victim, out _, out int damage, out bool wasSuper)) return;
 					Expect(victim == _victim && wasSuper, "Super SPD slam was not identified as the super variant");
 					Expect(_highestY <= -1800f, $"Super SPD rose only {-_highestY:0.0}px");
 					Expect(_sawForcedDescent, "Super SPD never entered its multi-screen forced plunge");

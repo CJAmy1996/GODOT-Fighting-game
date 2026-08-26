@@ -70,7 +70,7 @@ public partial class MechaFlightRegressionTest : Node2D
 			flight.Start(probe, runtime);
 			Expect(flight.IsBoosting(probe), "direction + flight button did not select boost mode");
 			Expect(flight.AirBoostsUsed(probe) == use + 1, "air boost counter did not increment once");
-			Expect(probe.Velocity == new Vector2(900f, 0f), "boost inherited old movement momentum");
+			Expect(probe.Velocity == new Vector2(750f, 0f), "boost inherited old movement momentum");
 			if (use == 0)
 			{
 				Expect(!flight.CanStartAttack(probe, runtime), "boost allowed an attack on frame zero");
@@ -121,7 +121,7 @@ public partial class MechaFlightRegressionTest : Node2D
 		backwardFlight.Start(backwardProbe, backwardRuntime);
 		Expect(backwardFlight.AirBoostsUsed(backwardProbe) == 2,
 			"air backward boost did not consume two boost uses");
-		Expect(Mathf.IsEqualApprox(backwardProbe.Velocity.X, -450f),
+		Expect(Mathf.IsEqualApprox(backwardProbe.Velocity.X, -375f),
 			"air backward boost did not use half boost speed");
 		Expect(backwardFlight.IsBackwardBoostCommittedThisAirTime(backwardProbe),
 			"air backward boost did not commit the remaining airtime");
@@ -147,7 +147,7 @@ public partial class MechaFlightRegressionTest : Node2D
 			"forward boost was rejected after an air backward boost");
 		backwardFlight.Start(backwardProbe, backwardRuntime);
 		Expect(backwardFlight.AirBoostsUsed(backwardProbe) == 3 &&
-			Mathf.IsEqualApprox(backwardProbe.Velocity.X, 900f),
+			Mathf.IsEqualApprox(backwardProbe.Velocity.X, 750f),
 			"post-backward forward boost did not consume the final use at full speed");
 		backwardFlight.Stop(backwardProbe, backwardRuntime);
 		backwardProbe.SetExternalInput(FlightInput(0f, 0f, pressed: true));
@@ -387,7 +387,7 @@ public partial class MechaFlightRegressionTest : Node2D
 	private void TryFinish()
 	{
 		if (!_mainDone || !_fallDone || !_superFallDone) return;
-		GD.Print("MECHA_FLIGHT_REGRESSION_PASS press=immediate_toggle hold=20f_negative_edge release=off boosts=3 boost_attack=3f flight_cancel=15f neutral_gate=false hit_boost_cost=16 backward_flight_speed=126 backward_boost_speed=450 backward_boost_cost=2 post_backward_only_forward=true non_flight_landing=2f flight_landing=full normal_jump_fall_normals_locked=true super_jump_fall_normals_locked=true");
+		GD.Print("MECHA_FLIGHT_REGRESSION_PASS press=immediate_toggle hold=20f_negative_edge release=off boosts=3 boost_attack=3f flight_cancel=15f neutral_gate=false hit_boost_cost=16 backward_flight_speed=126 backward_boost_speed=375 backward_boost_cost=2 post_backward_only_forward=true non_flight_landing=2f flight_landing=full normal_jump_fall_normals_locked=true super_jump_fall_normals_locked=true");
 		GetTree().Quit();
 	}
 

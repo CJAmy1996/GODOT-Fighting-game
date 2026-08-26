@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://bycdc00jmcrow"]
 
-[ext_resource type="Script" uid="uid://do0dkb2cosh1p" path="res://Scripts/Demo/SpriteTestFighter.cs" id="1_script"]
+[ext_resource type="Script" path="res://Scripts/Characters/KungFuManFighter.cs" id="1_script"]
 [ext_resource type="Resource" uid="uid://bsia1qvkdppur" path="res://Data/Characters/kung_fu_man_test.tres" id="2_definition"]
 [ext_resource type="SpriteFrames" uid="uid://cpa0pwly2qtf" path="res://Assets/TestFighter/KungFuMan/kung_fu_man_sprite_frames.tres" id="3_frames"]
 

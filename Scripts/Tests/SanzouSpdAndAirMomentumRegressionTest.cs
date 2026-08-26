@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using ModularFighter.Characters;
 using ModularFighter.Core;
 
 namespace ModularFighter.Tests;
@@ -81,7 +82,7 @@ public partial class SanzouSpdAndAirMomentumRegressionTest : Node2D
 					break;
 				case 1:
 					_attacker.SetExternalInput(default);
-					Expect(_attacker.CurrentAttackName == FighterController.SanzoSpdName,
+					Expect(_attacker.CurrentAttackName == SanzoKongoumaruFighter.SpdName,
 						$"Special-1 resolved as '{_attacker.CurrentAttackName}'");
 					Expect(_attacker.CurrentAttackStartupFrames == 5, "SPD startup is not five frames");
 					Expect(_attacker.CurrentAttackAnimationName == "spd_grab", "SPD did not select its authored composite animation");
@@ -99,7 +100,7 @@ public partial class SanzouSpdAndAirMomentumRegressionTest : Node2D
 					if (!_attacker.IsAttackActive) return;
 					Expect(_attacker.TryApplyBasicAttackHit(_victim, out int hitstop, out _, out _, out _, out _),
 						"active SPD grab did not capture its grounded victim");
-					Expect(hitstop == 0 && _attacker.SpdGrabConnected, "SPD contact did not enter its capture state");
+					Expect(hitstop == 0 && _attacker.CharacterGrabConnected, "SPD contact did not enter its capture state");
 					Expect(_attacker.CurrentAttackAnimationName == "spd_air_grab", "SPD did not switch to airborne hold art");
 					Expect(_attacker.Velocity.Y <= -1400f, "SPD did not begin its high ascent");
 					_highestY = _attacker.GlobalPosition.Y;
@@ -107,7 +108,7 @@ public partial class SanzouSpdAndAirMomentumRegressionTest : Node2D
 					break;
 				case 3:
 					_highestY = Mathf.Min(_highestY, _attacker.GlobalPosition.Y);
-					if (!_attacker.TryConsumeSpdSlamImpact(out FighterController victim, out _, out int damage)) return;
+					if (!_attacker.TryConsumeCharacterGrabImpact(out FighterController victim, out _, out int damage)) return;
 					Expect(victim == _victim, "SPD slam event referenced the wrong victim");
 					Expect(_highestY <= -300f, $"SPD rose only {-_highestY:0.0}px before descending");
 					Expect(damage == 260, $"SPD slam damage event reported {damage} instead of 260");

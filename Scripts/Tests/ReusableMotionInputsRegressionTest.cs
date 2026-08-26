@@ -137,6 +137,36 @@ public partial class ReusableMotionInputsRegressionTest : Node2D
 		ValidateCharge("charge_down_back_forward_back_up_forward", MotionDirection.DownBack,
 			new[] { MotionDirection.Forward, MotionDirection.Back, MotionDirection.UpForward });
 		ValidateConsumptionAndExpiry();
+		ValidateCleanDirectionalBackdash();
+	}
+
+	private static void ValidateCleanDirectionalBackdash()
+	{
+		var clean = new MotionInputBuffer();
+		clean.PressHorizontalTap(-1, 1, 4, 12, 12, 4, 18);
+		clean.Tick();
+		clean.PressHorizontalTap(-1, 1, 4, 12, 12, 4, 18);
+		Expect(clean.HasDashCommand && clean.DashCommandDirection == -1,
+			"clean double-back did not produce a backward dash command");
+
+		var interrupted = new MotionInputBuffer();
+		interrupted.PressHorizontalTap(-1, 1, 4, 12, 12, 4, 18);
+		interrupted.Tick();
+		interrupted.PressDown();
+		interrupted.Tick();
+		interrupted.PressHorizontalTap(-1, 1, 4, 12, 12, 4, 18);
+		Expect(!interrupted.HasDashCommand,
+			"down input did not invalidate the pending double-back sequence");
+
+		var groundBackdash = GD.Load<ModularFighter.Movement.DashAbility>(
+			"res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_ground_backdash.tres");
+		Expect(groundBackdash != null && groundBackdash.RequireDirectionalDoubleTap && groundBackdash.DisallowDownInput,
+			"Kamui ground backdash is not configured for a clean double-back");
+
+		var airBackdash = GD.Load<ModularFighter.Movement.TeleportDashAbility>(
+			"res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_teleport_backdash.tres");
+		Expect(airBackdash != null && airBackdash.RequireDirectionalDoubleTap && airBackdash.DisallowDownInput,
+			"Kamui air backdash is not configured for a clean double-back");
 	}
 
 	private static bool MatchesSequence(MotionInputDefinition definition, MotionDirection[] directions, int facing)

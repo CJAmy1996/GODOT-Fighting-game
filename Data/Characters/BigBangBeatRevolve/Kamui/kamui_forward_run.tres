@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RunAbility" load_steps=2 format=3]
+[ext_resource type="Script" path="res://Scripts/Movement/RunAbility.cs" id="1"]
+[resource]
+script = ExtResource("1")
+Id = "kamui_forward_run"
+Priority = 10
+Speed = 496.0
+Acceleration = 4340.0
+StopFriction = 5200.0
+CrouchCancelFriction = 2600.0

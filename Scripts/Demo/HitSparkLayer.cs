@@ -13,6 +13,8 @@ public partial class HitSparkLayer : Node2D
 	private const string WallJumpScenePath = "res://Effects/BigBangWallJump189To196.tscn";
 	private const string WallHitScenePath = "res://Effects/BigBangWallHit198To204.tscn";
 	private const string RunDustScenePath = "res://Effects/BigBangRunDust205To217.tscn";
+	private const string SlashHitSparkScenePath = "res://Effects/GenericRevolveSlashHitSpark.tscn";
+	private const string BloodHitSparkScenePath = "res://Effects/BigBangBloodHitSpark.tscn";
 	private const int SparkZIndex = 4096;
 	private static readonly Vector2[] AuthoredDustOffsets =
 	{
@@ -28,6 +30,8 @@ public partial class HitSparkLayer : Node2D
 	private PackedScene _wallJumpScene;
 	private PackedScene _wallHitScene;
 	private PackedScene _runDustScene;
+	private PackedScene _slashHitSparkScene;
+	private PackedScene _bloodHitSparkScene;
 
 	/// <summary>Spawn BBB action 41 at the wall contact, extending inward from either wall.</summary>
 	public BigBangCommonEffect SpawnWallSplat(Vector2 position, int wallDirection, float scale = 1f)
@@ -107,6 +111,45 @@ public partial class HitSparkLayer : Node2D
 		Spawn(position, heavy, facing);
 	}
 
+	public void SpawnContact(Vector2 position, bool heavy, bool slash, PackedScene authoredScene, int facing = 1)
+	{
+		if (!slash)
+		{
+			Spawn(position, heavy, authoredScene, facing);
+			return;
+		}
+
+		if (_slashHitSparkScene == null)
+		{
+			Spawn(position, heavy, authoredScene, facing);
+			return;
+		}
+
+		// Common action 60 layers the slash child over the standard contact core.
+		// Its action 79 child is the shared blood burst; restore both layers here.
+		Spawn(position, heavy, facing);
+		if (_bloodHitSparkScene != null)
+			SpawnScene(_bloodHitSparkScene, position, facing);
+
+		Node instance = _slashHitSparkScene.Instantiate();
+		if (instance is not Node2D node)
+		{
+			instance?.QueueFree();
+			Spawn(position, heavy, authoredScene, facing);
+			return;
+		}
+		if (node is GenericSlashHitSpark slashEffect)
+		{
+			slashEffect.Facing = facing >= 0 ? 1 : -1;
+			slashEffect.Heavy = heavy;
+		}
+		node.TopLevel = true;
+		node.ZAsRelative = false;
+		node.ZIndex = SparkZIndex;
+		node.GlobalPosition = position;
+		AddChild(node);
+	}
+
 	private BigBangCommonEffect SpawnScene(PackedScene scene, Vector2 position, int facing, int delayTicks = 0,
 		bool instantBlock = false)
 	{
@@ -153,5 +196,9 @@ public partial class HitSparkLayer : Node2D
 			_wallHitScene = GD.Load<PackedScene>(WallHitScenePath);
 		if (ResourceLoader.Exists(RunDustScenePath))
 			_runDustScene = GD.Load<PackedScene>(RunDustScenePath);
+		if (ResourceLoader.Exists(SlashHitSparkScenePath))
+			_slashHitSparkScene = GD.Load<PackedScene>(SlashHitSparkScenePath);
+		if (ResourceLoader.Exists(BloodHitSparkScenePath))
+			_bloodHitSparkScene = GD.Load<PackedScene>(BloodHitSparkScenePath);
 	}
 }

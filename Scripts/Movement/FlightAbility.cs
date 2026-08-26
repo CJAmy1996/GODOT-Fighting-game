@@ -162,12 +162,12 @@ public partial class FlightAbility : MovementAbility
 		if (UseDirectionalBoosts && !direction.IsZeroApprox())
 		{
 			if (!HasEnoughAirBoostUses(fighter, runtime, direction)) return false;
-			if (!fighter.HasPlaceholderSpecialMeter(BoostGasCost)) return false;
+			if (!fighter.HasGasMeter(BoostGasCost)) return false;
 			runtime.IntValue2 = BoostMode | ButtonActivation;
 			runtime.VectorValue = direction;
 			return true;
 		}
-		if (!fighter.HasPlaceholderSpecialMeter(GasCostPerFrame)) return false;
+		if (!fighter.HasGasMeter(GasCostPerFrame)) return false;
 		// A press is immediately toggle flight. Holding it long enough converts
 		// this same flight to negative-edge (hold/release) mode.
 		runtime.IntValue2 = ButtonActivation | (fighter.WasGrounded ? GroundButtonLift : 0);
@@ -182,7 +182,7 @@ public partial class FlightAbility : MovementAbility
 		bool authoredSpecialCancel = fighter.CanCancelCurrentNormalIntoSpecial("SPECIAL 1");
 		if (authoredSpecialCancel && (!UseDirectionalBoosts || direction.IsZeroApprox()))
 		{
-			if (!fighter.HasPlaceholderSpecialMeter(GasCostPerFrame)) return false;
+			if (!fighter.HasGasMeter(GasCostPerFrame)) return false;
 			// This is a true special cancel, not a hit-only flight cancel.
 			runtime.IntValue2 = ButtonActivation |
 				(fighter.WasGrounded ? GroundButtonLift : 0) |
@@ -197,7 +197,7 @@ public partial class FlightAbility : MovementAbility
 		{
 			if (!HasEnoughAirBoostUses(fighter, runtime, direction)) return false;
 			float cost = BoostGasCost + Mathf.Max(0f, BoostCancelExtraGasCost);
-			if (!fighter.HasPlaceholderSpecialMeter(cost)) return false;
+			if (!fighter.HasGasMeter(cost)) return false;
 			runtime.IntValue2 = BoostMode | CancelEntry | BoostCancel;
 			runtime.VectorValue = direction;
 			return true;
@@ -212,7 +212,7 @@ public partial class FlightAbility : MovementAbility
 		bool normalHitFlightCancel = AllowNormalHitFlightCancel && fighter.CurrentAttackIsNormal &&
 			fighter.CurrentAttackHasUnblockedHit;
 		if (!recoveryCancel && !normalHitFlightCancel) return false;
-		if (!fighter.HasPlaceholderSpecialMeter(FlightCancelGasCost)) return false;
+		if (!fighter.HasGasMeter(FlightCancelGasCost)) return false;
 		bool blueRecoveryCancel = specialRecoveryCancel;
 		runtime.IntValue2 = CancelEntry | (RequireNeutralBeforeCancelledFlightMovement ? AwaitingNeutral : 0) |
 			(blueRecoveryCancel ? BlueRecoveryCancel | ButtonActivation : 0) |
@@ -231,7 +231,7 @@ public partial class FlightAbility : MovementAbility
 		{
 			CallAudio(fighter, "play_mecha_boost");
 			float cost = BoostGasCost + ((runtime.IntValue2 & BoostCancel) != 0 ? Mathf.Max(0f, BoostCancelExtraGasCost) : 0f);
-			fighter.TrySpendPlaceholderSpecialMeter(cost);
+			fighter.TrySpendGasMeter(cost);
 			runtime.FramesRemaining = Mathf.Max(1, BoostFrames);
 			if (!fighter.WasGrounded)
 			{
@@ -244,7 +244,7 @@ public partial class FlightAbility : MovementAbility
 		}
 		CallAudio(fighter, "play_mecha_boost");
 		if ((runtime.IntValue2 & CancelEntry) != 0)
-			fighter.TrySpendPlaceholderSpecialMeter(FlightCancelGasCost);
+			fighter.TrySpendGasMeter(FlightCancelGasCost);
 	}
 
 	public override bool Tick(FighterController fighter, AbilityRuntime runtime, float delta)
@@ -268,7 +268,7 @@ public partial class FlightAbility : MovementAbility
 			return false;
 		}
 		if ((MaxFrames > 0 && runtime.IntValue >= MaxFrames) ||
-			!fighter.TrySpendPlaceholderSpecialMeter(GasCostPerFrame)) return false;
+			!fighter.TrySpendGasMeter(GasCostPerFrame)) return false;
 		if ((runtime.IntValue2 & GroundButtonLift) != 0)
 		{
 			// A grounded flight cancel is not complete until the body has actually

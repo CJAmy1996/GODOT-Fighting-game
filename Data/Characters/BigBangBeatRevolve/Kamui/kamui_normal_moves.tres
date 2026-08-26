@@ -1,7 +1,623 @@
-[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=53 format=3 uid="uid://bvl8mmy3vtqs0"]
 
-[ext_resource type="Script" path="res://Scripts/Core/NormalMoveSet.cs" id="1"]
+[ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="1_box"]
+[ext_resource type="Script" uid="uid://br48dic8s6gkm" path="res://Scripts/Core/NormalMoveData.cs" id="2_move"]
+[ext_resource type="Script" uid="uid://br5l43bdiww0l" path="res://Scripts/Core/NormalMoveSet.cs" id="3_set"]
+[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/Kamui/kamui_sprite_frames.tres" id="4_frames"]
+[ext_resource type="PackedScene" path="res://Effects/KamuiSwordHitSpark.tscn" id="5_sword_spark"]
+
+[sub_resource type="Resource" id="LightBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-38, -132, 76, 132)
+
+[sub_resource type="Resource" id="LightHit"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 7
+EndFrame = 11
+LocalRect = Rect2(22, -126, 74, 58)
+
+[sub_resource type="Resource" id="StandingLight"]
+script = ExtResource("2_move")
+AttackName = "LIGHT PUNCH"
+AnimationName = "light_punch"
+Stance = 1
+StartupFrames = 7
+ActiveFrames = 5
+RecoveryFrames = 5
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToMedium = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+RepeatLightPunchChainTarget = "MEDIUM PUNCH"
+MaxUsesPerCombo = 1
+ChainEarliestActiveFramesLeft = 3
+HitstunFrames = 9
+BlockstunFrames = 5
+HitstopFrames = 5
+BoxTimeline = [SubResource("LightBody"), SubResource("LightHit")]
+
+[sub_resource type="Resource" id="CrouchingLightPunchBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-38, -80, 76, 80)
+
+[sub_resource type="Resource" id="CrouchingLightPunchHit"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 7
+EndFrame = 11
+LocalRect = Rect2(14, -58, 88, 42)
+
+[sub_resource type="Resource" id="CrouchingLightPunch"]
+script = ExtResource("2_move")
+AttackName = "LIGHT PUNCH"
+AnimationName = "crouching_light_punch"
+Stance = 2
+StartupFrames = 7
+ActiveFrames = 5
+RecoveryFrames = 5
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToMedium = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+MaxUsesPerCombo = 1
+ChainEarliestActiveFramesLeft = 3
+Damage = 45
+HitstunFrames = 9
+BlockstunFrames = 5
+HitstopFrames = 5
+BoxTimeline = [SubResource("CrouchingLightPunchBody"), SubResource("CrouchingLightPunchHit")]
+
+[sub_resource type="Resource" id="AirLightPunch"]
+script = ExtResource("2_move")
+AttackName = "LIGHT PUNCH"
+AnimationName = "air_light_punch"
+Stance = 3
+StartupFrames = 7
+ActiveFrames = 5
+RecoveryFrames = 5
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToMedium = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+MaxUsesPerCombo = 1
+ChainEarliestActiveFramesLeft = 3
+HitstunFrames = 9
+BlockstunFrames = 5
+HitstopFrames = 5
+BoxTimeline = [SubResource("LightBody"), SubResource("LightHit")]
+
+[sub_resource type="Resource" id="MediumBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-40, -136, 80, 136)
+
+[sub_resource type="Resource" id="MediumHit1"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 6
+EndFrame = 7
+LocalRect = Rect2(48, -128, 250, 105)
+HitGroup = 1
+Damage = 18
+HitstunFrames = 8
+BlockstunFrames = 5
+HitstopFrames = 2
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="MediumHit2"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 10
+EndFrame = 11
+LocalRect = Rect2(48, -128, 250, 105)
+HitGroup = 2
+Damage = 18
+HitstunFrames = 8
+BlockstunFrames = 5
+HitstopFrames = 2
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="MediumHit3"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 14
+EndFrame = 15
+LocalRect = Rect2(48, -128, 250, 105)
+HitGroup = 3
+Damage = 18
+HitstunFrames = 8
+BlockstunFrames = 5
+HitstopFrames = 2
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="MediumHit4"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 18
+EndFrame = 19
+LocalRect = Rect2(48, -128, 250, 105)
+HitGroup = 4
+Damage = 18
+HitstunFrames = 8
+BlockstunFrames = 5
+HitstopFrames = 2
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="MediumHit5"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 22
+EndFrame = 23
+LocalRect = Rect2(48, -128, 250, 105)
+HitGroup = 5
+Damage = 18
+HitstunFrames = 12
+BlockstunFrames = 7
+HitstopFrames = 4
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="StandingMedium"]
+script = ExtResource("2_move")
+AttackName = "MEDIUM PUNCH"
+AnimationName = "standing_medium_punch"
+Stance = 1
+StartupFrames = 6
+ActiveFrames = 18
+RecoveryFrames = 3
+SuppressFallbackHitbox = true
+EffectSpriteFrames = ExtResource("4_frames")
+EffectAnimationName = "medium_punch_effect"
+EffectSpawnFrame = 6
+EffectSpawnOffset = Vector2(184, -57)
+CanChainToHeavy = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+Damage = 18
+HitstunFrames = 8
+BlockstunFrames = 5
+HitstopFrames = 2
+Pushback = 90.0
+BoxTimeline = [SubResource("MediumBody"), SubResource("MediumHit1"), SubResource("MediumHit2"), SubResource("MediumHit3"), SubResource("MediumHit4"), SubResource("MediumHit5")]
+
+[sub_resource type="Resource" id="BackMediumPunch"]
+script = ExtResource("2_move")
+AttackName = "MEDIUM PUNCH BACK"
+AnimationName = "standing_medium_punch"
+Stance = 1
+StartupFrames = 6
+ActiveFrames = 18
+RecoveryFrames = 3
+SuppressFallbackHitbox = true
+EffectSpriteFrames = ExtResource("4_frames")
+EffectAnimationName = "medium_punch_effect"
+EffectSpawnFrame = 6
+EffectSpawnOffset = Vector2(184, -57)
+EffectVelocity = Vector2(240, 0)
+EffectHorizontalDecelerationPerFrame = 40.0
+EffectFadeStartFrame = 4
+EffectOpacityLossPerFrame = 15.0
+EffectEndScale = Vector2(0.35, 0.35)
+EffectScaleStartFrame = 4
+EffectScaleEndFrame = 24
+EffectScaleFromFacingBackEdge = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+Damage = 18
+HitstunFrames = 8
+BlockstunFrames = 5
+HitstopFrames = 2
+Pushback = 90.0
+BoxTimeline = [SubResource("MediumBody"), SubResource("MediumHit1"), SubResource("MediumHit2"), SubResource("MediumHit3"), SubResource("MediumHit4"), SubResource("MediumHit5")]
+
+[sub_resource type="Resource" id="HeavyBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-44, -140, 88, 140)
+
+[sub_resource type="Resource" id="HeavyHit"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 9
+EndFrame = 20
+LocalRect = Rect2(18, -180, 190, 120)
+Damage = 95
+HitstunFrames = 16
+BlockstunFrames = 10
+HitstopFrames = 6
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="StandingHeavy"]
+script = ExtResource("2_move")
+AttackName = "HEAVY PUNCH"
+AnimationName = "standing_heavy_punch"
+Stance = 1
+StartupFrames = 9
+ActiveFrames = 12
+RecoveryFrames = 15
+SuppressFallbackHitbox = true
+EffectSpriteFrames = ExtResource("4_frames")
+EffectAnimationName = "standing_heavy_sword_effect"
+EffectSpawnFrame = 9
+EffectSpawnOffset = Vector2(72, -132)
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+Damage = 95
+HitstunFrames = 16
+BlockstunFrames = 10
+HitstopFrames = 6
+BoxTimeline = [SubResource("HeavyBody"), SubResource("HeavyHit")]
+
+[sub_resource type="Resource" id="ForwardHeavyPunchBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-48, -142, 96, 142)
+
+[sub_resource type="Resource" id="ForwardHeavyPunchHit1"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 15
+EndFrame = 17
+LocalRect = Rect2(18, -130, 230, 100)
+HitGroup = 1
+Damage = 52
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 4
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="ForwardHeavyPunchHit2"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 18
+EndFrame = 20
+LocalRect = Rect2(18, -130, 230, 100)
+HitGroup = 2
+Damage = 58
+HitstunFrames = 18
+BlockstunFrames = 11
+HitstopFrames = 7
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="ForwardHeavyPunch"]
+script = ExtResource("2_move")
+AttackName = "HEAVY PUNCH FORWARD"
+AnimationName = "forward_heavy_punch"
+Stance = 1
+StartupFrames = 15
+ActiveFrames = 6
+RecoveryFrames = 9
+SuppressFallbackHitbox = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+Damage = 110
+HitstunFrames = 18
+BlockstunFrames = 11
+HitstopFrames = 7
+BoxTimeline = [SubResource("ForwardHeavyPunchBody"), SubResource("ForwardHeavyPunchHit1"), SubResource("ForwardHeavyPunchHit2")]
+
+[sub_resource type="Resource" id="AirHeavyPunch"]
+script = ExtResource("2_move")
+AttackName = "HEAVY PUNCH AIR"
+AnimationName = "forward_heavy_punch"
+Stance = 3
+StartupFrames = 15
+ActiveFrames = 6
+RecoveryFrames = 9
+SuppressFallbackHitbox = true
+SwordSlashSound = 4
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+Damage = 110
+HitstunFrames = 18
+BlockstunFrames = 11
+HitstopFrames = 7
+BoxTimeline = [SubResource("ForwardHeavyPunchBody"), SubResource("ForwardHeavyPunchHit1"), SubResource("ForwardHeavyPunchHit2")]
+
+[sub_resource type="Resource" id="CrouchingHeavyPunchBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-48, -106, 96, 106)
+
+[sub_resource type="Resource" id="CrouchingHeavyPunchHit1"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 16
+EndFrame = 21
+LocalRect = Rect2(18, -116, 176, 104)
+Damage = 92
+HitstunFrames = 17
+BlockstunFrames = 10
+HitstopFrames = 7
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="CrouchingHeavyPunch"]
+script = ExtResource("2_move")
+AttackName = "HEAVY PUNCH CROUCHING"
+AnimationName = "crouching_heavy_punch"
+Stance = 2
+StartupFrames = 16
+ActiveFrames = 6
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+HitSparkScene = ExtResource("5_sword_spark")
+SwordSlashSound = 4
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+Damage = 92
+HitstunFrames = 17
+BlockstunFrames = 10
+HitstopFrames = 7
+BoxTimeline = [SubResource("CrouchingHeavyPunchBody"), SubResource("CrouchingHeavyPunchHit1")]
+Launches = true
+LaunchSpeed = 1265.0
+LaunchHitstunFrames = 30
+
+[sub_resource type="Resource" id="SweepBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-48, -92, 96, 92)
+
+[sub_resource type="Resource" id="SweepHit"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 9
+EndFrame = 20
+LocalRect = Rect2(18, -60, 190, 58)
+Damage = 90
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 6
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="CrouchingHeavySweep"]
+script = ExtResource("2_move")
+AttackName = "HEAVY KICK CROUCHING"
+AnimationName = "crouching_heavy_kick"
+Stance = 2
+StartupFrames = 9
+ActiveFrames = 12
+RecoveryFrames = 18
+SuppressFallbackHitbox = true
+EffectSpriteFrames = ExtResource("4_frames")
+EffectAnimationName = "crouching_heavy_sword_effect"
+EffectSpawnFrame = 9
+EffectSpawnOffset = Vector2(112, -42)
+EffectRotationDegrees = 90.0
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+Damage = 90
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 6
+HitReaction = 2
+KnockdownType = 1
+KnocksDown = true
+KnockdownFrames = 48
+BoxTimeline = [SubResource("SweepBody"), SubResource("SweepHit")]
+
+[sub_resource type="Resource" id="StandingLightKickBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-42, -138, 84, 138)
+
+[sub_resource type="Resource" id="StandingLightKickHit"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 6
+EndFrame = 19
+LocalRect = Rect2(16, -104, 132, 76)
+Damage = 42
+HitstunFrames = 10
+BlockstunFrames = 6
+HitstopFrames = 5
+
+[sub_resource type="Resource" id="StandingLightKick"]
+script = ExtResource("2_move")
+AttackName = "LIGHT KICK"
+AnimationName = "standing_light_kick"
+Stance = 1
+StartupFrames = 6
+ActiveFrames = 14
+RecoveryFrames = 10
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToMedium = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+MaxUsesPerCombo = 1
+ChainEarliestActiveFramesLeft = 3
+Damage = 42
+HitstunFrames = 10
+BlockstunFrames = 6
+HitstopFrames = 5
+BoxTimeline = [SubResource("StandingLightKickBody"), SubResource("StandingLightKickHit")]
+
+[sub_resource type="Resource" id="CrouchingSwordLightBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-46, -94, 92, 94)
+
+[sub_resource type="Resource" id="CrouchingSwordLightHit"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 6
+EndFrame = 11
+LocalRect = Rect2(12, -72, 150, 68)
+Damage = 45
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 5
+
+[sub_resource type="Resource" id="CrouchingSwordLightKick"]
+script = ExtResource("2_move")
+AttackName = "LIGHT KICK"
+AnimationName = "crouching_light_kick"
+Stance = 2
+StartupFrames = 6
+ActiveFrames = 6
+RecoveryFrames = 6
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToMedium = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+MaxUsesPerCombo = 1
+ChainEarliestActiveFramesLeft = 3
+Damage = 45
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 5
+BoxTimeline = [SubResource("CrouchingSwordLightBody"), SubResource("CrouchingSwordLightHit")]
+
+[sub_resource type="Resource" id="AirLightKickHit"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 6
+EndFrame = 11
+LocalRect = Rect2(12, -72, 150, 68)
+Damage = 45
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 5
+
+[sub_resource type="Resource" id="AirSwordLightKick"]
+script = ExtResource("2_move")
+AttackName = "LIGHT KICK"
+AnimationName = "air_light_kick"
+Stance = 3
+StartupFrames = 6
+ActiveFrames = 6
+RecoveryFrames = 6
+SuppressFallbackHitbox = true
+CanChainToLight = true
+CanChainToMedium = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+MaxUsesPerCombo = 1
+ChainEarliestActiveFramesLeft = 3
+Damage = 45
+HitstunFrames = 11
+BlockstunFrames = 7
+HitstopFrames = 5
+BoxTimeline = [SubResource("CrouchingSwordLightBody"), SubResource("AirLightKickHit")]
+
+[sub_resource type="Resource" id="StandingHeavyKickBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-46, -142, 92, 142)
+
+[sub_resource type="Resource" id="StandingHeavyKickHit"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 14
+EndFrame = 22
+LocalRect = Rect2(14, -142, 220, 114)
+Damage = 105
+HitstunFrames = 18
+BlockstunFrames = 11
+HitstopFrames = 7
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="StandingHeavyKick"]
+script = ExtResource("2_move")
+AttackName = "HEAVY KICK"
+AnimationName = "standing_heavy_kick"
+Stance = 1
+StartupFrames = 14
+ActiveFrames = 9
+RecoveryFrames = 32
+SuppressFallbackHitbox = true
+ForwardDriveDistance = 80.0
+ForwardDriveStartFrame = 4
+ForwardDriveEndFrame = 22
+SwordSlashSound = 4
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+Damage = 105
+HitstunFrames = 18
+BlockstunFrames = 11
+HitstopFrames = 7
+BoxTimeline = [SubResource("StandingHeavyKickBody"), SubResource("StandingHeavyKickHit")]
+
+[sub_resource type="Resource" id="AirHeavyKick"]
+script = ExtResource("2_move")
+AttackName = "HEAVY KICK"
+AnimationName = "standing_heavy_kick"
+Stance = 3
+StartupFrames = 14
+ActiveFrames = 9
+RecoveryFrames = 32
+SuppressFallbackHitbox = true
+SwordSlashSound = 4
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+Damage = 105
+HitstunFrames = 18
+BlockstunFrames = 11
+HitstopFrames = 7
+BoxTimeline = [SubResource("StandingHeavyKickBody"), SubResource("StandingHeavyKickHit")]
+
+[sub_resource type="Resource" id="BackMediumKickBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-44, -140, 88, 140)
+
+[sub_resource type="Resource" id="BackMediumKickHit"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 8
+EndFrame = 15
+LocalRect = Rect2(12, -126, 224, 76)
+Damage = 78
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 6
+HitSparkScene = ExtResource("5_sword_spark")
+
+[sub_resource type="Resource" id="BackMediumKick"]
+script = ExtResource("2_move")
+AttackName = "MEDIUM KICK BACK"
+AnimationName = "back_medium_kick"
+Stance = 1
+StartupFrames = 8
+ActiveFrames = 8
+RecoveryFrames = 8
+SuppressFallbackHitbox = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+ChainEarliestActiveFramesLeft = 3
+Damage = 78
+HitstunFrames = 15
+BlockstunFrames = 9
+HitstopFrames = 6
+BoxTimeline = [SubResource("BackMediumKickBody"), SubResource("BackMediumKickHit")]
+
+[sub_resource type="Resource" id="ThrowBody"]
+script = ExtResource("1_box")
+LocalRect = Rect2(-42, -136, 84, 136)
+
+[sub_resource type="Resource" id="ThrowGrab"]
+script = ExtResource("1_box")
+Kind = 1
+StartFrame = 5
+EndFrame = 8
+LocalRect = Rect2(10, -106, 82, 92)
+Attributes = 4
+AttackLevel = 0
+
+[sub_resource type="Resource" id="GroundThrow"]
+script = ExtResource("2_move")
+AttackName = "THROW"
+AnimationName = "throw"
+Stance = 1
+StartupFrames = 5
+ActiveFrames = 4
+RecoveryFrames = 23
+SuppressFallbackHitbox = true
+AnimationTailName = "forward_throw"
+AnimationTailStartFrame = 5
+ConnectedThrowRecoveryFrames = 61
+KnockdownType = 3
+KnocksDown = true
+KnockdownFrames = 42
+BoxTimeline = [SubResource("ThrowBody"), SubResource("ThrowGrab")]
 
 [resource]
-script = ExtResource("1")
-Rules = []
+script = ExtResource("3_set")
+Rules = [SubResource("StandingLight"), SubResource("CrouchingLightPunch"), SubResource("AirLightPunch"), SubResource("StandingMedium"), SubResource("BackMediumPunch"), SubResource("StandingHeavy"), SubResource("ForwardHeavyPunch"), SubResource("AirHeavyPunch"), SubResource("CrouchingHeavyPunch"), SubResource("CrouchingHeavySweep"), SubResource("StandingLightKick"), SubResource("CrouchingSwordLightKick"), SubResource("AirSwordLightKick"), SubResource("StandingHeavyKick"), SubResource("AirHeavyKick"), SubResource("BackMediumKick"), SubResource("GroundThrow")]

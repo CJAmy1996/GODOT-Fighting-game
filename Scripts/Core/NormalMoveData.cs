@@ -95,6 +95,15 @@ public enum SpecialReactionKind
 	GuardPullbackAir
 }
 
+public enum SwordSlashSoundStrength
+{
+	Auto,
+	Light,
+	Medium,
+	Heavy,
+	Heaviest
+}
+
 /// <summary>
 /// Per-normal combo/cancel/launcher rule data. Designers should make one of these
 /// for any normal that differs from the character's default behavior.
@@ -138,6 +147,12 @@ public partial class NormalMoveData : Resource
 	/// </summary>
 	[Export] public Vector2[] AnimationDrawingOffsets { get; set; } = Array.Empty<Vector2>();
 
+	[ExportGroup("Movement")]
+	/// <summary>Total grounded distance travelled forward across the inclusive attack-frame window.</summary>
+	[Export] public float ForwardDriveDistance { get; set; }
+	[Export] public int ForwardDriveStartFrame { get; set; } = -1;
+	[Export] public int ForwardDriveEndFrame { get; set; } = -1;
+
 	[ExportGroup("Visual Effect")]
 	[Export] public SpriteFrames EffectSpriteFrames { get; set; }
 	[Export] public string EffectAnimationName { get; set; } = "";
@@ -145,6 +160,18 @@ public partial class NormalMoveData : Resource
 	[Export] public Vector2 EffectSpawnOffset { get; set; } = Vector2.Zero;
 	[Export] public Vector2 EffectVisualOffset { get; set; } = Vector2.Zero;
 	[Export] public Vector2 EffectScale { get; set; } = Vector2.One;
+	[Export(PropertyHint.Range, "-360,360,1")] public float EffectRotationDegrees { get; set; }
+	/// <summary>Source-authored effect travel in pixels per second, mirrored with fighter facing.</summary>
+	[Export] public Vector2 EffectVelocity { get; set; } = Vector2.Zero;
+	/// <summary>Per-frame horizontal speed loss, matching Big Bang Beat's M command.</summary>
+	[Export(PropertyHint.Range, "0,1000,1")] public float EffectHorizontalDecelerationPerFrame { get; set; }
+	[Export] public int EffectFadeStartFrame { get; set; } = -1;
+	[Export(PropertyHint.Range, "0,255,1")] public float EffectOpacityLossPerFrame { get; set; }
+	[Export] public Vector2 EffectEndScale { get; set; } = Vector2.One;
+	[Export] public int EffectScaleStartFrame { get; set; } = -1;
+	[Export] public int EffectScaleEndFrame { get; set; } = -1;
+	/// <summary>Keeps the rear tip fixed at the fighter's hand while the effect scales.</summary>
+	[Export] public bool EffectScaleFromFacingBackEdge { get; set; }
 	[Export] public bool EffectRequiresFullCharge { get; set; }
 	[Export] public bool EffectAdditiveBlend { get; set; }
 	/// <summary>Discard the opaque near-black backing used by legacy additive effect sheets.</summary>
@@ -157,6 +184,7 @@ public partial class NormalMoveData : Resource
 	[Export] public SpriteFrames EffectDefenderFireSpriteFrames { get; set; }
 	[Export] public string EffectDefenderFireAnimationName { get; set; } = "";
 	[Export] public PackedScene HitSparkScene { get; set; }
+	[Export] public SwordSlashSoundStrength SwordSlashSound { get; set; } = SwordSlashSoundStrength.Auto;
 
 	[ExportGroup("Charge")]
 	[Export] public bool Chargeable { get; set; }
@@ -164,6 +192,7 @@ public partial class NormalMoveData : Resource
 
 	[ExportGroup("Chains")]
 	[Export] public bool CanChainToLight { get; set; }
+	[Export] public bool CanChainToMedium { get; set; }
 	[Export] public bool CanChainToHeavy { get; set; }
 	[Export] public bool CanChainToSpecial { get; set; }
 	[Export] public string[] AllowedChainTargets { get; set; } = Array.Empty<string>();
@@ -248,7 +277,8 @@ public partial class NormalMoveData : Resource
 		string ruleName = AttackName?.Trim().ToUpperInvariant() ?? "ANY";
 		string moveName = currentAttackName.ToUpperInvariant();
 		if (ruleName == "" || ruleName == "ANY") return true;
-		if (ruleName == "LIGHT" || ruleName == "HEAVY" || ruleName == "SPECIAL") return moveName.StartsWith(ruleName);
+		if (ruleName == "LIGHT" || ruleName == "MEDIUM" || ruleName == "HEAVY" || ruleName == "SPECIAL")
+			return IsAttackStrength(moveName, ruleName);
 		return moveName == ruleName;
 	}
 
@@ -262,9 +292,18 @@ public partial class NormalMoveData : Resource
 		}
 
 		string next = nextAttackName.ToUpperInvariant();
-		return (next.StartsWith("LIGHT") && CanChainToLight) ||
-			(next.StartsWith("HEAVY") && CanChainToHeavy) ||
+		return (IsAttackStrength(next, "LIGHT") && CanChainToLight) ||
+			(IsAttackStrength(next, "MEDIUM") && CanChainToMedium) ||
+			(IsAttackStrength(next, "HEAVY") && CanChainToHeavy) ||
 			(next.StartsWith("SPECIAL") && CanChainToSpecial);
+	}
+
+	internal static bool IsAttackStrength(string attackName, string strength)
+	{
+		if (string.IsNullOrWhiteSpace(attackName) || string.IsNullOrWhiteSpace(strength)) return false;
+		string expected = strength.ToUpperInvariant();
+		return Array.Exists(attackName.ToUpperInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries),
+			word => word == expected);
 	}
 
 	internal static bool MatchesAttackToken(string token, string attackName) =>

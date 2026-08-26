@@ -12,6 +12,7 @@ public partial class SpecialMoveData : NormalMoveData
 	[ExportGroup("Command Input")]
 	[Export] public MotionInputBinding CommandInput { get; set; }
 	[Export] public bool CanCancelIntoFromNormals { get; set; }
+	[Export] public bool RequiresSwordInHand { get; set; }
 
 	[ExportGroup("Guard Cancel")]
 	[Export] public bool GuardCancel { get; set; }
@@ -46,8 +47,20 @@ public partial class SpecialMoveData : NormalMoveData
 	[Export] public Vector2 ProjectileVisualOffset { get; set; } = Vector2.Zero;
 	[Export] public Vector2 ProjectileVisualScale { get; set; } = Vector2.One;
 	[Export] public bool ProjectileVisualAdditiveBlend { get; set; }
+	/// <summary>Removes opaque near-black pixels before additive projectile rendering.</summary>
+	[Export] public bool ProjectileVisualBlackKey { get; set; }
+	[Export] public string ProjectileTrailAnimationName { get; set; } = "";
+	[Export(PropertyHint.Range, "0,12,1")] public int ProjectileTrailCount { get; set; }
+	[Export(PropertyHint.Range, "1,30,1")] public int ProjectileTrailFrameSpacing { get; set; } = 4;
+	[Export(PropertyHint.Range, "0.0,1.0,0.05")] public float ProjectileTrailOpacity { get; set; } = 0.65f;
+	[Export(PropertyHint.Range, "0.0,0.5,0.01")] public float ProjectileTrailScaleStep { get; set; } = 0.1f;
+	[Export(PropertyHint.Range, "1,120,1")] public int ProjectileTrailLifetimeFrames { get; set; } = 30;
+	[Export(PropertyHint.Range, "0.0,255.0,1.0")] public float ProjectileTrailOpacityLossPerFrame { get; set; }
 	[Export(PropertyHint.Range, "1,30,1")] public int ProjectileHitCount { get; set; } = 1;
 	[Export(PropertyHint.Range, "1,30,1")] public int ProjectileHitCooldownFrames { get; set; } = 4;
+	/// <summary>Source effect frame where the damaging FA box first becomes active.</summary>
+	[Export(PropertyHint.Range, "0,600,1")] public int ProjectileHitStartFrame { get; set; }
+	[Export] public bool ProjectilePersistsVisuallyAfterFinalHit { get; set; }
 	/// <summary>Keeps beam-style projectiles attached to their firing point instead of travelling.</summary>
 	[Export] public bool ProjectileAnchoredToOwner { get; set; }
 	/// <summary>Mirrors an asymmetric local hitbox so it always extends in the owner's facing direction.</summary>
@@ -56,12 +69,18 @@ public partial class SpecialMoveData : NormalMoveData
 	/// <summary>Optional source-authored horizontal speed change. A negative frame disables it.</summary>
 	[Export] public float ProjectileSecondarySpeed { get; set; } = -1f;
 	[Export] public int ProjectileSecondarySpeedFrame { get; set; } = -1;
+	/// <summary>Source M-command velocity delta applied after each authored 60 Hz movement tick.</summary>
+	[Export] public float ProjectileSpeedDeltaPerFrame { get; set; }
 	/// <summary>Source-authored visual scale interpolation. ProjectileVisualScale is the target scale.</summary>
 	[Export] public Vector2 ProjectileVisualStartScale { get; set; } = Vector2.One;
 	[Export] public int ProjectileVisualScaleStartFrame { get; set; }
 	[Export] public int ProjectileVisualScaleEndFrame { get; set; }
 	/// <summary>Keeps cropped drawings of different dimensions on one authored bottom edge.</summary>
 	[Export] public bool ProjectileVisualBottomAnchored { get; set; }
+	/// <summary>Source color-command segments: frame, starting alpha (0-255), and alpha loss per 60 Hz tick.</summary>
+	[Export] public int[] ProjectileVisualOpacityFrames { get; set; } = System.Array.Empty<int>();
+	[Export] public float[] ProjectileVisualOpacityValues { get; set; } = System.Array.Empty<float>();
+	[Export] public float[] ProjectileVisualOpacityLossPerFrame { get; set; } = System.Array.Empty<float>();
 	[Export] public SpriteFrames ProjectileImpactSpriteFrames { get; set; }
 	[Export] public string ProjectileImpactAnimationName { get; set; } = "";
 	[Export] public Vector2 ProjectileImpactVisualOffset { get; set; } = Vector2.Zero;
@@ -74,6 +93,26 @@ public partial class SpecialMoveData : NormalMoveData
 	[Export] public string ProjectileImpactDefenderFireAnimationName { get; set; } = "";
 	[Export] public Curve2D ProjectilePath { get; set; }
 	[Export(PropertyHint.Range, "1,600,1")] public int ProjectilePathTravelFrames { get; set; } = 60;
+
+	[ExportGroup("Projectile Assist Emission")]
+	/// <summary>Lets a summoned entity emit a second, independently damaging projectile.</summary>
+	[Export] public bool EmitsAssistProjectile { get; set; }
+	[Export(PropertyHint.Range, "0,600,1")] public int AssistProjectileSpawnFrame { get; set; }
+	[Export] public Vector2 AssistProjectileSpawnOffset { get; set; } = Vector2.Zero;
+	[Export] public float AssistProjectileSpeed { get; set; } = 420f;
+	[Export] public float AssistProjectileVerticalSpeed { get; set; } = -260f;
+	[Export] public float AssistProjectileGravity { get; set; } = 900f;
+	[Export] public Rect2 AssistProjectileHitboxLocal { get; set; } = new(-24f, -24f, 48f, 48f);
+	[Export] public SpriteFrames AssistProjectileSpriteFrames { get; set; }
+	[Export] public string AssistProjectileAnimationName { get; set; } = "";
+	[Export] public Vector2 AssistProjectileVisualOffset { get; set; } = Vector2.Zero;
+	[Export] public Vector2 AssistProjectileVisualScale { get; set; } = Vector2.One;
+	[Export] public bool AssistProjectileDirectionalHitbox { get; set; }
+	[Export] public string AssistProjectileGroundAnimationName { get; set; } = "";
+	/// <summary>Visible pixels below the texture origin; used for exact floor contact on uncropped source art.</summary>
+	[Export] public float AssistProjectileGroundContactOffset { get; set; }
+	[Export(PropertyHint.Range, "1,600,1")] public int AssistProjectileLifetimeFrames { get; set; } = 120;
+	[Export(PropertyHint.Range, "1,600,1")] public int AssistProjectileGroundLifetimeFrames { get; set; } = 69;
 
 	[ExportGroup("Reflector")]
 	[Export] public PackedScene ReflectorScene { get; set; }

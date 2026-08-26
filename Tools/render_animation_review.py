@@ -55,7 +55,19 @@ def load_catalog_row(character: str, animation: str) -> tuple[Path, dict[str, st
     raise ValueError(f"{animation} was not found in {catalog}")
 
 
-def render(character: str, animation: str, start: int = 0, end: int | None = None) -> tuple[Path, Path]:
+def foot_anchor_x(image: Image.Image) -> int:
+    alpha = image.getchannel("A")
+    pixels = alpha.load()
+    bottom = max(y for y in range(image.height) if any(pixels[x, y] > 20 for x in range(image.width)))
+    contacts = [x for y in range(max(0, bottom - 5), bottom + 1)
+                for x in range(image.width) if pixels[x, y] > 20]
+    return sorted(contacts)[len(contacts) // 2]
+
+
+def render(character: str, animation: str, start: int = 0, end: int | None = None,
+           lock_feet: bool = False, source_offsets: bool = False) -> tuple[Path, Path]:
+    # Source drawing offsets are populated by the catalog branch below.
+    drawing_offsets: list[tuple[int, int]] = []
     if character == "MechaHeita" and animation in {
             "booster_forward", "booster_up_forward", "booster_down_forward", "booster_back"}:
         character_dir = ASSET_ROOT / character
@@ -82,12 +94,33 @@ def render(character: str, animation: str, start: int = 0, end: int | None = Non
         source_ids = row["source_frames"].split()
         resolved_ids = row["resolved_frames"].split()
         hold_ticks = [int(value) for value in row["hold_ticks"].split()]
+        drawing_offsets = list(zip(
+            [int(value) for value in row["offset_x"].split()],
+            [int(value) for value in row["offset_y"].split()]))
         if not (len(source_ids) == len(resolved_ids) == len(hold_ticks)):
             raise ValueError(f"{animation} has mismatched frame metadata")
-        images = [
-            Image.open(character_dir / "Frames" / f"frame_{int(frame_id):04d}.png").convert("RGBA")
-            for frame_id in resolved_ids
-        ]
+        images = []
+        for drawing_index, frame_id in enumerate(resolved_ids):
+            frame_path = character_dir / "Frames" / f"frame_{int(frame_id):04d}.png"
+            aligned_path = character_dir / "Frames" / "Aligned" / animation / f"drawing_{drawing_index:02d}.png"
+            if aligned_path.is_file():
+                frame_path = aligned_path
+            images.append(Image.open(frame_path).convert("RGBA"))
+    if source_offsets and drawing_offsets:
+        aligned = []
+        for image, offset in zip(images, drawing_offsets):
+            shifted = Image.new("RGBA", image.size)
+            shifted.alpha_composite(image, offset)
+            aligned.append(shifted)
+        images = aligned
+    if lock_feet:
+        target_x = foot_anchor_x(images[0])
+        aligned = []
+        for image in images:
+            shifted = Image.new("RGBA", image.size)
+            shifted.alpha_composite(image, (target_x - foot_anchor_x(image), 0))
+            aligned.append(shifted)
+        images = aligned
     original_count = len(images)
     end = original_count if end is None else min(end, original_count)
     if start < 0 or start >= end:
@@ -155,8 +188,11 @@ def main() -> None:
     parser.add_argument("animation", help="Catalog animation, for example anim_000")
     parser.add_argument("--start", type=int, default=0, help="First drawing index to include")
     parser.add_argument("--end", type=int, help="Exclusive drawing index to include")
+    parser.add_argument("--lock-feet", action="store_true", help="Keep the bottom contact anchor fixed")
+    parser.add_argument("--source-offsets", action="store_true", help="Apply CSV drawing offsets")
     args = parser.parse_args()
-    gif_path, sheet_path = render(args.character, args.animation, args.start, args.end)
+    gif_path, sheet_path = render(args.character, args.animation, args.start, args.end,
+                                  args.lock_feet, args.source_offsets)
     print(gif_path)
     print(sheet_path)
 

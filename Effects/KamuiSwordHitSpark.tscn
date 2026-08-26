@@ -1,0 +1,27 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Demo/CompositeSwordHitSpark.cs" id="1_root"]
+[ext_resource type="Script" path="res://Scripts/Demo/BigBangCommonEffect.cs" id="2_blood"]
+[ext_resource type="Script" path="res://Scripts/Demo/AuthoredHitSpark.cs" id="3_slash"]
+[ext_resource type="Texture2D" path="res://Assets/TestFighter/BigBangBeatRevolve/Kamui/Effects/SwordHitSpark/slash_horizontal.png" id="4_texture"]
+
+[sub_resource type="SpriteFrames" id="SlashFrames"]
+animations = [{
+"frames": [{"duration": 8.0, "texture": ExtResource("4_texture")}],
+"loop": false,
+"name": &"default",
+"speed": 60.0
+}]
+
+[node name="KamuiSwordHitSpark" type="Node2D"]
+script = ExtResource("1_root")
+
+[node name="Blood" type="Node2D" parent="."]
+script = ExtResource("2_blood")
+EffectKind = 4
+
+[node name="Slash" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SlashFrames")
+animation = &"default"
+autoplay = "default"
+script = ExtResource("3_slash")

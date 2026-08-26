@@ -66,6 +66,7 @@ FighterOnePath = NodePath("../Fighter")
 FighterTwoPath = NodePath("../Opponent")
 StageCameraPath = NodePath("../StageCamera")
 StageRulesPath = NodePath("../VersusStageRules")
+LifeBarTopOffset = 36.0
 
 [node name="TrainingBlockControls" type="Control" parent="HUD"]
 layout_mode = 3

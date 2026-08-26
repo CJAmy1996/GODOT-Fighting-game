@@ -159,6 +159,12 @@ public sealed class MotionInputBuffer
 	public void PressDown()
 	{
 		_framesSinceDown = 0;
+		// Down/down-back is never part of a clean directional dash. Discard both
+		// the first tap and any completed-but-unconsumed dash command.
+		_framesSinceLeftTap = int.MaxValue;
+		_framesSinceRightTap = int.MaxValue;
+		_dashCommandFramesLeft = 0;
+		_dashCommandDirection = 0;
 		if (_framesSinceForwardTap <= 16) _forwardThenDownFramesLeft = 16;
 	}
 

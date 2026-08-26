@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TeleportDashAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/TeleportDashAbility.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Id = "air_dash"
+Priority = 20
+Distance = 240.0
+StartupFrames = 6
+ActiveFrames = 18
+MaxAirUses = 1
+InvulnerabilityFrames = 8

@@ -49,12 +49,73 @@ MECHA_DIRECTIONAL_FLIGHT_SPECS = {
     "booster_up_back": (61, 103, (134, 138), 0),
 }
 
+KAMUI_AUTHORED_FRAME_OFFSETS = {
+    # Shared aerial recovery/air-walk fall drawings. Preserve the source X
+    # anchors so the body stays registered instead of wobbling frame-to-frame.
+    22: (0, 0), 23: (2, 0), 24: (8, 0), 25: (5, 0),
+    # Forward dash: lock the recurring ground-contact foot to X=118.
+    26: (0, 0), 27: (2, 0), 28: (3, 0), 29: (0, 0),
+    # Dash brake: hold the forward/right foot at X=201 through the landing.
+    30: (35, 0), 2: (0, 0), 3: (0, 0), 4: (-4, 0), 5: (-3, 0),
+    40: (0, 0), 41: (-3, 0), 42: (0, 0), 43: (1, 0),
+    44: (39, 0), 45: (41, 0), 46: (43, 0), 47: (43, 0),
+    72: (0, 0), 73: (1, 0),
+    # Standing light: lock the forward boot at X=196 for every drawing.
+    74: (10, 0), 75: (15, 0), 76: (15, 0), 77: (6, 0), 78: (0, 0),
+    # Standing medium / fireball / trait activation source anchors.
+    80: (0, 0), 81: (0, 0), 82: (9, 0), 83: (11, 0), 84: (11, 0),
+    85: (11, 0), 86: (11, 0), 87: (11, 0), 88: (12, 0), 89: (-2, 1),
+    # Shared standing/crouching hit-reaction drawings, reconstructed from
+    # source action 20 relative to drawing 48.
+    48: (0, 0), 49: (0, 0), 50: (-2, 1), 51: (-2, 1), 52: (5, 1), 53: (-4, 3),
+    # Shared airborne hit-reaction drawings, reconstructed from action 35.
+    54: (0, 0), 55: (-8, 0), 56: (0, -4), 57: (0, -18),
+    58: (4, -28), 59: (-4, -9), 60: (-6, 0),
+    # Bounce startup drawing relative to the already aligned airborne set.
+    61: (-10, 8),
+}
+
 
 def rotate_screen_offset(offset: tuple[int, int], angle: int) -> tuple[int, int]:
     """Rotate a pixel offset using Pillow's screen-coordinate angle convention."""
     theta = radians(angle)
     return (round(cos(theta) * offset[0] + sin(theta) * offset[1]),
             round(-sin(theta) * offset[0] + cos(theta) * offset[1]))
+
+
+def add_kinako_root_aligned_walk(asset_dir: Path, texture_paths: dict[int, Path]) -> None:
+    """Stabilize Kinako's torso/root while preserving the authored leg cycle."""
+    frame_ids = list(range(20, 28))
+    images = [Image.open(texture_paths[frame_id]).convert("RGBA") for frame_id in frame_ids]
+    anchors: list[tuple[float, float, int]] = []
+    for image in images:
+        alpha = image.getchannel("A")
+        bounds = alpha.getbbox()
+        if bounds is None:
+            anchors.append((image.width / 2, image.height / 2, image.height - 1))
+            continue
+        pixels = alpha.load()
+        upper_cut = bounds[1] + int((bounds[3] - bounds[1]) * 0.58)
+        points = [(x, y) for y in range(bounds[1], upper_cut)
+                  for x in range(bounds[0], bounds[2]) if pixels[x, y] > 32]
+        anchors.append((sum(x for x, _ in points) / len(points),
+                        sum(y for _, y in points) / len(points), bounds[3]))
+    target_x = sorted(anchor[0] for anchor in anchors)[len(anchors) // 2]
+    target_y = sorted(anchor[1] for anchor in anchors)[len(anchors) // 2]
+    target_floor = max(anchor[2] for anchor in anchors)
+    output_dir = asset_dir / "Frames" / "Aligned" / "anim_001"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for drawing, (frame_id, image, anchor) in enumerate(zip(frame_ids, images, anchors)):
+        shift_x = round(target_x - anchor[0])
+        # The shared floor is authoritative; the tiny torso correction removes
+        # sub-pixel sampling wobble without lifting either planted foot.
+        shift_y = round(target_floor - anchor[2])
+        if abs(target_y - anchor[1]) <= 2.5:
+            shift_y += round((target_y - anchor[1]) * 0.5)
+        aligned = shift_frame(image, (shift_x, shift_y))
+        destination = output_dir / f"drawing_{drawing:02d}.png"
+        aligned.save(destination)
+        texture_paths[frame_id] = destination
 
 
 @dataclass(frozen=True)
@@ -98,6 +159,100 @@ FIGHTERS = (
 
 # Confirmed source-action roles from the character-by-character design pass.
 SOURCE_ASSIGNMENTS: dict[str, dict[int, str]] = {
+    "kinako": {
+        136: "BENCHED_CURSED_STATE_STARTUP_CANDIDATE",
+        137: "BENCHED_CURSED_STATE_CIRCLE_CANDIDATE",
+        138: "BENCHED_COUNTER_REUSE_CANDIDATE",
+        139: "BENCHED_COUNTER_SUCCESS_EFFECT_CANDIDATE",
+    },
+    "kamui": {
+        0: "NEUTRAL",
+        1: "FORWARD_WALK_AIR_DASH",
+        2: "BACK_WALK_BACKDASH_BACK_AIR_DASH",
+        3: "NEUTRAL_JUMP",
+        4: "FORWARD_JUMP",
+        5: "BACKWARD_JUMP",
+        6: "FALL_ALIGNMENT_PENDING",
+        7: "ENTER_CROUCH",
+        8: "HELD_CROUCH",
+        9: "EXIT_CROUCH",
+        12: "MATCH_INTRO",
+        13: "STANDARD_WIN",
+        14: "TIMEOUT_LOSS",
+        15: "DRAW",
+        16: "NEUTRAL_SUPER_JUMP",
+        17: "FORWARD_SUPER_JUMP",
+        18: "BACKWARD_SUPER_JUMP",
+        19: "SUPER_JUMP_FALL",
+        20: "STANDING_HIGH_ATTACK_HITSTUN",
+        21: "HIGH_HITSTUN_WEAK",
+        22: "HIGH_HITSTUN_MEDIUM",
+        23: "HIGH_HITSTUN_STRONG",
+        24: "HIGH_HITSTUN_SPECIAL_STRONG",
+        25: "LOW_HITSTUN_STOP",
+        26: "LOW_HITSTUN_WEAK",
+        27: "LOW_HITSTUN_MEDIUM",
+        28: "LOW_HITSTUN_STRONG",
+        29: "LOW_HITSTUN_SPECIAL_STRONG",
+        30: "CROUCH_HITSTUN_STOP",
+        31: "CROUCH_HITSTUN_WEAK",
+        32: "CROUCH_HITSTUN_MEDIUM",
+        33: "CROUCH_HITSTUN_STRONG",
+        34: "CROUCH_HITSTUN_SPECIAL_STRONG",
+        35: "AIR_HITSTUN_STOP",
+        36: "AIR_HITSTUN_WEAK",
+        37: "AIR_HITSTUN_MEDIUM",
+        38: "AIR_HITSTUN_STRONG",
+        39: "AIR_HITSTUN_SPECIAL_STRONG",
+        40: "HORIZONTAL_BLOW_AWAY_HITSTUN",
+        41: "VERTICAL_BLOW_AWAY_WEAK",
+        42: "VERTICAL_BLOW_AWAY_MEDIUM",
+        43: "VERTICAL_BLOW_AWAY_STRONG",
+        44: "DIAGONAL_BLOW_AWAY_WEAK",
+        45: "DIAGONAL_BLOW_AWAY_MEDIUM",
+        46: "DIAGONAL_BLOW_AWAY_STRONG",
+        47: "DOWNWARD_BLOW_AWAY_WEAK",
+        48: "DOWNWARD_BLOW_AWAY_MEDIUM",
+        49: "DOWNWARD_BLOW_AWAY_STRONG",
+        50: "STUMBLE_HITSTUN",
+        51: "DIAGONAL_DOWN_BLOW_AWAY",
+        52: "WALL_BOUNCE_STRONG",
+        53: "WALL_BOUNCE_WEAK",
+        54: "HIT_FALL",
+        55: "KNOCKDOWN",
+        56: "GET_UP",
+        57: "VERTICAL_BOUNCE_WEAK",
+        58: "VERTICAL_BOUNCE_MEDIUM",
+        59: "VERTICAL_BOUNCE_STRONG",
+        60: "STANDING_GUARD_WEAK",
+        61: "STANDING_GUARD_MEDIUM",
+        62: "STANDING_GUARD_STRONG",
+        63: "STANDING_GUARD_SPECIAL_STRONG",
+        64: "CROUCH_GUARD_WEAK",
+        65: "CROUCH_GUARD_MEDIUM",
+        66: "CROUCH_GUARD_STRONG",
+        67: "CROUCH_GUARD_SPECIAL_STRONG",
+        68: "AIR_GUARD_WEAK",
+        69: "AIR_GUARD_MEDIUM",
+        70: "AIR_GUARD_STRONG",
+        71: "AIR_GUARD_SPECIAL_STRONG",
+        72: "SPECIAL_STUMBLE_HURT",
+        73: "SLIDE_DOWN_HORIZONTAL_HURT",
+        74: "SLIDE_DOWN_DIAGONAL_HURT",
+        75: "SLIDING_KNOCKDOWN",
+        76: "DOWNWARD_NO_BOUNCE_HIT",
+        77: "DIAGONAL_DOWN_NO_BOUNCE_HIT",
+        78: "DIAGONAL_BOUNCE",
+        79: "PULLBACK_HURT_WEAK",
+        80: "PULLBACK_HURT_STRONG",
+        81: "GUARD_PULLBACK_WEAK",
+        82: "GUARD_PULLBACK_STRONG",
+        83: "PULLBACK_HURT_AIR",
+        84: "GUARD_PULLBACK_AIR",
+        85: "GUARD_CANCEL_ALPHA_COUNTER",
+        86: "UKEMI_LEFT",
+        87: "GROUND_TECH_ROLL_LANDING",
+    },
     "m_heita": {
         0: "NEUTRAL",
         1: "WALK_FORWARD",
@@ -319,6 +474,39 @@ def align_character_frame(image: Image.Image) -> Image.Image:
     return canvas
 
 
+def shift_frame(image: Image.Image, offset: tuple[int, int]) -> Image.Image:
+    shifted = Image.new("RGBA", CANVAS_SIZE, (0, 0, 0, 0))
+    shifted.alpha_composite(image.convert("RGBA"), offset)
+    return shifted
+
+
+def add_kinako_authored_alignment(asset_dir: Path, actions: list[Action],
+                                   texture_paths: dict[int, Path],
+                                   resolved_by_action: dict[int, list[int]],
+                                   visual_index: int) -> None:
+    """Apply Kinako's half-scale source registration to one authored action."""
+    action = next(action for action in actions if action.visual_index == visual_index)
+    base_x = action.drawings[0].offset_x
+    base_y = action.drawings[0].offset_y
+    output_dir = asset_dir / "Frames" / "Aligned" / f"anim_{visual_index:03d}"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    next_texture_id = max(texture_paths) + 1
+    for drawing_index, drawing in enumerate(action.drawings):
+        source_path = texture_paths.get(drawing.image_id)
+        if source_path is None:
+            continue
+        # BBBR records these coordinates at twice the extracted sprite scale.
+        shift = (round((drawing.offset_x - base_x) / 2),
+                 round((drawing.offset_y - base_y) / 2))
+        with Image.open(source_path) as source:
+            aligned = shift_frame(source, shift)
+        destination = output_dir / f"drawing_{drawing_index:02d}.png"
+        aligned.save(destination)
+        texture_paths[next_texture_id] = destination
+        resolved_by_action[visual_index][drawing_index] = next_texture_id
+        next_texture_id += 1
+
+
 def normalize_name(name: str) -> str:
     return name.replace(" ", "").replace("（", "(").replace("）", ")")
 
@@ -534,6 +722,127 @@ def write_catalog(path: Path, actions: list[Action], missing_by_action: dict[int
             ))
 
 
+def add_kamui_foot_locked_backdash(asset_dir: Path, actions: list[Action],
+                                   texture_paths: dict[int, Path],
+                                   resolved_by_action: dict[int, list[int]]) -> None:
+    """Give action 105 private textures so shared drawings keep their other alignments."""
+    action = next(action for action in actions if action.visual_index == 105)
+    source_ids = resolved_by_action[action.visual_index]
+    images = [Image.open(texture_paths[source_id]).convert("RGBA") for source_id in source_ids]
+
+    def contact_x(image: Image.Image) -> int:
+        alpha = image.getchannel("A")
+        pixels = alpha.load()
+        bottom = max(y for y in range(image.height)
+                     if any(pixels[x, y] > 20 for x in range(image.width)))
+        contacts = [x for y in range(max(0, bottom - 5), bottom + 1)
+                    for x in range(image.width) if pixels[x, y] > 20]
+        return sorted(contacts)[len(contacts) // 2]
+
+    target_x = contact_x(images[0])
+    output_dir = asset_dir / "Frames" / "Aligned" / "anim_105"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    aligned_ids: list[int] = []
+    for drawing_index, image in enumerate(images):
+        aligned = Image.new("RGBA", image.size)
+        aligned.alpha_composite(image, (target_x - contact_x(image), 0))
+        path = output_dir / f"drawing_{drawing_index:02d}.png"
+        aligned.save(path)
+        synthetic_id = 105000 + drawing_index
+        texture_paths[synthetic_id] = path
+        aligned_ids.append(synthetic_id)
+    resolved_by_action[action.visual_index] = aligned_ids
+
+
+def add_kamui_foot_locked_backdash_end(asset_dir: Path, actions: list[Action],
+                                       texture_paths: dict[int, Path],
+                                       resolved_by_action: dict[int, list[int]]) -> None:
+    """Foot-lock action 106 without moving its shared neutral drawings globally."""
+    action = next(action for action in actions if action.visual_index == 106)
+    source_ids = resolved_by_action[action.visual_index]
+    images = [Image.open(texture_paths[source_id]).convert("RGBA") for source_id in source_ids]
+
+    def contact_x(image: Image.Image) -> int:
+        alpha = image.getchannel("A")
+        pixels = alpha.load()
+        bottom = max(y for y in range(image.height)
+                     if any(pixels[x, y] > 20 for x in range(image.width)))
+        contacts = [x for y in range(max(0, bottom - 5), bottom + 1)
+                    for x in range(image.width) if pixels[x, y] > 20]
+        return sorted(contacts)[len(contacts) // 2]
+
+    target_x = contact_x(images[0])
+    output_dir = asset_dir / "Frames" / "Aligned" / "anim_106"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    aligned_ids: list[int] = []
+    for drawing_index, image in enumerate(images):
+        aligned = Image.new("RGBA", image.size)
+        aligned.alpha_composite(image, (target_x - contact_x(image), 0))
+        path = output_dir / f"drawing_{drawing_index:02d}.png"
+        aligned.save(path)
+        synthetic_id = 106000 + drawing_index
+        texture_paths[synthetic_id] = path
+        aligned_ids.append(synthetic_id)
+    resolved_by_action[action.visual_index] = aligned_ids
+
+
+def add_kamui_foot_locked_action(asset_dir: Path, actions: list[Action],
+                                 texture_paths: dict[int, Path],
+                                 resolved_by_action: dict[int, list[int]],
+                                 visual_index: int) -> None:
+    """Create private, foot-locked textures for one Kamui source action."""
+    action = next(action for action in actions if action.visual_index == visual_index)
+    source_ids = resolved_by_action[action.visual_index]
+    images = [Image.open(texture_paths[source_id]).convert("RGBA") for source_id in source_ids]
+
+    def contact_x(image: Image.Image) -> int:
+        alpha = image.getchannel("A")
+        pixels = alpha.load()
+        bottom = max(y for y in range(image.height)
+                     if any(pixels[x, y] > 20 for x in range(image.width)))
+        contacts = [x for y in range(max(0, bottom - 5), bottom + 1)
+                    for x in range(image.width) if pixels[x, y] > 20]
+        return sorted(contacts)[len(contacts) // 2]
+
+    target_x = contact_x(images[0])
+    output_dir = asset_dir / "Frames" / "Aligned" / f"anim_{visual_index:03d}"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    aligned_ids: list[int] = []
+    for drawing_index, image in enumerate(images):
+        aligned = Image.new("RGBA", image.size)
+        aligned.alpha_composite(image, (target_x - contact_x(image), 0))
+        path = output_dir / f"drawing_{drawing_index:02d}.png"
+        aligned.save(path)
+        synthetic_id = visual_index * 1000 + drawing_index
+        texture_paths[synthetic_id] = path
+        aligned_ids.append(synthetic_id)
+    resolved_by_action[action.visual_index] = aligned_ids
+
+
+def add_kamui_planted_foot_light_kick(asset_dir: Path, actions: list[Action],
+                                      texture_paths: dict[int, Path],
+                                      resolved_by_action: dict[int, list[int]]) -> None:
+    """Lock only the sword-side planted foot in Kamui action 115."""
+    action = next(action for action in actions if action.visual_index == 115)
+    source_ids = resolved_by_action[action.visual_index]
+    images = [Image.open(texture_paths[source_id]).convert("RGBA") for source_id in source_ids]
+    # Measured from the planted shoe beneath the bent left knee. Do not use the
+    # lowest-pixel/extended-leg contact: that drags Kamui's entire body around.
+    planted_foot_offsets = ((0, 0), (-1, 0), (9, 0), (9, 0), (5, 0), (-1, 0))
+    output_dir = asset_dir / "Frames" / "Aligned" / "anim_115"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    aligned_ids: list[int] = []
+    for drawing_index, (image, offset) in enumerate(zip(images, planted_foot_offsets)):
+        aligned = Image.new("RGBA", image.size)
+        aligned.alpha_composite(image, offset)
+        path = output_dir / f"drawing_{drawing_index:02d}.png"
+        aligned.save(path)
+        synthetic_id = 115000 + drawing_index
+        texture_paths[synthetic_id] = path
+        aligned_ids.append(synthetic_id)
+    resolved_by_action[action.visual_index] = aligned_ids
+
+
 def write_sprite_frames(path: Path, actions: list[Action], aliases: dict[str, Action],
                         texture_paths: dict[int, Path], resolved_by_action: dict[int, list[int]],
                         spec: FighterSpec,
@@ -585,6 +894,8 @@ def write_sprite_frames(path: Path, actions: list[Action], aliases: dict[str, Ac
             # The first four drawings are the straight knock-away reaction;
             # drawing four begins the airborne tumble used by the launch state.
             drawing_indices = list(range(0, 4))
+        elif spec.archive_id == "kinako" and alias == "walk_back":
+            drawing_indices = list(reversed(drawing_indices))
         animations.append((alias, action,
                            alias in {"idle", "walk", "walk_back", "run", "crouch_hold", "win_loop",
                                      "fly_up_jet_effect", "booster_jet_fire"},
@@ -598,8 +909,28 @@ def write_sprite_frames(path: Path, actions: list[Action], aliases: dict[str, Ac
         animations.append(("booster_start", fly_up_action, False, list(range(0, 3))))
         animations.append(("booster_recovery", fly_up_action, False, list(range(11, 17))))
 
+    # Authored/composited animations intentionally replace any generic alias
+    # bearing the same runtime name; SpriteFrames names must stay unique.
+    animations = [animation for animation in animations if animation[0] not in composite_animations]
+
     custom_animations: list[tuple[str, bool, list[tuple[float, int]]]] = [
-        (name, True, [(2.0, composite_ext_ids[composite]) for composite in composites])
+        (name, spec.archive_id != "kamui", [((1.0 if name == "air_light_punch" else
+                                              (5.0, 17.0, 2.0, 20.0, 30.0)[index]
+                                              if name == "ikazuchi_lightning" else
+                                              (2.0, 20.0, 30.0)[index]
+                                              if name == "ikazuchi_active" else
+                                              4.0
+                                              if name in {"kamui_fireball_core", "kamui_fireball_ring"} else
+                                              4.0
+                                              if name == "back_medium_kick" else
+                                              3.0
+                                              if name == "forward_heavy_punch" else
+                                              1.0
+                                              if name == "electrocution_super_effect" else
+                                              (4.0 if index == 0 else 30.0)
+                                              if name == "medium_punch_effect" else 2.0),
+                                             composite_ext_ids[composite])
+                                            for index, composite in enumerate(composites)])
         for name, composites in composite_animations.items()
     ]
 
@@ -726,6 +1057,66 @@ def build_mecha_composite_animations(spec: FighterSpec, asset_dir: Path,
         "booster_loop": fly_up_composites,
         **escape_composites,
         **directional_composites,
+    }
+
+
+def build_kamui_authored_animations(spec: FighterSpec, asset_dir: Path,
+                                    texture_paths: dict[int, Path]) -> dict[str, list[Path]]:
+    if spec.archive_id != "kamui":
+        return {}
+    frames = sorted((asset_dir / "Frames" / "Authored" / "AirJab").glob("air_jab_*.png"))
+    if len(frames) != 17:
+        raise FileNotFoundError("Kamui air jab must contain exactly 17 authored tick frames")
+    medium_effect = asset_dir / "Effects" / "MediumPunch" / "medium_punch_112.png"
+    if not medium_effect.is_file():
+        raise FileNotFoundError("Kamui horizontal medium-punch effect is missing")
+    spinning_sword = [
+        asset_dir / "Effects" / "SpinningSword" / f"spinning_sword_{source_id:03}.png"
+        for source_id in range(104, 109)
+    ]
+    if not all(frame.is_file() for frame in spinning_sword):
+        raise FileNotFoundError("Kamui standing-heavy spinning-sword effect is missing")
+    sweep_sword = sorted((asset_dir / "Effects" / "SweepSword").glob("sweep_sword_*.png"))
+    if len(sweep_sword) != 5:
+        raise FileNotFoundError("Kamui crouching-heavy sweep sword must contain five frames")
+    ikazuchi_dir = asset_dir / "Effects" / "Ikazuchi"
+    ikazuchi = [ikazuchi_dir / f"ikazuchi_{source_id}.png"
+                for source_id in (146, 146, 147, 146, 146)]
+    if not all(frame.is_file() for frame in ikazuchi):
+        raise FileNotFoundError("Kamui Ikazuchi lightning drawings are missing")
+    ring_fireball_dir = asset_dir / "Effects" / "RingFireball"
+    ring_core_path = ring_fireball_dir / "fireball_core.png"
+    ring_source_path = ring_fireball_dir / "fireball_ringed.png"
+    if not ring_core_path.is_file() or not ring_source_path.is_file():
+        raise FileNotFoundError("Kamui ring fireball assets are missing")
+    ring_only_path = ring_fireball_dir / "fireball_ring_only.png"
+    with Image.open(ring_core_path) as core_source, Image.open(ring_source_path) as ring_source:
+        core = core_source.convert("RGBA")
+        ring = ring_source.convert("RGBA")
+        ring_pixels = ring.load()
+        center_x, center_y = ring.width // 2, ring.height // 2
+        for y in range(ring.height):
+            for x in range(ring.width):
+                if (x - center_x) ** 2 + (y - center_y) ** 2 < 15 ** 2:
+                    ring_pixels[x, y] = (0, 0, 0, 0)
+        ring.save(ring_only_path)
+    back_medium_kick = [texture_paths[source_id] for source_id in range(166, 172)]
+    forward_heavy_punch = [texture_paths[source_id] for source_id in range(174, 184)]
+    electrocution = sorted((asset_dir / "Effects" / "ElectrocutionSuper").glob("electrocution_*.png"))
+    if len(electrocution) != 48:
+        raise FileNotFoundError("Kamui electrocution super must contain 48 tick frames")
+    return {
+        "air_light_punch": frames,
+        "medium_punch_effect": [medium_effect, medium_effect],
+        "standing_heavy_sword_effect": spinning_sword,
+        "crouching_heavy_sword_effect": sweep_sword,
+        "ikazuchi_lightning": ikazuchi,
+        "ikazuchi_active": [ikazuchi[1], ikazuchi[0], ikazuchi[0]],
+        "kamui_fireball_core": [ring_core_path],
+        "kamui_fireball_ring": [ring_only_path],
+        "back_medium_kick": back_medium_kick,
+        "forward_heavy_punch": forward_heavy_punch,
+        "electrocution_super_effect": electrocution,
     }
 
 
@@ -1513,6 +1904,429 @@ def import_fighter(spec: FighterSpec) -> tuple[int, int, Path]:
 
     actions = parse_actions(script_path)
     aliases = choose_aliases(actions)
+    if spec.archive_id == "kinako":
+        # Kinako's complete source-authored movement/reaction baseline. Keep
+        # every distinct CSV channel addressable even when the current combat
+        # controller resolves several of them through one generic state.
+        movement_aliases = {
+            "neutral_jump": 3, "forward_jump_start": 4, "forward_jump_loop": 4,
+            "backward_jump": 5, "fall": 6,
+            "super_jump_neutral": 16, "super_jump_forward": 17,
+            "super_jump_backward": 18,
+            "double_jump_neutral": 98, "double_jump_forward": 99,
+            "double_jump_backward": 100, "double_jump_fall": 101,
+        }
+        for alias, visual_index in movement_aliases.items():
+            aliases[alias] = next(action for action in actions if action.visual_index == visual_index)
+        loss = next(action for action in actions if action.visual_index == 14)
+        aliases["loss"] = loss
+        aliases["timeout_loss"] = loss
+        aliases["draw"] = next(action for action in actions if action.visual_index == 15)
+        backward_walk = next(action for action in actions if action.visual_index == 2)
+        aliases["walk_back"] = backward_walk
+        reaction_aliases = {
+            19: ("hitstun_high_stop",),
+            20: ("hitstun_light", "high_hitstun_weak"),
+            21: ("hitstun_medium", "high_hitstun_medium"),
+            22: ("hitstun_heavy", "high_hitstun_strong"),
+            23: ("high_hitstun_special_strong",),
+            24: ("low_hitstun_stop",), 25: ("low_hitstun_weak",),
+            26: ("low_hitstun_medium",), 27: ("low_hitstun_strong",),
+            28: ("low_hitstun_special_strong",), 29: ("crouch_hitstun_stop",),
+            30: ("crouch_hit", "crouch_hitstun_weak"),
+            31: ("crouch_hitstun_medium",), 32: ("crouch_hitstun_strong",),
+            33: ("crouch_hitstun_special_strong",), 34: ("air_hitstun_stop",),
+            35: ("air_hitstun", "air_hitstun_weak"),
+            36: ("air_hitstun_medium",),
+            37: ("hitstun_heavy_air", "air_hitstun_strong"),
+            38: ("air_hitstun_special_strong",),
+            39: ("blow_away_horizontal", "tumble"),
+            40: ("blow_away_vertical_weak",), 41: ("blow_away_vertical_medium",),
+            42: ("blow_away_vertical_strong",), 43: ("blow_away_diagonal_weak",),
+            44: ("blow_away_diagonal_medium",), 45: ("blow_away_diagonal_strong",),
+            46: ("blow_away_downward_weak",), 47: ("blow_away_downward_medium",),
+            48: ("blow_away_downward_strong",), 49: ("stumble",),
+            50: ("blow_away_diagonal_down",),
+            51: ("wall_bounce", "wall_bounce_strong"),
+            52: ("wall_bounce_weak",), 53: ("hit_fall",),
+            54: ("knockdown",), 55: ("get_up",),
+            56: ("ground_bounce_weak",),
+            57: ("ground_bounce", "ground_bounce_medium"),
+            58: ("ground_bounce_strong",),
+        }
+        for visual_index, names in reaction_aliases.items():
+            action = next(action for action in actions if action.visual_index == visual_index)
+            for alias in names:
+                aliases[alias] = action
+        guard_aliases = {
+            59: ("stand_block_weak",),
+            60: ("stand_block", "stand_block_medium"),
+            61: ("stand_block_strong",),
+            62: ("stand_block_special_strong",),
+            63: ("crouch_block_weak",),
+            64: ("crouch_block", "crouch_block_medium"),
+            65: ("crouch_block_strong",),
+            66: ("crouch_block_special_strong",),
+            67: ("air_block_weak",),
+            68: ("air_block", "air_block_medium"),
+            69: ("air_block_strong",),
+            70: ("air_block_special_strong",),
+        }
+        for visual_index, names in guard_aliases.items():
+            action = next(action for action in actions if action.visual_index == visual_index)
+            for alias in names:
+                aliases[alias] = action
+        aliases["special_stagger"] = next(
+            action for action in actions if action.visual_index == 71
+        )
+        special_reaction_aliases = {
+            "slide_down_horizontal": 72,
+            "slide_down_diagonal": 73,
+            "slide_downed": 74,
+            "blow_away_downward_no_bounce": 75,
+            "blow_away_diagonal_down_no_bounce": 76,
+            "diagonal_bounce": 77,
+            "pullback_weak": 78,
+            "pullback_strong": 79,
+            "guard_pullback_weak": 80,
+            "guard_pullback_strong": 81,
+            "pullback_air": 82,
+            "guard_pullback_air": 83,
+        }
+        for alias, visual_index in special_reaction_aliases.items():
+            aliases[alias] = next(
+                action for action in actions if action.visual_index == visual_index
+            )
+        guard_cancel = next(action for action in actions if action.visual_index == 84)
+        aliases["guard_cancel_attack"] = guard_cancel
+        aliases["alpha_counter"] = guard_cancel
+        movement_system_aliases = {
+            "escape_left": 85,
+            "escape_landing": 86,
+            "escape_right": 87,
+            "burst": 88,
+            "burst_landing": 89,
+            "tech_neutral": 95,
+            "tech_forward": 96,
+            "tech_backward": 97,
+            "run": 102,
+            "forward_dash": 102,
+            "run_stop": 103,
+            "back_dash": 104,
+            "back_dash_end": 105,
+            "back_dash_landing": 105,
+            "landing": 106,
+            "air_dash": 107,
+            "backward_air_dash": 108,
+            "air_dash_fall": 109,
+            "air_dash_exit": 109,
+            "air_interpolation_fall": 110,
+        }
+        for alias, visual_index in movement_system_aliases.items():
+            aliases[alias] = next(
+                action for action in actions if action.visual_index == visual_index
+            )
+        standing_light = next(action for action in actions if action.visual_index == 111)
+        aliases["light_punch"] = standing_light
+        aliases["standing_light_punch"] = standing_light
+        standing_heavy_punch = next(action for action in actions if action.visual_index == 112)
+        aliases["heavy_punch"] = standing_heavy_punch
+        aliases["standing_heavy_punch"] = standing_heavy_punch
+        aliases["standing_heavy_kick"] = next(
+            action for action in actions if action.visual_index == 113
+        )
+        pink_bear_low = next(action for action in actions if action.visual_index == 114)
+        aliases["crouching_light_punch"] = pink_bear_low
+        aliases["crouching_light_kick"] = pink_bear_low
+        aliases["crouching_heavy_punch"] = next(
+            action for action in actions if action.visual_index == 115
+        )
+        aliases["crouching_heavy_kick"] = next(
+            action for action in actions if action.visual_index == 116
+        )
+        jumping_light_punch = next(action for action in actions if action.visual_index == 117)
+        aliases["air_light_punch"] = jumping_light_punch
+        aliases["jumping_light_punch"] = jumping_light_punch
+        jumping_heavy_punch = next(action for action in actions if action.visual_index == 118)
+        aliases["air_heavy_punch"] = jumping_heavy_punch
+        aliases["jumping_heavy_punch"] = jumping_heavy_punch
+        jumping_heavy_kick = next(action for action in actions if action.visual_index == 119)
+        aliases["air_heavy_kick"] = jumping_heavy_kick
+        aliases["jumping_heavy_kick"] = jumping_heavy_kick
+        aliases["forward_heavy_punch"] = next(
+            action for action in actions if action.visual_index == 120
+        )
+        hover_dash = next(action for action in actions if action.visual_index == 121)
+        aliases["forward_dash"] = hover_dash
+        aliases["hover_dash"] = hover_dash
+        aliases["throw"] = next(
+            action for action in actions if action.visual_index == 122
+        )
+        aliases["forward_throw"] = next(
+            action for action in actions if action.visual_index == 123
+        )
+        aliases["back_throw"] = next(
+            action for action in actions if action.visual_index == 124
+        )
+        aliases["back_throw_startup"] = next(
+            action for action in actions if action.visual_index == 125
+        )
+        aliases["standing_rush"] = next(
+            action for action in actions if action.visual_index == 127
+        )
+        aliases["rush_landing"] = next(
+            action for action in actions if action.visual_index == 128
+        )
+        aliases["red_ghost_summon"] = next(
+            action for action in actions if action.visual_index == 129
+        )
+        aliases["blue_ghost_summon"] = next(
+            action for action in actions if action.visual_index == 130
+        )
+        aliases["yellow_ghost"] = next(
+            action for action in actions if action.visual_index == 131
+        )
+        aliases["yellow_ghost_hit"] = next(
+            action for action in actions if action.visual_index == 132
+        )
+        aliases["red_ghost"] = next(
+            action for action in actions if action.visual_index == 133
+        )
+        aliases["blue_ghost"] = next(
+            action for action in actions if action.visual_index == 134
+        )
+        aliases["blue_ghost_attack"] = next(
+            action for action in actions if action.visual_index == 135
+        )
+        aliases["crucifixion_super_startup"] = next(
+            action for action in actions if action.visual_index == 140
+        )
+    if spec.archive_id == "kamui":
+        aliases.pop("air_light_punch", None)
+        # User-approved source action 1: reuse the exact eight-drawing forward
+        # walk cycle for Kamui's forward ground and air movement family.
+        forward_movement = next(action for action in actions if action.visual_index == 1)
+        aliases["walk"] = forward_movement
+        aliases["run"] = forward_movement
+        backward_movement = next(action for action in actions if action.visual_index == 2)
+        aliases["walk_back"] = backward_movement
+        neutral_jump_into_fall = next(action for action in actions if action.visual_index == 3)
+        aliases["neutral_jump"] = neutral_jump_into_fall
+        aliases["fall"] = next(action for action in actions if action.visual_index == 6)
+        forward_jump = next(action for action in actions if action.visual_index == 4)
+        aliases["forward_jump_start"] = forward_jump
+        aliases["forward_jump_loop"] = forward_jump
+        aliases["backward_jump"] = next(action for action in actions if action.visual_index == 5)
+        aliases["crouch_start"] = next(action for action in actions if action.visual_index == 7)
+        aliases["crouch_hold"] = next(action for action in actions if action.visual_index == 8)
+        aliases["crouch_end"] = next(action for action in actions if action.visual_index == 9)
+        aliases["intro"] = next(action for action in actions if action.visual_index == 12)
+        standard_win = next(action for action in actions if action.visual_index == 13)
+        aliases["win"] = standard_win
+        aliases["win_loop"] = standard_win
+        timeout_loss = next(action for action in actions if action.visual_index == 14)
+        aliases["loss"] = timeout_loss
+        aliases["timeout_loss"] = timeout_loss
+        aliases["draw"] = next(action for action in actions if action.visual_index == 15)
+        aliases["super_jump_neutral"] = next(action for action in actions if action.visual_index == 16)
+        aliases["super_jump_forward"] = next(action for action in actions if action.visual_index == 17)
+        aliases["super_jump_backward"] = next(action for action in actions if action.visual_index == 18)
+        aliases["super_jump_fall"] = next(action for action in actions if action.visual_index == 19)
+        standing_high_hitstun = next(action for action in actions if action.visual_index == 20)
+        aliases["hitstun_high"] = standing_high_hitstun
+        aliases["standing_high_hitstun"] = standing_high_hitstun
+        hitstun_aliases = {
+            21: ("hitstun_light", "high_hitstun_weak"),
+            22: ("hitstun_medium", "high_hitstun_medium"),
+            23: ("hitstun_heavy", "high_hitstun_strong"),
+            24: ("high_hitstun_special_strong",),
+            25: ("low_hitstun_stop",),
+            26: ("low_hitstun_weak",),
+            27: ("low_hitstun_medium",),
+            28: ("low_hitstun_strong",),
+            29: ("low_hitstun_special_strong",),
+            30: ("crouch_hitstun_stop",),
+            31: ("crouch_hit", "crouch_hitstun_weak"),
+            32: ("crouch_hitstun_medium",),
+            33: ("crouch_hitstun_strong",),
+            34: ("crouch_hitstun_special_strong",),
+            35: ("air_hitstun_stop",),
+            36: ("air_hitstun", "air_hitstun_weak"),
+            37: ("air_hitstun_medium",),
+            38: ("hitstun_heavy_air", "air_hitstun_strong"),
+            39: ("air_hitstun_special_strong",),
+            40: ("horizontal_blow_away", "tumble"),
+        }
+        for visual_index, names in hitstun_aliases.items():
+            hitstun_action = next(action for action in actions if action.visual_index == visual_index)
+            for name in names:
+                aliases[name] = hitstun_action
+        blow_away_aliases = {
+            41: "vertical_blow_away_weak",
+            42: "vertical_blow_away_medium",
+            43: "vertical_blow_away_strong",
+            44: "diagonal_blow_away_weak",
+            45: "diagonal_blow_away_medium",
+            46: "diagonal_blow_away_strong",
+            47: "downward_blow_away_weak",
+            48: "downward_blow_away_medium",
+            49: "downward_blow_away_strong",
+            50: "stumble_hitstun",
+            51: "diagonal_down_blow_away",
+        }
+        for visual_index, name in blow_away_aliases.items():
+            aliases[name] = next(action for action in actions if action.visual_index == visual_index)
+        bounce_aliases = {
+            52: ("wall_bounce", "wall_bounce_strong"),
+            53: ("wall_bounce_weak",),
+            57: ("ground_bounce_weak", "vertical_bounce_weak"),
+            58: ("ground_bounce", "ground_bounce_medium", "vertical_bounce_medium"),
+            59: ("ground_bounce_strong", "vertical_bounce_strong"),
+            78: ("diagonal_bounce",),
+        }
+        for visual_index, names in bounce_aliases.items():
+            bounce_action = next(action for action in actions if action.visual_index == visual_index)
+            for name in names:
+                aliases[name] = bounce_action
+        aliases["hit_fall"] = next(action for action in actions if action.visual_index == 54)
+        hurt_aliases = {
+            55: ("knockdown", "downed"),
+            56: ("get_up",),
+            72: ("special_stumble_hurt",),
+            73: ("slide_down_horizontal",),
+            74: ("slide_down_diagonal",),
+            75: ("sliding_knockdown",),
+            76: ("downward_no_bounce_hit",),
+            77: ("diagonal_down_no_bounce_hit",),
+            79: ("pullback_hurt_weak",),
+            80: ("pullback_hurt_strong",),
+            83: ("pullback_hurt_air",),
+        }
+        for visual_index, names in hurt_aliases.items():
+            hurt_action = next(action for action in actions if action.visual_index == visual_index)
+            for name in names:
+                aliases[name] = hurt_action
+        guard_aliases = {
+            60: ("stand_block", "stand_block_weak"),
+            61: ("stand_block_medium",),
+            62: ("stand_block_impact", "stand_block_strong"),
+            63: ("stand_block_special_strong",),
+            64: ("crouch_block", "crouch_block_weak"),
+            65: ("crouch_block_medium",),
+            66: ("crouch_block_impact", "crouch_block_strong"),
+            67: ("crouch_block_special_strong",),
+            68: ("air_block", "air_block_weak"),
+            69: ("air_block_medium",),
+            70: ("air_block_impact", "air_block_strong"),
+            71: ("air_block_special_strong",),
+            81: ("guard_pullback_weak",),
+            82: ("guard_pullback_strong",),
+            84: ("guard_pullback_air",),
+        }
+        for visual_index, names in guard_aliases.items():
+            guard_action = next(action for action in actions if action.visual_index == visual_index)
+            for name in names:
+                aliases[name] = guard_action
+        guard_cancel = next(action for action in actions if action.visual_index == 85)
+        aliases["guard_cancel_attack"] = guard_cancel
+        aliases["alpha_counter"] = guard_cancel
+        ukemi_left = next(action for action in actions if action.visual_index == 86)
+        aliases["ukemi_left"] = ukemi_left
+        aliases["escape_left"] = ukemi_left
+        tech_roll_landing = next(action for action in actions if action.visual_index == 87)
+        aliases["tech_roll_landing"] = tech_roll_landing
+        aliases["ukemi_landing"] = tech_roll_landing
+        aliases["escape_landing"] = tech_roll_landing
+        # Source labels action 99 as a neutral double jump, but Kamui uses this
+        # drawing sequence to enter his character-specific aerial float.
+        float_activation = next(action for action in actions if action.visual_index == 99)
+        aliases["float_activation"] = float_activation
+        aliases["float_start"] = float_activation
+        forward_float_activation = next(action for action in actions if action.visual_index == 100)
+        aliases["float_activation_forward"] = forward_float_activation
+        aliases["float_start_forward"] = forward_float_activation
+        backward_float_activation = next(action for action in actions if action.visual_index == 101)
+        aliases["float_activation_backward"] = backward_float_activation
+        aliases["float_start_backward"] = backward_float_activation
+        air_walk_exit = next(action for action in actions if action.visual_index == 102)
+        aliases["air_walk_exit"] = air_walk_exit
+        aliases["air_walk_fall"] = air_walk_exit
+        forward_dash = next(action for action in actions if action.visual_index == 103)
+        aliases["forward_dash"] = forward_dash
+        dash_stop = next(action for action in actions if action.visual_index == 104)
+        aliases["dash_stop"] = dash_stop
+        aliases["dash_brake"] = dash_stop
+        aliases["run_stop"] = dash_stop
+        aliases["back_dash"] = next(action for action in actions if action.visual_index == 105)
+        back_dash_end = next(action for action in actions if action.visual_index == 106)
+        aliases["back_dash_end"] = back_dash_end
+        aliases["back_dash_landing"] = back_dash_end
+        aliases["landing"] = next(action for action in actions if action.visual_index == 107)
+        teleport_dash = next(action for action in actions if action.visual_index == 108)
+        aliases["air_dash"] = teleport_dash
+        aliases["teleport_dash"] = teleport_dash
+        teleport_backdash = next(action for action in actions if action.visual_index == 109)
+        aliases["backward_air_dash"] = teleport_backdash
+        aliases["teleport_backdash"] = teleport_backdash
+        air_dash_fall = next(action for action in actions if action.visual_index == 110)
+        aliases["air_dash_fall"] = air_dash_fall
+        aliases["air_dash_exit"] = air_dash_fall
+        interpolation_fall = next(action for action in actions if action.visual_index == 111)
+        aliases["air_interpolation_fall"] = interpolation_fall
+        aliases["interpolation_fall"] = interpolation_fall
+        standing_light = next(action for action in actions if action.visual_index == 112)
+        aliases["light_punch"] = standing_light
+        aliases["standing_light_punch"] = standing_light
+        standing_medium = next(action for action in actions if action.visual_index == 113)
+        aliases["medium_punch"] = standing_medium
+        aliases["standing_medium_punch"] = standing_medium
+        aliases["fireball"] = standing_medium
+        aliases["trait_activation"] = standing_medium
+        aliases["trait_1"] = standing_medium
+        standing_heavy = next(action for action in actions if action.visual_index == 114)
+        aliases["heavy_punch"] = standing_heavy
+        aliases["standing_heavy_punch"] = standing_heavy
+        crouching_light_kick = next(action for action in actions if action.visual_index == 115)
+        aliases["crouching_light_kick"] = crouching_light_kick
+        aliases["jumping_light_kick"] = crouching_light_kick
+        aliases["air_light_kick"] = crouching_light_kick
+        crouching_heavy = next(action for action in actions if action.visual_index == 150)
+        aliases["crouching_heavy_punch"] = crouching_heavy
+        crouching_heavy_kick = next(action for action in actions if action.visual_index == 117)
+        aliases["crouching_heavy_kick"] = crouching_heavy_kick
+        standing_light_kick = next(action for action in actions if action.visual_index == 121)
+        aliases["standing_light_kick"] = standing_light_kick
+        standing_heavy_kick = next(action for action in actions if action.visual_index == 151)
+        aliases["standing_heavy_kick"] = standing_heavy_kick
+        throw_startup = next(action for action in actions if action.visual_index == 123)
+        aliases["throw"] = throw_startup
+        aliases["throw_startup"] = throw_startup
+        throw_connected = next(action for action in actions if action.visual_index == 124)
+        aliases["forward_throw"] = throw_connected
+        aliases["throw_connected"] = throw_connected
+        auto_ikazuchi = next(action for action in actions if action.visual_index == 134)
+        aliases["auto_ikazuchi_effect"] = auto_ikazuchi
+        super_ikazuchi = next(action for action in actions if action.visual_index == 135)
+        aliases["super_ikazuchi"] = super_ikazuchi
+        fireball_cast = next(action for action in actions if action.visual_index == 140)
+        aliases["fireball_cast"] = fireball_cast
+        guard_cancel_burst = next(action for action in actions if action.visual_index == 141)
+        aliases["guard_cancel_burst"] = guard_cancel_burst
+        guard_cancel_burst_super = next(action for action in actions if action.visual_index == 146)
+        aliases["guard_cancel_burst_super"] = guard_cancel_burst_super
+        special_trait_counter = next(action for action in actions if action.visual_index == 147)
+        aliases["trait_2"] = special_trait_counter
+        aliases["special_trait_counter"] = special_trait_counter
+        throw_tech_parent = next(action for action in actions if action.visual_index == 154)
+        aliases["throw_tech"] = throw_tech_parent
+        aliases["throw_tech_parent"] = throw_tech_parent
+        throw_tech_child = next(action for action in actions if action.visual_index == 155)
+        aliases["throw_tech_child"] = throw_tech_child
+        win_vs_rouga = next(action for action in actions if action.visual_index == 156)
+        aliases["win_vs_rouga"] = win_vs_rouga
+        aliases["win_rouga_family"] = win_vs_rouga
+        win_vs_bancho = next(action for action in actions if action.visual_index == 157)
+        aliases["win_vs_bancho"] = win_vs_bancho
     if spec.archive_id == "m_heita":
         # Confirmed during the character pass: source action 10 is repurposed
         # as Mecha Heita's dedicated crouching hit reaction.
@@ -1796,16 +2610,22 @@ def import_fighter(spec: FighterSpec) -> tuple[int, int, Path]:
     if portrait_source.exists() and not portrait_destination.exists():
         shutil.copy2(portrait_source, portrait_destination)
 
-    referenced_ids = sorted({drawing.image_id for action in actions for drawing in action.drawings})
+    referenced_ids = {drawing.image_id for action in actions for drawing in action.drawings}
+    if spec.archive_id == "kamui":
+        referenced_ids.update(range(166, 172))
+    referenced_ids = sorted(referenced_ids)
     texture_paths: dict[int, Path] = {}
     for image_id in referenced_ids:
         source = source_image(source_dir, image_id)
         if source is None:
             continue
         destination = frame_dir / f"frame_{image_id:04d}.png"
-        if not destination.exists():
+        rebuild_for_source_anchor = spec.archive_id == "kamui" and image_id in KAMUI_AUTHORED_FRAME_OFFSETS
+        if not destination.exists() or rebuild_for_source_anchor:
             with Image.open(source) as image:
                 normalized = align_character_frame(image) if source.suffix.lower() == ".bmp" else remove_green(image)
+                if rebuild_for_source_anchor:
+                    normalized = shift_frame(normalized, KAMUI_AUTHORED_FRAME_OFFSETS[image_id])
                 normalized.save(destination)
         texture_paths[image_id] = destination
 
@@ -1824,11 +2644,22 @@ def import_fighter(spec: FighterSpec) -> tuple[int, int, Path]:
         action.visual_index: resolve_action_textures(action, texture_paths, fallback_id)
         for action in actions
     }
+    if spec.archive_id == "kamui":
+        add_kamui_foot_locked_backdash(asset_dir, actions, texture_paths, resolved_by_action)
+        add_kamui_foot_locked_backdash_end(asset_dir, actions, texture_paths, resolved_by_action)
+        add_kamui_planted_foot_light_kick(asset_dir, actions, texture_paths, resolved_by_action)
+    if spec.archive_id == "kinako":
+        add_kinako_root_aligned_walk(asset_dir, texture_paths)
+        for visual_index in (111, 117, 120, 122, 123, 124, 125, 127, 128, 129, 130):
+            add_kinako_authored_alignment(
+                asset_dir, actions, texture_paths, resolved_by_action, visual_index
+            )
     catalog = asset_dir / "animation_catalog.csv"
     write_catalog(catalog, actions, missing_by_action, resolved_by_action, spec)
     composite_animations = build_mecha_composite_animations(
         spec, asset_dir, aliases, texture_paths, resolved_by_action
     )
+    composite_animations.update(build_kamui_authored_animations(spec, asset_dir, texture_paths))
     sprite_frames = asset_dir / f"{spec.slug}_sprite_frames.tres"
     write_sprite_frames(sprite_frames, actions, aliases, texture_paths, resolved_by_action, spec,
                         composite_animations)

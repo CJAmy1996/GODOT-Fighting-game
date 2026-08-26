@@ -149,6 +149,18 @@ public static class HitResolver
 		Mathf.Max(minimumBounceSpeed,
 			initialBounceSpeed - Mathf.Max(0, juggleHitCount - 1) * decayPerHit);
 
+	public static float ResolveJuggleGravityScale(int juggleHitCount, int scalingDelayHits,
+		float scalePerHit, float maximumScale) =>
+		Mathf.Min(Mathf.Max(1f, maximumScale),
+			1f + Mathf.Max(0, juggleHitCount - Mathf.Max(0, scalingDelayHits)) * Mathf.Max(0f, scalePerHit));
+
+	/// <summary>
+	/// Universal corner wall splats from an existing juggle are reserved for grounded heavy normals.
+	/// Authored wall-bounce hitboxes use their separate reaction path and are unaffected.
+	/// </summary>
+	public static bool CanApplyJuggleWallSplat(bool defenderWasJuggled, bool groundedHeavyNormal, bool blocked) =>
+		defenderWasJuggled && groundedHeavyNormal && !blocked;
+
 	/// <summary>
 	/// Reaction precedence is intentionally explicit. Changing this order changes gameplay;
 	/// add a regression before inserting or moving a branch.

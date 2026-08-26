@@ -25,6 +25,7 @@ public partial class StageCamera : Camera2D
 	[ExportGroup("Vertical Follow")]
 	[Export] public float SuperJumpFollowHeight { get; set; } = 90f;
 	[Export] public float SuperJumpFollowWeight { get; set; } = 0.85f;
+	[Export] public float VerticalFighterPadding { get; set; } = 120f;
 	[ExportGroup("Zoom")]
 	[Export] public float ZoomSpeed { get; set; } = 5f;
 	public Rect2 CurrentFightBox { get; private set; }
@@ -35,6 +36,10 @@ public partial class StageCamera : Camera2D
 	private int _shakeFramesLeft;
 	private float _shakeStrength;
 	private bool _cinematicShake;
+	private FighterController _cinematicHorizontalFocus;
+	private bool _shockwaveScrollActive;
+	private int _shockwaveImpactFramesLeft;
+	private float _shockwaveImpactStrength;
 
 	public override void _Ready()
 	{
@@ -57,10 +62,20 @@ public partial class StageCamera : Camera2D
 		float leftFighterX = Mathf.Min(fighterOneX, fighterTwoX);
 		float rightFighterX = Mathf.Max(fighterOneX, fighterTwoX);
 		float midpoint = (fighterOneX + fighterTwoX) * 0.5f;
-		float desiredFightBoxWidth = Mathf.Clamp(
-			rightFighterX - leftFighterX + FighterHorizontalPadding * 2f,
-			CloseFightBoxWidth,
-			Mathf.Min(FarFightBoxWidth, StageWidth));
+		float horizontalFightBoxWidth = GodotObject.IsInstanceValid(_cinematicHorizontalFocus)
+			? CloseFightBoxWidth
+			: Mathf.Clamp(rightFighterX - leftFighterX + FighterHorizontalPadding * 2f,
+				CloseFightBoxWidth, Mathf.Min(FarFightBoxWidth, StageWidth));
+		float highestFighterY = Mathf.Min(_fighterOne.GlobalPosition.Y, _fighterTwo.GlobalPosition.Y);
+		float lowestFighterY = Mathf.Max(_fighterOne.GlobalPosition.Y, _fighterTwo.GlobalPosition.Y);
+		bool launcherChaseActive = IsLauncherChase(_fighterOne, _fighterTwo) ||
+			IsLauncherChase(_fighterTwo, _fighterOne);
+		float requiredVerticalViewHeight = lowestFighterY - highestFighterY + VerticalFighterPadding * 2f;
+		float verticalFightBoxWidth = requiredVerticalViewHeight * ViewportWidth / ViewportHeight;
+		float desiredFightBoxWidth = Mathf.Clamp(launcherChaseActive
+			? Mathf.Max(horizontalFightBoxWidth, verticalFightBoxWidth)
+			: horizontalFightBoxWidth,
+			CloseFightBoxWidth, StageWidth);
 		float targetZoom = ViewportWidth / desiredFightBoxWidth;
 		targetZoom = Mathf.Max(targetZoom, MinimumStageZoom());
 		float zoomWeight = 1f - Mathf.Exp(-ZoomSpeed * (float)delta);
@@ -69,22 +84,66 @@ public partial class StageCamera : Camera2D
 		Zoom = Vector2.One * smoothedZoom;
 
 		float halfView = Mathf.Min((ViewportWidth / smoothedZoom) * 0.5f, StageWidth * 0.5f);
-		float targetX = midpoint;
+		float targetX = GodotObject.IsInstanceValid(_cinematicHorizontalFocus)
+			? _cinematicHorizontalFocus.GlobalPosition.X
+			: midpoint;
 		targetX = Mathf.Clamp(targetX, halfView, StageWidth - halfView);
 		float weight = 1f - Mathf.Exp(-FollowSpeed * (float)delta);
+		float resolvedX;
+		if (GodotObject.IsInstanceValid(_cinematicHorizontalFocus))
+		{
+			resolvedX = Mathf.Lerp(GlobalPosition.X, targetX, weight);
+		}
+		else if (TryResolveSharedCameraCenterRange(halfView, out float minimumCenter, out float maximumCenter))
+		{
+			// A fighter already occupying the opposite screen edge creates an
+			// unofficial corner. Clamp the camera itself before stage rules clamp
+			// either character, so retreating can never drag the opponent.
+			targetX = Mathf.Clamp(targetX, minimumCenter, maximumCenter);
+			resolvedX = Mathf.Clamp(Mathf.Lerp(GlobalPosition.X, targetX, weight), minimumCenter, maximumCenter);
+		}
+		else
+		{
+			// The fighters no longer fit in a wider translated view. Hold the camera
+			// still; VersusStageRules will stop whichever fighter crossed its edge.
+			resolvedX = Mathf.Clamp(GlobalPosition.X, halfView, StageWidth - halfView);
+		}
 		float halfHeight = (ViewportHeight / smoothedZoom) * 0.5f;
-		float highestFighterY = Mathf.Min(_fighterOne.GlobalPosition.Y, _fighterTwo.GlobalPosition.Y);
 		float highJumpAmount = Mathf.Max(0f, CameraHeight - highestFighterY - SuperJumpFollowHeight);
 		float targetY = CameraHeight - highJumpAmount * SuperJumpFollowWeight;
-		bool superSpdFlight = _fighterOne.IsPerformingSuperSpdGrab || _fighterTwo.IsPerformingSuperSpdGrab;
+		float usableVerticalHalfView = Mathf.Max(1f, halfHeight - VerticalFighterPadding);
+		float minimumFramingCenter = lowestFighterY - usableVerticalHalfView;
+		float maximumFramingCenter = highestFighterY + usableVerticalHalfView;
+		if (launcherChaseActive && minimumFramingCenter <= maximumFramingCenter)
+			targetY = Mathf.Clamp(targetY, minimumFramingCenter, maximumFramingCenter);
+		bool superSpdFlight = _fighterOne.IsPerformingCharacterSuperGrab || _fighterTwo.IsPerformingCharacterSuperGrab;
 		// Super SPD deliberately travels several screens above the normal stage.
 		// Keep the bottom clamp, but release the ordinary top clamp for its flight.
 		targetY = superSpdFlight
 			? Mathf.Min(targetY, StageHeight - halfHeight)
 			: Mathf.Clamp(targetY, StageTopY + halfHeight, StageHeight - halfHeight);
-		GlobalPosition = new Vector2(Mathf.Lerp(GlobalPosition.X, targetX, weight), Mathf.Lerp(GlobalPosition.Y, targetY, weight));
+		GlobalPosition = new Vector2(resolvedX, Mathf.Lerp(GlobalPosition.Y, targetY, weight));
 		UpdateShake();
 		UpdateCurrentFightBox();
+	}
+
+	private static bool IsLauncherChase(FighterController chaser, FighterController launched)
+	{
+		if (!chaser.IsInSuperJumpRoute || chaser.WasGrounded || launched.WasGrounded ||
+			launched.HitstunFramesLeft <= 0) return false;
+		return launched.HitState is FighterHitState.Juggle or FighterHitState.Tumble or
+			FighterHitState.CounterHit or FighterHitState.Hitstun;
+	}
+
+	private bool TryResolveSharedCameraCenterRange(float halfView, out float minimumCenter, out float maximumCenter)
+	{
+		Rect2 fighterOneBox = _fighterOne.WorldPushbox;
+		Rect2 fighterTwoBox = _fighterTwo.WorldPushbox;
+		minimumCenter = Mathf.Max(halfView,
+			Mathf.Max(fighterOneBox.End.X - halfView, fighterTwoBox.End.X - halfView));
+		maximumCenter = Mathf.Min(StageWidth - halfView,
+			Mathf.Min(fighterOneBox.Position.X + halfView, fighterTwoBox.Position.X + halfView));
+		return minimumCenter <= maximumCenter;
 	}
 
 	public float FightBoxLeft => CurrentFightBox.Position.X;
@@ -92,6 +151,23 @@ public partial class StageCamera : Camera2D
 	public void SetPrimaryFighter(FighterController fighter)
 	{
 		if (fighter != null) _fighterOne = fighter;
+	}
+	public void FocusHorizontalOn(FighterController fighter) => _cinematicHorizontalFocus = fighter;
+	public void ClearHorizontalFocus() => _cinematicHorizontalFocus = null;
+	public void BeginShockwaveScroll()
+	{
+		_shockwaveScrollActive = true;
+		// The activation rumble must not fight the scrolling camera. MVC2's wave
+		// presentation is driven by screen travel plus discrete ground impacts.
+		_shakeFramesLeft = 0;
+		_shakeStrength = 0f;
+		_cinematicShake = false;
+	}
+	public void EndShockwaveScroll() => _shockwaveScrollActive = false;
+	public void ShockwaveImpact(float strength)
+	{
+		_shockwaveImpactStrength = Mathf.Clamp(strength * 0.42f, 1.5f, 4.25f);
+		_shockwaveImpactFramesLeft = 5;
 	}
 	public void Shake(float strength, int frames)
 	{
@@ -123,17 +199,35 @@ public partial class StageCamera : Camera2D
 
 	private void UpdateShake()
 	{
-		if (_shakeFramesLeft <= 0)
+		Vector2 randomShake = Vector2.Zero;
+		if (_shakeFramesLeft > 0 && !_shockwaveScrollActive)
 		{
-			Offset = Vector2.Zero;
+			_shakeFramesLeft--;
+			randomShake = new Vector2(
+				_shakeRandom.RandfRange(-_shakeStrength, _shakeStrength),
+				_shakeRandom.RandfRange(-_shakeStrength, _shakeStrength));
+			_shakeStrength *= _cinematicShake ? 0.94f : 0.82f;
+		}
+		else if (_shakeFramesLeft <= 0)
+		{
 			_shakeStrength = 0f;
 			_cinematicShake = false;
-			return;
 		}
-		_shakeFramesLeft--;
-		float x = _shakeRandom.RandfRange(-_shakeStrength, _shakeStrength);
-		float y = _shakeRandom.RandfRange(-_shakeStrength, _shakeStrength);
-		Offset = new Vector2(x, y);
-		_shakeStrength *= _cinematicShake ? 0.94f : 0.82f;
+
+		Vector2 impactKick = Vector2.Zero;
+		if (_shockwaveImpactFramesLeft > 0)
+		{
+			int phase = 5 - _shockwaveImpactFramesLeft--;
+			float vertical = phase switch
+			{
+				0 => 1f,
+				1 => -0.52f,
+				2 => 0.28f,
+				3 => -0.12f,
+				_ => 0f
+			};
+			impactKick = new Vector2(0f, vertical * _shockwaveImpactStrength);
+		}
+		Offset = randomShake + impactKick;
 	}
 }

@@ -166,11 +166,14 @@ public partial class MechaAnimationAnchorRegressionTest : Node
 	{
 		if (move is { Projectile: true, ProjectileImpactAdditiveBlend: true, ProjectileImpactBlackKey: true,
 			ProjectileImpactBlackensDefender: true, ProjectileImpactBlackSilhouetteFrames: 8 } &&
+			move.CommandInput is { Buttons: MotionAttackButton.AnyPunch,
+				ButtonMatchMode: MotionButtonMatchMode.AllSelectedButtons } &&
+			move.CommandInput.Motion?.MotionName == "Double Quarter Circle Forward" &&
 			move.ProjectileImpactAnimationName == "system_explosion" &&
 			move.ProjectileImpactVisualOffset == Vector2.Zero &&
 			move.ProjectileImpactDefenderFireSpriteFrames == move.ProjectileImpactSpriteFrames &&
 			move.ProjectileImpactDefenderFireAnimationName == "system_burn_flame") return 0;
-		GD.PushError("Mecha anchor regression: full-fire missiles lost their contact-centered system explosion/burn presentation");
+		GD.PushError("Mecha anchor regression: full fire lost QCFx2+LP+HP or its missile explosion/burn presentation");
 		return 1;
 	}
 

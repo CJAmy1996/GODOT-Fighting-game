@@ -5,7 +5,7 @@
 [ext_resource type="Resource" path="res://Data/Characters/Common/neutral_jump.tres" id="3_neutral_jump"]
 [ext_resource type="Resource" path="res://Data/Characters/Common/forward_jump.tres" id="4_forward_jump"]
 [ext_resource type="Resource" path="res://Data/Characters/Common/backward_jump.tres" id="5_backward_jump"]
-[ext_resource type="Resource" path="res://Data/Characters/Common/forward_run.tres" id="6_run"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kinako/kinako_hover_dash.tres" id="6_run"]
 [ext_resource type="Resource" path="res://Data/Characters/Common/backdash.tres" id="7_backdash"]
 [ext_resource type="Resource" path="res://Data/Characters/Common/air_dash.tres" id="8_air_dash"]
 [ext_resource type="Resource" path="res://Data/Characters/Common/backward_air_dash.tres" id="9_back_air_dash"]
@@ -15,6 +15,7 @@
 [ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kinako/kinako_gauges.tres" id="13_gauges"]
 [ext_resource type="Resource" uid="uid://buorwoycb1rfb" path="res://Data/Characters/BigBangBeatRevolve/Kinako/kinako_state_boxes.tres" id="14_states"]
 [ext_resource type="Texture2D" uid="uid://bdmvtqcemvrp4" path="res://Assets/TestFighter/BigBangBeatRevolve/Kinako/super_portrait.png" id="20_portrait"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kinako/kinako_crucifixion_super.tres" id="21_crucifixion"]
 
 [sub_resource type="Resource" id="MovementTuning_imported"]
 script = ExtResource("2_tuning")
@@ -39,3 +40,4 @@ Abilities = [ExtResource("10_super_jump"), ExtResource("3_neutral_jump"), ExtRes
 NormalMoves = ExtResource("11_normals")
 StateBoxes = ExtResource("14_states")
 SpecialMoves = ExtResource("12_specials")
+SuperMoves = [ExtResource("21_crucifixion")]

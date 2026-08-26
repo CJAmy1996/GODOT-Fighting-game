@@ -17,11 +17,17 @@ public partial class SpriteTestFighter : FighterController
 	[Export] public bool HeavyLandingShake { get; set; }
 	[Export] public float HeavyLandingShakeStrength { get; set; } = 4.25f;
 	[Export] public int HeavyLandingShakeFrames { get; set; } = 6;
-	[ExportGroup("Selected Move Presentation")]
-	[Export(PropertyHint.Range, "0.1,1.0,0.01")]
-	public float SweepAndSpdVisualScale { get; set; } = 1f;
 	[Export] public float AuthoredSpriteFloorOffset { get; set; } = 58f;
+	protected virtual bool UsesCharacterSelectedVisualScale(string attackName, StringName animation) => false;
+	protected virtual float CharacterSelectedVisualScale => 1f;
+	protected virtual bool TrySyncCharacterAttackDrawing(StringName animation) => false;
+	protected virtual float CharacterReactionVerticalOffset(StringName animation) => 0f;
+	protected virtual float CharacterLandingShakeMultiplier => 1f;
+	protected virtual int CharacterLandingShakeExtraFrames => 0;
+	protected virtual int CharacterLandingShakeMinimumFrames => 0;
+	protected virtual bool UsesNeutralJumpAtLowHorizontalSpeed => false;
 	private bool _forwardJumpIntroStarted;
+	private bool _airWalkWasActive;
 	private bool _crouchIntroStarted;
 	private bool _crouchExitStarted;
 	private bool _boosterWasActive;
@@ -41,7 +47,6 @@ public partial class SpriteTestFighter : FighterController
 	private static readonly int[] SuperAfterimageDelays = { 5, 10, 15, 20 };
 	private readonly List<SuperShadowSample> _superShadowHistory = new();
 	private readonly List<Sprite2D> _superAfterimages = new();
-	private Sprite2D _electricityGreyBody;
 	private int _burnSilhouetteFramesLeft;
 	private Color _burnRestoreSelfModulate = Colors.White;
 	private int _burnFlameSerial;
@@ -50,6 +55,9 @@ public partial class SpriteTestFighter : FighterController
 	private ulong _lastInstantBlockFlashSerial;
 	private int _instantBlockWhiteFramesLeft;
 	private Material _instantBlockRestoreMaterial;
+	private ulong _lastElectrocutionFlashSerial;
+	private int _electrocutionFramesLeft;
+	private Color _electrocutionRestoreModulate = Colors.White;
 	private static readonly StringName[] SuperOneAttackCycle =
 	{
 		"heavy_punch", "standing_light_kick", "light_punch", "standing_heavy_kick",
@@ -68,7 +76,6 @@ public partial class SpriteTestFighter : FighterController
 		}
 		UpdateAnimation();
 		ApplySelectedMoveVisualScale();
-		UpdateElectricityGreyBodyFlash();
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -76,12 +83,29 @@ public partial class SpriteTestFighter : FighterController
 		base._PhysicsProcess(delta);
 		UpdateAnimation();
 		ApplySelectedMoveVisualScale();
-		UpdateElectricityGreyBodyFlash();
 		UpdateHeavyWalkFootsteps();
 		UpdateHeavyLandingShake();
 		UpdateSuperShadows();
 		UpdateBurnHitPresentation();
 		UpdateInstantBlockWhiteFlash();
+		UpdateElectrocutionFlash();
+	}
+
+	private void UpdateElectrocutionFlash()
+	{
+		if (CharacterSprite == null) return;
+		if (_lastElectrocutionFlashSerial != ElectrocutionFlashSerial)
+		{
+			_lastElectrocutionFlashSerial = ElectrocutionFlashSerial;
+			if (_electrocutionFramesLeft <= 0) _electrocutionRestoreModulate = CharacterSprite.Modulate;
+			_electrocutionFramesLeft = Mathf.Max(_electrocutionFramesLeft, ElectrocutionPresentationFrames);
+		}
+		if (_electrocutionFramesLeft <= 0) return;
+		_electrocutionFramesLeft--;
+		CharacterSprite.Modulate = (_electrocutionFramesLeft / 2) % 2 == 0
+			? new Color(0.45f, 0.75f, 1.8f, 1f)
+			: new Color(0.12f, 0.12f, 0.2f, 1f);
+		if (_electrocutionFramesLeft == 0) CharacterSprite.Modulate = _electrocutionRestoreModulate;
 	}
 
 	private void UpdateInstantBlockWhiteFlash()
@@ -181,57 +205,19 @@ public partial class SpriteTestFighter : FighterController
 		_activeBurnFlames.Clear();
 	}
 
-	private void UpdateElectricityGreyBodyFlash()
-	{
-		if (CharacterSprite == null) return;
-		bool electricityActive = IsAttackActive && CurrentAttackName == "MECHA ELECTRICITY" &&
-			CurrentAttackActiveLoopAnimationName == "anim_149";
-		if (!electricityActive)
-		{
-			if (_electricityGreyBody != null) _electricityGreyBody.Visible = false;
-			return;
-		}
-
-		if (_electricityGreyBody == null)
-		{
-			Texture2D greyBody = CharacterSprite.SpriteFrames?.HasAnimation("anim_148") == true &&
-				CharacterSprite.SpriteFrames.GetFrameCount("anim_148") > 4
-				? CharacterSprite.SpriteFrames.GetFrameTexture("anim_148", 4)
-				: null;
-			if (greyBody == null) return;
-			_electricityGreyBody = new Sprite2D
-			{
-				Name = "ElectricityGreyBody",
-				Texture = greyBody,
-				Centered = true,
-				ZIndex = 1
-			};
-			CharacterSprite.AddChild(_electricityGreyBody);
-		}
-
-		_electricityGreyBody.FlipH = CharacterSprite.FlipH;
-		// Grey for two 60 Hz ticks, absent for exactly one tick, then repeat.
-		_electricityGreyBody.Visible = Mathf.PosMod(CurrentAttackFrame - CurrentAttackStartupFrames, 3) != 2;
-	}
-
 	private void ApplySelectedMoveVisualScale()
 	{
 		if (CharacterSprite == null || !_capturedCharacterSpriteTransform) return;
-		bool sanzou = string.Equals(Definition?.FighterName, "Sanzou Kongoumaru", System.StringComparison.OrdinalIgnoreCase);
-		bool selectedMove = sanzou && (CurrentAttackName == CrouchingHeavyKickName ||
-			CurrentAttackName == SanzoSpdName || CurrentAttackName == SanzoSuperSpdName);
-		bool selectedAnimation = sanzou && (CharacterSprite.Animation == "crouching_heavy_kick" ||
-			CharacterSprite.Animation == "spd_grab" || CharacterSprite.Animation == "spd_air_grab");
-		float selectedFactor = selectedMove || selectedAnimation
-			? Mathf.Clamp(SweepAndSpdVisualScale, 0.1f, 1f)
+		bool useSelectedScale = UsesCharacterSelectedVisualScale(CurrentAttackName, CharacterSprite.Animation);
+		float selectedFactor = useSelectedScale
+			? Mathf.Clamp(CharacterSelectedVisualScale, 0.1f, 1f)
 			: 1f;
 		float moveFactor = IsAttacking ? Mathf.Clamp(CurrentAttackCharacterVisualScale, 0.1f, 2f) : 1f;
 		CharacterSprite.Scale = _baseCharacterSpriteScale * selectedFactor * moveFactor;
 		float floorCompensation = AuthoredSpriteFloorOffset * (1f - selectedFactor) * Mathf.Abs(_baseCharacterSpriteScale.Y);
 		Vector2 authoredOffset = IsAttacking ? CurrentAttackCharacterVisualOffset : Vector2.Zero;
 		authoredOffset.X *= Facing;
-		if (sanzou && (CharacterSprite.Animation == "knockdown" || CharacterSprite.Animation == "ground_bounce"))
-			authoredOffset.Y += 1f;
+		authoredOffset.Y += CharacterReactionVerticalOffset(CharacterSprite.Animation);
 		Vector2 drawingOffset = Vector2.Zero;
 		Vector2[] drawingOffsets = CurrentAttackAnimationDrawingOffsets;
 		if (IsAttacking && drawingOffsets.Length > 0)
@@ -272,16 +258,15 @@ public partial class SpriteTestFighter : FighterController
 		if (!HeavyLandingShake || !JustLanded) return;
 		if (GetViewport().GetCamera2D() is StageCamera camera)
 		{
-			bool stompLanding = CurrentAttackName == StompSpecialName;
-			camera.Shake(stompLanding ? HeavyLandingShakeStrength * 1.8f : HeavyLandingShakeStrength,
-				stompLanding ? Mathf.Max(10, HeavyLandingShakeFrames + 3) : HeavyLandingShakeFrames);
+			camera.Shake(HeavyLandingShakeStrength * CharacterLandingShakeMultiplier,
+				Mathf.Max(CharacterLandingShakeMinimumFrames,
+					HeavyLandingShakeFrames + CharacterLandingShakeExtraFrames));
 		}
 	}
 
 	private void UpdateAnimation()
 	{
 		if (CharacterSprite?.SpriteFrames == null) return;
-		bool sanzou = string.Equals(Definition?.FighterName, "Sanzou Kongoumaru", System.StringComparison.OrdinalIgnoreCase);
 		// SpeedScale freezes the exact displayed sprite frame without resetting animation state.
 		// Attack drawings are selected manually from the deterministic combat
 		// frame below; AnimatedSprite must not independently advance between ticks.
@@ -306,9 +291,11 @@ public partial class SpriteTestFighter : FighterController
 		bool jetEscaping = ActiveAbility is JetEscapeAbility;
 		JetEscapeAbility activeJetEscape = ActiveAbility as JetEscapeAbility;
 		if (jetEscaping) _awaitingJetEscapeLanding = true;
-		bool forwardShortHopping = ActiveAbility?.Id == "forward_short_hop";
+		bool forwardShortHopping = ActiveAbility is DashAbility { UsesShortHopNormalRules: true };
 		bool backDashing = ActiveAbility?.Id == "backdash";
 		bool airDashing = ActiveAbility?.Id == "air_dash";
+		bool backwardAirDashing = ActiveAbility?.Id == "backward_air_dash";
+		bool airWalking = ActiveAbility is AirWalkAbility;
 		bool holdingCrouch = WasGrounded && CurrentInput.Vertical > 0.5f;
 		bool leavingCrouchForAnotherAction = !holdingCrouch &&
 			(ActiveAbility != null || Mathf.Abs(CurrentInput.Horizontal) > 0.1f);
@@ -519,6 +506,46 @@ public partial class SpriteTestFighter : FighterController
 		if (!forwardAirborne) _forwardJumpIntroStarted = false;
 		bool crouching = holdingCrouch;
 		bool superJumpRising = !IsAttacking && !WasGrounded && IsInSuperJumpRoute && Velocity.Y < 0f;
+		bool doubleJumping = !IsAttacking && !WasGrounded && IsInDoubleJumpState;
+		if (!IsAttacking && airWalking)
+		{
+			if (!_airWalkWasActive)
+			{
+				_airWalkWasActive = true;
+				StringName entry = CurrentInput.Horizontal * Facing > 0.1f
+					? "float_start_forward"
+					: CurrentInput.Horizontal * Facing < -0.1f
+						? "float_start_backward"
+						: "float_start";
+				if (CharacterSprite.SpriteFrames.HasAnimation(entry)) CharacterSprite.Play(entry);
+				return;
+			}
+			if (CharacterSprite.Animation.ToString().StartsWith("float_start") && CharacterSprite.IsPlaying()) return;
+			StringName airWalkMovement = Mathf.Abs(Velocity.X) > 25f
+				? Velocity.X * Facing < 0f ? "walk_back" : "walk"
+				: "float_start";
+			if (CharacterSprite.Animation != airWalkMovement) CharacterSprite.Play(airWalkMovement);
+			return;
+		}
+		if (!airWalking) _airWalkWasActive = false;
+		if (doubleJumping)
+		{
+			StringName doubleJumpAnimation;
+			if (Velocity.Y >= 0f)
+				doubleJumpAnimation = "double_jump_fall";
+			else if (Velocity.X * Facing > 25f)
+				doubleJumpAnimation = "double_jump_forward";
+			else if (Velocity.X * Facing < -25f)
+				doubleJumpAnimation = "double_jump_backward";
+			else
+				doubleJumpAnimation = "double_jump_neutral";
+
+			if (CharacterSprite.SpriteFrames.HasAnimation(doubleJumpAnimation) &&
+				CharacterSprite.Animation != doubleJumpAnimation)
+				CharacterSprite.Play(doubleJumpAnimation);
+			if (CharacterSprite.SpriteFrames.HasAnimation(doubleJumpAnimation)) return;
+		}
+
 		if (superJumpRising)
 		{
 			StringName superJumpAnimation = SuperJumpPresentationDirection > 0
@@ -526,8 +553,8 @@ public partial class SpriteTestFighter : FighterController
 				: SuperJumpPresentationDirection < 0
 					? "super_jump_backward"
 					: "super_jump_neutral";
-			// Imported characters such as Sanzou predate the dedicated Mecha
-			// super-jump aliases. Fall back to their authored jump animation instead
+			// Imported characters may predate dedicated directional super-jump
+			// aliases. Fall back to their authored jump animation instead
 			// of asking AnimatedSprite2D to play a missing animation name.
 			if (!CharacterSprite.SpriteFrames.HasAnimation(superJumpAnimation))
 				superJumpAnimation = CharacterSprite.SpriteFrames.HasAnimation("neutral_jump")
@@ -607,10 +634,14 @@ public partial class SpriteTestFighter : FighterController
 		else if (backDashing) nextAnimation = "back_dash";
 		else if (forwardShortHopping) nextAnimation = "forward_dash";
 		else if (airDashing) nextAnimation = "air_dash";
+		else if (backwardAirDashing) nextAnimation = CharacterSprite.SpriteFrames.HasAnimation("backward_air_dash")
+			? "backward_air_dash"
+			: "air_dash";
 		else if (!WasGrounded)
 		{
-			bool sanzouNeutralJump = sanzou && !IsInSuperJumpRoute && Mathf.Abs(Velocity.X) <= 25f;
-			nextAnimation = sanzouNeutralJump || Velocity.Y < 0f ? "neutral_jump" : "fall";
+			bool authoredNeutralJump = UsesNeutralJumpAtLowHorizontalSpeed &&
+				!IsInSuperJumpRoute && Mathf.Abs(Velocity.X) <= 25f;
+			nextAnimation = authoredNeutralJump || Velocity.Y < 0f ? "neutral_jump" : "fall";
 		}
 		else if (ActiveAbility is RunAbility) nextAnimation = "run";
 		else if (IsInRunStopSlide && CharacterSprite.SpriteFrames.HasAnimation("run_stop")) nextAnimation = "run_stop";
@@ -680,14 +711,7 @@ public partial class SpriteTestFighter : FighterController
 	/// </summary>
 	private void SyncAttackDrawingToCombatFrame(StringName animation)
 	{
-		if ((CurrentAttackName == SanzoSpdName || CurrentAttackName == SanzoSuperSpdName) &&
-			SpdGrabConnected && animation == "spd_air_grab")
-		{
-			int drawings = CharacterSprite.SpriteFrames.GetFrameCount(animation);
-			int flightTick = Mathf.Max(0, CurrentAttackFrame - CurrentAttackStartupFrames);
-			CharacterSprite.SetFrameAndProgress((flightTick / 4) % Mathf.Max(1, drawings), 0f);
-			return;
-		}
+		if (TrySyncCharacterAttackDrawing(animation)) return;
 		int drawing = ResolveAttackDrawing(animation);
 		CharacterSprite.SetFrameAndProgress(drawing, 0f);
 	}
@@ -763,7 +787,9 @@ public partial class SpriteTestFighter : FighterController
 
 	private void UpdateSuperShadows()
 	{
-		bool superAttackAfterimagesActive = IsPerformingSuperMove;
+		// Follow the authored super presentation rather than only the storage type.
+		// This includes super-class specials such as Mecha Heita's Shinryuken.
+		bool superAttackAfterimagesActive = CurrentAttackTriggersHyperComboFinish;
 		bool superJumpAfterimagesActive = IsInSuperJumpRoute && !WasGrounded;
 		bool superAfterimagesActive = superAttackAfterimagesActive || superJumpAfterimagesActive;
 		if (!superAfterimagesActive)

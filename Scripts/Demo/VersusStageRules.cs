@@ -41,13 +41,17 @@ public partial class VersusStageRules : Node
 	[Export] public float JuggleWallSplatDetectionDistance { get; set; } = 30f;
 	[Export] public float JuggleWallSplatPushProjection { get; set; } = 0.08f;
 	[Export] public float AuthoredWallBounceDetectionDistance { get; set; } = 8f;
-	[Export] public bool AllowHealthToReachZero { get; set; } = false;
+	[Export] public bool AllowHealthToReachZero { get; set; } = true;
+	[Export(PropertyHint.Range, "1,5,1")] public int StartingLifeStocks { get; set; } = 2;
 	[Export] public float RoundTimeSeconds { get; set; } = 99f;
 	[Export] public float KoResetDelaySeconds { get; set; } = 1.5f;
 	[Export] public float TrainingLifeRecoveryPerSecond { get; set; } = 650f;
 	[Export] public float TrainingLifeRecoveryDelaySeconds { get; set; } = 2.25f;
+	[Export(PropertyHint.Range, "0,100,1")] public float BPowerGainPerHit { get; set; } = 10f;
 	public float RoundSecondsRemaining { get; private set; }
 	public bool IsKoActive { get; private set; }
+	public int FighterOneLifeStocksRemaining { get; private set; }
+	public int FighterTwoLifeStocksRemaining { get; private set; }
 	[Export] public StateImpactEffectProfile KnockdownLandingEffect { get; set; } = new()
 	{
 		TriggerState = FighterHitState.GroundedKnockdown,
@@ -106,6 +110,16 @@ public partial class VersusStageRules : Node
 	private bool _finishingSuperSlowMotionActive;
 	private FighterController _finishingSuperTimelineAttacker;
 	private double _timeScaleBeforeFinishingSuper = 1.0;
+	private FighterController _screenCarryAttacker;
+	private FighterController _screenCarryDefender;
+	private int _screenCarryDirection;
+	private int _screenCarryFramesLeft;
+	private float _screenCarryAttackerSpeed;
+	private bool _screenCarryCameraActive;
+	private FighterController _screenCarrySequenceAttacker;
+	[Export(PropertyHint.Range, "0.25,5.0,0.05")] public float SuperCameraCorrectionSeconds { get; set; } = 1.5f;
+	private int _superCameraCorrectionFramesLeft;
+	private bool _superCameraCorrectionActive;
 
 	public void SetPrimaryFighter(FighterController fighter)
 	{
@@ -165,6 +179,8 @@ public partial class VersusStageRules : Node
 		_bigBangSuperCancelEffectScene = ResourceLoader.Load<PackedScene>(BigBangSuperCancelEffectPath);
 		_hyperComboBackdropRandom.Randomize();
 		RoundSecondsRemaining = Mathf.Max(0f, RoundTimeSeconds);
+		FighterOneLifeStocksRemaining = Mathf.Max(1, StartingLifeStocks);
+		FighterTwoLifeStocksRemaining = Mathf.Max(1, StartingLifeStocks);
 		_fighterOneLastLife = _fighterOne.PlaceholderLife;
 		_fighterTwoLastLife = _fighterTwo.PlaceholderLife;
 	}
@@ -223,6 +239,8 @@ public partial class VersusStageRules : Node
 	{
 		if (_fighterOne == null || _fighterTwo == null) return;
 		ResolveSuperBackdropCancellation();
+		UpdateProjectileScreenCarry((float)delta);
+		UpdateSuperCameraCorrectionWatchdog();
 		ResolveSuperActivations();
 		GetFightBoxEdges(out float leftEdge, out float rightEdge);
 		ResolveWallSplatCornerProtection(_fighterOne, _fighterTwo, leftEdge, rightEdge);
@@ -308,6 +326,7 @@ public partial class VersusStageRules : Node
 			Mathf.Max(firstBackdropFrames, secondBackdropFrames));
 		FighterController activatingFighter = firstSuper ? _fighterOne : _fighterTwo;
 		FighterController otherFighter = activatingFighter == _fighterOne ? _fighterTwo : _fighterOne;
+		BeginSuperCameraCorrectionWatchdog();
 		GetNodeOrNull<Node>("/root/AudioController")?.Call("play_super_activation");
 		// Portrait ignition and the source-authored BBB impact are shared by every
 		// super, including supers with a zero-frame gameplay freeze.
@@ -330,9 +349,23 @@ public partial class VersusStageRules : Node
 		effect.TopLevel = true;
 		effect.ZAsRelative = false;
 		effect.ZIndex = 4096;
-		effect.Scale = Vector2.One * Mathf.Max(0.1f, UniversalSuperCancelEffectScale);
-		effect.GlobalPosition = activatingFighter.WorldPositionBox.GetCenter();
+		Vector2 activationCenter = activatingFighter.WorldPositionBox.GetCenter();
+		Vector2 visibleWorldSize;
+		if (_fightCamera?.CurrentFightBox.Size is { X: > 0f, Y: > 0f } fightBoxSize)
+			visibleWorldSize = fightBoxSize;
+		else
+		{
+			Vector2 viewportSize = GetViewport().GetVisibleRect().Size;
+			Vector2 zoom = _stageCamera?.Zoom ?? Vector2.One;
+			visibleWorldSize = new Vector2(viewportSize.X / Mathf.Max(0.01f, zoom.X),
+				viewportSize.Y / Mathf.Max(0.01f, zoom.Y));
+		}
 		GetParent().AddChild(effect);
+		// Lock the composite to one activation center after parenting. This avoids
+		// inherited arena transforms and prevents camera correction from dragging
+		// the ignition art during its animation.
+		effect.GlobalPosition = activationCenter;
+		effect.ConfigureScreenCoverage(visibleWorldSize, Vector2.Zero, UniversalSuperCancelEffectScale);
 	}
 
 	private void SpawnSuperPortrait(FighterController activatingFighter, FighterController otherFighter, int freezeFrames)
@@ -572,7 +605,8 @@ public partial class VersusStageRules : Node
 	private void ResolveOneBasicAttack(FighterController attacker, FighterController defender)
 	{
 		bool defenderWasJuggled = defender?.HitState == FighterHitState.Juggle;
-		bool groundedNormal = attacker?.CurrentAttackIsGroundedNormal == true;
+		bool groundedHeavyNormal = attacker?.CurrentAttackIsGroundedNormal == true &&
+			attacker.CurrentAttackIsHeavyNormal;
 		if (attacker == null || defender == null || attacker.IsSameTeam(defender) || !attacker.TryApplyBasicAttackHit(defender,
 			out int hitlag, out float shake, out float pushback, out Vector2 hitPoint, out bool heavySpark)) return;
 
@@ -584,7 +618,8 @@ public partial class VersusStageRules : Node
 		}
 		// A real strike/throw contact earns foreground priority. Whiffed attacks never reorder sprites.
 		SetLatestAttackerLayer(attacker);
-		if (defenderWasJuggled && groundedNormal && !attacker.LastContactWasBlocked)
+		if (HitResolver.CanApplyJuggleWallSplat(defenderWasJuggled, groundedHeavyNormal,
+			attacker.LastContactWasBlocked))
 			TryApplyJuggleWallSplat(attacker, defender, pushback);
 		if (!attacker.IsPerformingThrow) ApplyCornerPushbackTransfer(attacker, defender, pushback);
 		if (attacker.LastContactWasBlocked)
@@ -594,7 +629,10 @@ public partial class VersusStageRules : Node
 		}
 		else
 		{
-			if (!attacker.IsPerformingThrow) _hitSparkLayer?.Spawn(hitPoint, heavySpark, attacker.CurrentHitSparkScene, attacker.Facing);
+			if (!attacker.IsPerformingThrow)
+				_hitSparkLayer?.SpawnContact(hitPoint, heavySpark, attacker.CurrentAttackUsesSlashEffect,
+					attacker.CurrentHitSparkScene, attacker.Facing);
+			attacker.GainPlaceholderSpecialMeter(BPowerGainPerHit);
 			float dramaticDrain = attacker.CurrentAttackName.StartsWith("SUPER")
 				? 58f
 				: heavySpark ? 92f : 44f;
@@ -602,7 +640,10 @@ public partial class VersusStageRules : Node
 			CheckForKo(attacker.CurrentAttackTriggersHyperComboFinish, attacker);
 		}
 		if (attacker.CurrentAttackName.StartsWith("SUPER"))
+		{
+			RefreshSuperCameraCorrection(attacker, defender, cinematicFocus: false);
 			_fightCamera?.ShakeSuper(Mathf.Max(8f, shake), Mathf.Max(12, hitlag));
+		}
 		else if (shake > 0f)
 			_fightCamera?.Shake(shake, hitlag);
 	}
@@ -695,7 +736,7 @@ public partial class VersusStageRules : Node
 
 	private void ResolveSpdSlamImpact(FighterController attacker)
 	{
-		if (attacker == null || !attacker.TryConsumeSpdSlamImpact(
+		if (attacker == null || !attacker.TryConsumeCharacterGrabImpact(
 			out FighterController victim, out Vector2 position, out int damage, out bool wasSuper)) return;
 		_hitSparkLayer?.SpawnDust(position, wasSuper ? 30 : 18, wasSuper ? 180f : 105f);
 		_fightCamera?.ShakeSuper(wasSuper ? 34f : 18f, wasSuper ? 45 : 24);
@@ -704,6 +745,7 @@ public partial class VersusStageRules : Node
 		victim?.AddHitstop(impactFreeze);
 		if (victim != null)
 		{
+			attacker.GainPlaceholderSpecialMeter(BPowerGainPerHit);
 			victim.ApplyPlaceholderLifeDrain(damage > 0 ? damage : 220f, AllowHealthToReachZero);
 			CheckForKo(wasSuper, attacker);
 		}
@@ -764,7 +806,12 @@ public partial class VersusStageRules : Node
 				continue;
 			}
 			SetLatestAttackerLayer(projectile.OwnerFighter);
-			if (projectile.Super)
+			if (projectile.ScreenCarry)
+			{
+				_fightCamera?.BeginShockwaveScroll();
+				_fightCamera?.ShockwaveImpact(shake);
+			}
+			else if (projectile.Super)
 				_fightCamera?.ShakeSuper(Mathf.Max(9f, shake), Mathf.Max(14, hitstop));
 			else if (shake > 0f)
 				_fightCamera?.Shake(shake, hitstop);
@@ -773,15 +820,110 @@ public partial class VersusStageRules : Node
 				_hitSparkLayer?.SpawnBlockShield(hitPoint, defender.Facing,
 					projectile.OwnerFighter.LastContactWasInstantBlocked);
 				PlayBlockSound(defender, projectile.OwnerFighter.LastContactWasInstantBlocked);
+				if (projectile.ScreenCarry && projectile.IsFinalVolleyProjectile)
+					_fightCamera?.EndShockwaveScroll();
 			}
 			else
 			{
 				_hitSparkLayer?.Spawn(hitPoint, heavySpark, projectile.OwnerFighter.Facing);
+				projectile.OwnerFighter.GainPlaceholderSpecialMeter(BPowerGainPerHit);
 				defender.ApplyPlaceholderLifeDrain(projectile.Damage, AllowHealthToReachZero);
 				CheckForKo(projectile.Super, projectile.OwnerFighter);
+				if (projectile.ScreenCarry)
+					BeginProjectileScreenCarry(projectile, defender);
 			}
+			if (projectile.Super)
+				RefreshSuperCameraCorrection(projectile.OwnerFighter, defender,
+					projectile.ScreenCarry && !projectile.IsFinalVolleyProjectile);
 			projectile.MarkHit(defender, hitPoint);
 		}
+	}
+
+	private void BeginProjectileScreenCarry(BasicProjectile projectile, FighterController defender)
+	{
+		if (projectile.IsFinalVolleyProjectile)
+		{
+			bool completedCinematicCarry = _screenCarryCameraActive;
+			_fightCamera?.ClearHorizontalFocus();
+			_fightCamera?.EndShockwaveScroll();
+			_screenCarryCameraActive = false;
+			_screenCarrySequenceAttacker = null;
+			if (!completedCinematicCarry)
+			{
+				_screenCarryFramesLeft = 0;
+				return;
+			}
+			_screenCarryAttacker = projectile.OwnerFighter;
+			_screenCarryDefender = defender;
+			_screenCarryDirection = projectile.CarryDirection;
+			_screenCarryAttackerSpeed = projectile.AttackerDashSpeed;
+			_screenCarryFramesLeft = Mathf.Max(18, projectile.CarryFrames);
+			return;
+		}
+		if (_screenCarrySequenceAttacker != projectile.OwnerFighter)
+		{
+			_screenCarrySequenceAttacker = projectile.OwnerFighter;
+			float available = projectile.CarryDirection > 0
+				? StageWidth - defender.GlobalPosition.X
+				: defender.GlobalPosition.X;
+			_screenCarryCameraActive = available >= projectile.RequiredCarryDistance + 120f;
+			if (_screenCarryCameraActive) _fightCamera?.FocusHorizontalOn(defender);
+		}
+		if (!_screenCarryCameraActive) return;
+		_screenCarryAttacker = projectile.OwnerFighter;
+		_screenCarryDefender = defender;
+		_screenCarryDirection = projectile.CarryDirection;
+		_screenCarryAttackerSpeed = 0f;
+		_screenCarryFramesLeft = projectile.CarryFrames;
+	}
+
+	private void UpdateProjectileScreenCarry(float delta)
+	{
+		if (_screenCarryFramesLeft <= 0 || !GodotObject.IsInstanceValid(_screenCarryAttacker) ||
+			!GodotObject.IsInstanceValid(_screenCarryDefender)) return;
+		_screenCarryFramesLeft--;
+		float targetGap = 250f;
+		float gap = (_screenCarryDefender.GlobalPosition.X - _screenCarryAttacker.GlobalPosition.X) * _screenCarryDirection;
+		if (gap > targetGap)
+		{
+			float step = Mathf.Min(_screenCarryAttackerSpeed * delta, gap - targetGap);
+			float nextX = Mathf.Clamp(_screenCarryAttacker.GlobalPosition.X + step * _screenCarryDirection,
+				MinOriginX(_screenCarryAttacker), MaxOriginX(_screenCarryAttacker));
+			_screenCarryAttacker.GlobalPosition = new Vector2(nextX, _screenCarryAttacker.GlobalPosition.Y);
+			_screenCarryAttacker.Velocity = new Vector2(_screenCarryAttackerSpeed * _screenCarryDirection,
+				_screenCarryAttacker.Velocity.Y);
+		}
+	}
+
+	private void BeginSuperCameraCorrectionWatchdog()
+	{
+		_superCameraCorrectionActive = true;
+		_superCameraCorrectionFramesLeft = Mathf.Max(1,
+			Mathf.RoundToInt(SuperCameraCorrectionSeconds * 60f));
+	}
+
+	private void RefreshSuperCameraCorrection(FighterController attacker, FighterController defender, bool cinematicFocus)
+	{
+		BeginSuperCameraCorrectionWatchdog();
+		if (cinematicFocus && GodotObject.IsInstanceValid(defender))
+			_fightCamera?.FocusHorizontalOn(defender);
+		else
+			_fightCamera?.ClearHorizontalFocus();
+	}
+
+	private void UpdateSuperCameraCorrectionWatchdog()
+	{
+		if (!_superCameraCorrectionActive) return;
+		if (--_superCameraCorrectionFramesLeft > 0) return;
+		_superCameraCorrectionActive = false;
+		_fightCamera?.ClearHorizontalFocus();
+		_fightCamera?.EndShockwaveScroll();
+		_screenCarryCameraActive = false;
+		_screenCarrySequenceAttacker = null;
+		_screenCarryAttacker = null;
+		_screenCarryDefender = null;
+		_screenCarryFramesLeft = 0;
+		_screenCarryAttackerSpeed = 0f;
 	}
 
 	private void PlayBlockSound(FighterController defender, bool instantBlock)
@@ -794,6 +936,8 @@ public partial class VersusStageRules : Node
 	{
 		if (!AllowHealthToReachZero || IsKoActive || _pendingSuperKo ||
 			(_fighterOne.PlaceholderLife > 0f && _fighterTwo.PlaceholderLife > 0f)) return;
+		FighterController depleted = _fighterOne.PlaceholderLife <= 0f ? _fighterOne : _fighterTwo;
+		if (TryConsumeLifeStock(depleted)) return;
 		if (killedBySuper)
 		{
 			_pendingSuperKo = true;
@@ -839,6 +983,25 @@ public partial class VersusStageRules : Node
 		}
 		_hyperComboFinishOverlay.StartNormalKoImpact();
 		StartPendingDefeatedKo();
+	}
+
+	private bool TryConsumeLifeStock(FighterController depleted)
+	{
+		if (depleted == _fighterOne && FighterOneLifeStocksRemaining > 1)
+		{
+			FighterOneLifeStocksRemaining--;
+			_fighterOne.RefillPlaceholderLife();
+			_fighterOneLastLife = _fighterOne.PlaceholderLife;
+			return true;
+		}
+		if (depleted == _fighterTwo && FighterTwoLifeStocksRemaining > 1)
+		{
+			FighterTwoLifeStocksRemaining--;
+			_fighterTwo.RefillPlaceholderLife();
+			_fighterTwoLastLife = _fighterTwo.PlaceholderLife;
+			return true;
+		}
+		return false;
 	}
 
 	private void StartPendingDefeatedKo()
@@ -937,6 +1100,17 @@ public partial class VersusStageRules : Node
 
 	private void ClampFighterToCameraRange(FighterController fighter, float leftEdge, float rightEdge)
 	{
+		if (_screenCarryFramesLeft > 0 && _screenCarryCameraActive &&
+			(fighter == _screenCarryDefender || fighter == _screenCarryAttacker))
+		{
+			// The defender drives the authored shockwave camera. Kamui is deliberately
+			// allowed to fall behind that camera and stops affecting its composition;
+			// the final volley uses the configured attacker dash to bring him back later.
+			// Actual stage walls remain absolute for both fighters.
+			float stageClampedX = Mathf.Clamp(fighter.GlobalPosition.X, MinOriginX(fighter), MaxOriginX(fighter));
+			fighter.GlobalPosition = new Vector2(stageClampedX, fighter.GlobalPosition.Y);
+			return;
+		}
 		Rect2 localPushbox = GetCurrentPushboxLocal(fighter);
 		float min = Mathf.Max(MinOriginX(fighter), leftEdge - localPushbox.Position.X);
 		float max = Mathf.Min(MaxOriginX(fighter), rightEdge - localPushbox.End.X);

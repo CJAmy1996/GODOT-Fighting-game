@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="SuperMoveData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/SuperMoveData.cs" id="1_super"]
+[ext_resource type="Script" path="res://Scripts/Core/MotionInputBinding.cs" id="2_binding"]
+[ext_resource type="Resource" path="res://Data/Motions/quarter_circle_forward.tres" id="3_qcf"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_shinryuken_timeline.tres" id="4_timeline"]
+
+[sub_resource type="Resource" id="ShinryukenSuperBinding"]
+script = ExtResource("2_binding")
+Motion = ExtResource("3_qcf")
+Buttons = 12
+ButtonMatchMode = 1
+Priority = 50
+
+[resource]
+script = ExtResource("1_super")
+AuthoredMoveData = ExtResource("4_timeline")
+AttackName = "MECHA SHINRYUKEN"
+AnimationName = "anim_145"
+CommandInput = SubResource("ShinryukenSuperBinding")
+StartupFrames = 9
+ActiveFrames = 102
+RecoveryFrames = 12
+ActivationFreezeFrames = 45
+BackdropFrames = 95
+HitCount = 17
+HitIntervalFrames = 1
+HitstunFrames = 15
+HitstopFrames = 2
+AddsGlobalHitstopBonus = false
+Pushback = 25.0
+FinalHitstunFrames = 30
+FinalHitstopFrames = 10
+FinalPushback = 220.0
+ShakeStrength = 2.0
+FinalShakeStrength = 7.0
+FinalHitKnocksDown = false

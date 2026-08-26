@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Godot;
+using ModularFighter.Characters;
 using ModularFighter.Core;
 using ModularFighter.Demo;
 
@@ -80,7 +81,7 @@ public partial class SanzouAnimationPolishRegressionTest : Node
 		for (int cycle = 0; cycle < 4; cycle++)
 			ExpectSlice(blockReflector.AnimationSourceTimeline, 6 + cycle * 3, 6, 7, 8);
 
-		SpecialMoveData superReflector = Special(definition, FighterController.SanzoSuperReflectorName);
+		SpecialMoveData superReflector = Special(definition, SanzoKongoumaruFighter.SuperReflectorName);
 		Expect(superReflector.StartupFrames == 12, "super reflector dramatic pre-start is not twelve ticks");
 		for (int cycle = 0; cycle < 4; cycle++)
 			ExpectSlice(superReflector.AnimationSourceTimeline, cycle * 3, 6, 7, 8);
@@ -114,7 +115,7 @@ public partial class SanzouAnimationPolishRegressionTest : Node
 		Expect(backDash.ActiveFrames == 24,
 			"backdash does not remain active for its exact four-drawing, 24-tick CSV animation");
 
-		SpecialMoveData stomp = Special(definition, FighterController.StompSpecialName);
+		SpecialMoveData stomp = Special(definition, SanzoKongoumaruFighter.StompName);
 		float riseSeconds = stomp.ForceDownwardStartFrame / 60f;
 		float stompHeight = stomp.SelfLaunchSpeed * riseSeconds - 0.5f * definition.Tuning.Gravity * riseSeconds * riseSeconds;
 		float normalJumpHeight = neutralJump.InitialSpeed * neutralJump.InitialSpeed / (2f * definition.Tuning.Gravity);

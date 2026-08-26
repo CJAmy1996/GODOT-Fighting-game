@@ -14,6 +14,9 @@ public abstract partial class MovementAbility : Resource
 	[Export] public int Priority { get; set; }
 	public virtual bool OwnsHorizontalVelocity => false;
 	public virtual bool OwnsGravity => false;
+	public virtual bool PreventsBlocking => false;
+	public virtual bool TicksDuringAttack => false;
+	public virtual bool PersistsThroughNormalAttack => false;
 	/// <summary>Prevents this airborne movement from pushing a grounded opponent.</summary>
 	public virtual bool SuppressesGroundedPushWhileAirborne => false;
 	/// <summary>Lets this movement retain horizontal steering for its full airborne lifetime.</summary>

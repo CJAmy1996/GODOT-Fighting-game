@@ -62,7 +62,7 @@ public partial class SanzouParryReflectorRegressionTest : Node2D
 					LatchMotionEvent(_superReflectorProbe, "move_right");
 					_superReflectorProbe.SetExternalInput(new FighterInput(1f, 0f, false, false, false, false,
 						lightKickPressed: true, heavyKickPressed: true));
-					Expect(_parryFighter.CurrentAttackName == FighterController.SanzoParryName,
+					Expect(_parryFighter.CurrentAttackName == SanzoKongoumaruFighter.ParryName,
 						$"L resolved as '{_parryFighter.CurrentAttackName}'");
 					Expect(_parryFighter.CurrentAttackAnimationName == "trait_2", "S2/L parry did not use the Trait 2 animation");
 					Expect(_parryFighter.IsParryWindowActive, "L did not open its parry window");
@@ -93,7 +93,7 @@ public partial class SanzouParryReflectorRegressionTest : Node2D
 				case 3:
 					Expect(_parryFighter.CharacterSprite.Material == null,
 						"parry-window white flash remained after the parry succeeded");
-					Expect(_superReflectorProbe.CurrentAttackName == FighterController.SanzoSuperReflectorName,
+					Expect(_superReflectorProbe.CurrentAttackName == SanzoKongoumaruFighter.SuperReflectorName,
 						$"QCF+LK+HK resolved as '{_superReflectorProbe.CurrentAttackName}'");
 					if (_superReflectorProbe.CurrentAttackFrame < 22) return;
 					Expect(_superReflectorProbe.IsPerformingSuperMove,
@@ -115,17 +115,17 @@ public partial class SanzouParryReflectorRegressionTest : Node2D
 	private void ValidateConfiguredMovesAndReflectors()
 	{
 		SpecialMoveData parry = _parryFighter.Definition.SpecialMoves.FindMove(
-			FighterController.SanzoParryName, false, false);
+			SanzoKongoumaruFighter.ParryName, false, false);
 		SpecialMoveData blockReflector = _parryFighter.Definition.SpecialMoves.FindMove(
 			FighterController.BlockReflectorName, false, false);
 		SuperMoveData superReflector = Array.Find(_parryFighter.Definition.SuperMoves,
-			move => move?.AttackName == FighterController.SanzoSuperReflectorName);
+			move => move?.AttackName == SanzoKongoumaruFighter.SuperReflectorName);
 		Expect(parry?.Parry == true && parry.StartupFrames == 0 && parry.ActiveFrames == 30,
 			"L parry resource is missing its 30-frame window");
 		Expect(parry.AnimationName == "trait_2",
 			"S2/L parry resource is not assigned to the Trait 2 source animation");
 		Expect(Array.Find(_parryFighter.Definition.SuperMoves,
-			move => move?.AttackName == FighterController.SanzoParryName) == null,
+			move => move?.AttackName == SanzoKongoumaruFighter.ParryName) == null,
 			"L parry is still registered in Sanzou's super list");
 		Expect(superReflector?.ProjectileScene != null && superReflector.HitCount == 8 &&
 			superReflector.HitstopFrames == 1 && superReflector.ProjectileHitCooldownFrames == 5 &&

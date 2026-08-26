@@ -39,6 +39,11 @@ public partial class BigBangSourcePortRegressionTest : Node
 				Mathf.IsEqualApprox(ground.SelfLaunchSpeed, 800f) &&
 				Mathf.IsEqualApprox(ground.SelfHorizontalDeceleration, 2400f),
 				"grounded DP does not preserve M 1000,-800,-40/tick on frame 9");
+			Expect(ground.ActiveFrames == 27 && ground.RecoveryFrames == 0 &&
+				ground.AnimationSourceTimeline?.Length == 36 && ground.AnimationSourceTimeline[^1] == 11 &&
+				Array.FindAll(ground.BoxTimeline, box => box?.Kind == FighterBoxKind.Hitbox).Length == 13 &&
+				Array.TrueForAll(ground.BoxTimeline, box => box == null || box.EndFrame <= 35),
+				"grounded DP does not keep all 13 hits inside the helicopter drawings before natural fall");
 			Expect(ground.HitSparkScene == null,
 				"grounded DP blood must be selected by its source FA hit group, not the entire move");
 			for (int hit = 1; hit <= 8; hit++)
@@ -106,6 +111,29 @@ public partial class BigBangSourcePortRegressionTest : Node
 				"common source catalogs were not generated");
 			Expect(ResourceLoader.Exists("res://Effects/BigBangSuperCancelEffect.tscn"),
 				"universal BBB special-impact/super-cancel composite scene is missing");
+			var activationEffect = GD.Load<PackedScene>("res://Effects/BigBangSuperCancelEffect.tscn")
+				.Instantiate<BigBangSuperCancelEffect>();
+			activationEffect.ConfigureScreenCoverage(new Vector2(860f, 486f), new Vector2(-120f, 80f));
+			AddChild(activationEffect);
+			Sprite2D activationLightning = activationEffect.GetNodeOrNull<Sprite2D>("InnerLightning");
+			Sprite2D activationOuterLightning = activationEffect.GetNodeOrNull<Sprite2D>("OuterLightning");
+			Sprite2D activationCore = activationEffect.GetNodeOrNull<Sprite2D>("ImpactRing");
+			Vector2 innerConnection = activationLightning.Position +
+				new Vector2(-activationLightning.Texture.GetWidth(), activationLightning.Texture.GetHeight()) *
+				activationLightning.Scale * 0.5f;
+			Vector2 outerConnection = activationOuterLightning.Position +
+				new Vector2(activationOuterLightning.Texture.GetWidth(), -activationOuterLightning.Texture.GetHeight()) *
+				activationOuterLightning.Scale * 0.5f;
+			Expect(activationEffect.CoverageWorldSize == new Vector2(860f, 486f) &&
+				activationLightning != null && activationLightning.Scale.X > 1f &&
+				activationOuterLightning is { FlipH: true } &&
+				innerConnection.IsEqualApprox(new Vector2(-120f, 80f)) &&
+				outerConnection.IsEqualApprox(new Vector2(-120f, 80f)) &&
+				activationCore?.Position == new Vector2(-120f, 80f) &&
+				activationEffect.GetNodeOrNull<Sprite2D>("InnerLightningOpposite") == null &&
+				activationEffect.GetNodeOrNull<Sprite2D>("OuterLightningQuarterTurn") == null,
+				"super activation does not join exactly two diagonal lightning sheets at the fighter-centered core");
+			activationEffect.QueueFree();
 			string catalog = File.ReadAllText(actionCatalogPath);
 			Expect(catalog.Contains("common_section_020") && catalog.Contains("192 193 194 195 196 197 198 199") &&
 				catalog.Contains("common_section_026") && catalog.Contains("200 201 202 203 204 205 206 207 208 209 210"),

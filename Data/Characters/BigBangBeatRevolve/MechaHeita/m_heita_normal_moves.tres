@@ -50,7 +50,7 @@ Tag = "standing-light-punch-body"
 script = ExtResource("1_box")
 Kind = 1
 StartFrame = 3
-EndFrame = 6
+EndFrame = 5
 LocalRect = Rect2(12, -92, 88, 42)
 Tag = "standing-light-punch"
 
@@ -205,7 +205,7 @@ Tag = "crouching-light-kick-body"
 script = ExtResource("1_box")
 Kind = 1
 StartFrame = 3
-EndFrame = 5
+EndFrame = 6
 LocalRect = Rect2(11, -21, 55, 21)
 Tag = "crouching-light-kick-fast"
 
