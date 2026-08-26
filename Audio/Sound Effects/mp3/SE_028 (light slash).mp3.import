@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://jg143yr7ewks"
+path="res://.godot/imported/SE_028 (light slash).mp3-71729b6024d39d3023274cf63df20e8a.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_028 (light slash).mp3"
+dest_files=["res://.godot/imported/SE_028 (light slash).mp3-71729b6024d39d3023274cf63df20e8a.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

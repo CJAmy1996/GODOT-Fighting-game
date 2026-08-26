@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://k4o8hk3g1cq2"
+
+[deps]
+
+files=["res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.category.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.assignment.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.drawing.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.timeline.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.resolved.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.hold.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.offset.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.offset.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.missing.translation"]
+
+source_file="res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.csv"
+dest_files=["res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.category.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.assignment.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.drawing.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.timeline.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.resolved.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.hold.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.offset.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.offset.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kamui/animation_catalog.missing.translation"]
+
+[params]
+
+compress=true
+delimiter=0

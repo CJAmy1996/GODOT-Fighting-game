@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cg4mc4603isw1"
+path="res://.godot/imported/SE_008 (Light Sound Effect).mp3-9eea3e867726be9097a3695ad663122a.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_008 (Light Sound Effect).mp3"
+dest_files=["res://.godot/imported/SE_008 (Light Sound Effect).mp3-9eea3e867726be9097a3695ad663122a.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

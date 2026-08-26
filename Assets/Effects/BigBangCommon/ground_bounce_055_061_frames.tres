@@ -1,0 +1,17 @@
+[gd_resource type="SpriteFrames" load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/055.png" id="1_055"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/056.png" id="2_056"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/057.png" id="3_057"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/058.png" id="4_058"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/059.png" id="5_059"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/060.png" id="6_060"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/061.png" id="7_061"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 2.0, "texture": ExtResource("1_055")}, {"duration": 2.0, "texture": ExtResource("2_056")}, {"duration": 2.0, "texture": ExtResource("3_057")}, {"duration": 2.0, "texture": ExtResource("4_058")}, {"duration": 2.0, "texture": ExtResource("5_059")}, {"duration": 2.0, "texture": ExtResource("6_060")}, {"duration": 2.0, "texture": ExtResource("7_061")}],
+"loop": false,
+"name": &"ground_bounce_055_061",
+"speed": 60.0
+}]

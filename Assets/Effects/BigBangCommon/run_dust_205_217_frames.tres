@@ -1,0 +1,23 @@
+[gd_resource type="SpriteFrames" load_steps=14 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/205.png" id="1_205"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/206.png" id="2_206"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/207.png" id="3_207"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/208.png" id="4_208"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/209.png" id="5_209"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/210.png" id="6_210"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/211.png" id="7_211"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/212.png" id="8_212"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/213.png" id="9_213"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/214.png" id="10_214"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/215.png" id="11_215"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/216.png" id="12_216"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/217.png" id="13_217"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 2.0, "texture": ExtResource("1_205")}, {"duration": 2.0, "texture": ExtResource("2_206")}, {"duration": 2.0, "texture": ExtResource("3_207")}, {"duration": 2.0, "texture": ExtResource("4_208")}, {"duration": 2.0, "texture": ExtResource("5_209")}, {"duration": 2.0, "texture": ExtResource("6_210")}, {"duration": 2.0, "texture": ExtResource("7_211")}, {"duration": 2.0, "texture": ExtResource("8_212")}, {"duration": 2.0, "texture": ExtResource("9_213")}, {"duration": 2.0, "texture": ExtResource("10_214")}, {"duration": 2.0, "texture": ExtResource("11_215")}, {"duration": 2.0, "texture": ExtResource("12_216")}, {"duration": 2.0, "texture": ExtResource("13_217")}],
+"loop": false,
+"name": &"run_dust_205_217",
+"speed": 60.0
+}]

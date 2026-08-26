@@ -12,7 +12,7 @@ public partial class PuppetCoordinator : Node
 {
 	[Export] public FighterController Primary { get; set; }
 	[Export] public FighterController Puppet { get; set; }
-	[Export] public StringName SwapAction { get; set; } = "swap_control";
+	[Export(PropertyHint.Range, "0,3,1")] public int LocalPlayerIndex { get; set; }
 	[Export] public bool PuppetFollowsPrimary { get; set; } = true;
 	[Export] public float FollowDeadZone { get; set; } = 90f;
 	[Export] public int ActiveIndex { get; private set; }
@@ -26,9 +26,10 @@ public partial class PuppetCoordinator : Node
 	public override void _PhysicsProcess(double delta)
 	{
 		if (Primary == null || Puppet == null) return;
-		if (Input.IsActionJustPressed(SwapAction)) ActiveIndex = 1 - ActiveIndex;
+		NativeInputFrame nativeFrame = NativeInputRouter.GetGameplayFrame((long)Engine.GetPhysicsFrames(), LocalPlayerIndex);
+		if (nativeFrame.WasPressed(NativeInputButtons.Swap)) ActiveIndex = 1 - ActiveIndex;
 
-		FighterInput playerInput = FighterInput.ReadLocal();
+		FighterInput playerInput = nativeFrame.ToFighterInput();
 		FighterController active = ActiveIndex == 0 ? Primary : Puppet;
 		FighterController inactive = ActiveIndex == 0 ? Puppet : Primary;
 		active.SetExternalInput(playerInput);

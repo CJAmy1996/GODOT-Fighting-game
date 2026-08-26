@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="JumpAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/JumpAbility.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Id = "backward_jump"
+Priority = 20
+Direction = 2
+InitialSpeed = 629.2
+AirJumpInitialSpeed = 614.9
+ForwardSpeed = 221.65
+MaxAirJumps = 1
+HeldFrames = 10
+JumpSquatFrames = 5
+HeldGravityMultiplier = 1.0
+ReleaseVelocityMultiplier = 0.48

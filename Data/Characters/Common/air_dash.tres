@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DashAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/DashAbility.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Id = "air_dash"
+Priority = 15
+AirOnly = true
+MaxAirUses = 1
+ActiveFrames = 11
+RecoveryFrames = 6
+Speed = 650.0
+AimWithStick = true
+MinimumAirHeight = 80.0

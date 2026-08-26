@@ -185,5 +185,5 @@ Backdrop,Scripts/Demo/ArenaBackdrop.cs,StageHeight,1008,Drawn stage height,"Visu
 Backdrop,Scripts/Demo/ArenaBackdrop.cs,StageTopY,-650,Drawn stage top,"Visual only."
 Backdrop,Scripts/Demo/ArenaBackdrop.cs,FloorY,650,Floor line position,"Visual only."
 Clone prototype,Scripts/Characters/CloneCommandRelay.cs,Clone,null,Controlled clone reference,"Early stub only."
-Clone prototype,Scripts/Characters/CloneCommandRelay.cs,Owner,null,Owner fighter reference,"Warning exists because Godot Node also has Owner."
+Clone prototype,Scripts/Characters/CloneCommandRelay.cs,OwnerFighter,null,Owner fighter reference,"Explicit name avoids colliding with Godot Node.Owner."
 Clone prototype,Scripts/Characters/CloneCommandRelay.cs,MirrorOwnerMovement,true,Mirror movement input,"Prototype relay behavior."

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dvvfbv068hdha"
+path="res://.godot/imported/SE_013 (Projecttile).mp3-36146349e811342bc6f76efe8ee1ee3b.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_013 (Projecttile).mp3"
+dest_files=["res://.godot/imported/SE_013 (Projecttile).mp3-36146349e811342bc6f76efe8ee1ee3b.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

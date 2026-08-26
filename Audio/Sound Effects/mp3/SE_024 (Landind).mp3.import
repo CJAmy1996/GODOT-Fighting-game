@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://p2hmlrl64wp8"
+path="res://.godot/imported/SE_024 (Landind).mp3-d07178822c7ece3e6542223233dae647.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_024 (Landind).mp3"
+dest_files=["res://.godot/imported/SE_024 (Landind).mp3-d07178822c7ece3e6542223233dae647.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

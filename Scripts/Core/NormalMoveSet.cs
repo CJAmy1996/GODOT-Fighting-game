@@ -7,7 +7,7 @@ namespace ModularFighter.Core;
 /// Character-level normal cancel rules. Rule order matters: put specific rules
 /// before broad rules such as LIGHT or ANY.
 /// </summary>
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class NormalMoveSet : Resource
 {
 	[Export] public NormalMoveData[] Rules { get; set; } = Array.Empty<NormalMoveData>();
@@ -16,6 +16,16 @@ public partial class NormalMoveSet : Resource
 	{
 		foreach (var rule in Rules)
 			if (rule != null && rule.Matches(attackName, startedCrouching, startedAirborne))
+				return rule;
+		return null;
+	}
+
+	/// <summary>State-box channels use exact names; their stance describes the reaction, not an attack-start filter.</summary>
+	public NormalMoveData FindStateRule(string stateName)
+	{
+		string requested = stateName?.Trim() ?? "";
+		foreach (NormalMoveData rule in Rules)
+			if (rule != null && string.Equals(rule.AttackName?.Trim(), requested, StringComparison.OrdinalIgnoreCase))
 				return rule;
 		return null;
 	}

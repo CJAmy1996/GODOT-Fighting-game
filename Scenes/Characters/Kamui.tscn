@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Characters/KamuiFighter.cs" id="1_script"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_definition.tres" id="2_definition"]
+[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/Kamui/kamui_sprite_frames.tres" id="3_frames"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(56, 100)
+
+[node name="KamuiTest" type="CharacterBody2D" node_paths=PackedStringArray("CharacterSprite")]
+collision_layer = 2
+script = ExtResource("1_script")
+CharacterSprite = NodePath("CharacterSprite")
+Definition = ExtResource("2_definition")
+
+[node name="CharacterSprite" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, -58)
+sprite_frames = ExtResource("3_frames")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="BodyCollision" type="CollisionShape2D" parent="."]
+position = Vector2(0, -50)
+shape = SubResource("RectangleShape2D_body")

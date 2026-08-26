@@ -1,0 +1,1619 @@
+[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=209 format=3 uid="uid://c13bhhkg52jko"]
+
+[ext_resource type="Script" uid="uid://br48dic8s6gkm" path="res://Scripts/Core/NormalMoveData.cs" id="1_move"]
+[ext_resource type="Script" uid="uid://br5l43bdiww0l" path="res://Scripts/Core/NormalMoveSet.cs" id="2_set"]
+[ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="3_box"]
+
+[sub_resource type="Resource" id="IdleHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -108, 84, 108)
+Tag = "idle-hurtbox"
+
+[sub_resource type="Resource" id="IdleState"]
+script = ExtResource("1_move")
+AttackName = "STATE IDLE"
+AnimationName = "idle"
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("IdleHurtbox")]
+
+[sub_resource type="Resource" id="CrouchStartHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-40, -104, 81, 104)
+Tag = "crouch-start-hurtbox"
+
+[sub_resource type="Resource" id="CrouchStartState"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCH START"
+AnimationName = "crouch_start"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 10
+RecoveryFrames = 0
+BoxTimeline = [SubResource("CrouchStartHurtbox")]
+
+[sub_resource type="Resource" id="CrouchHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-30, -68, 60, 68)
+Tag = "full-crouch-hurtbox"
+
+[sub_resource type="Resource" id="CrouchState"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCH"
+AnimationName = "crouch_hold"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("CrouchHurtbox")]
+
+[sub_resource type="Resource" id="FullCrouch2Hurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-30, -66, 60, 66)
+Tag = "full-crouch-2-hurtbox"
+
+[sub_resource type="Resource" id="FullCrouch2State"]
+script = ExtResource("1_move")
+AttackName = "STATE FULL CROUCH 2"
+AnimationName = "full_crouch_2"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 1000
+RecoveryFrames = 0
+BoxTimeline = [SubResource("FullCrouch2Hurtbox")]
+
+[sub_resource type="Resource" id="CrouchEndHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-40, -104, 81, 104)
+Tag = "crouch-end-hurtbox"
+
+[sub_resource type="Resource" id="CrouchEndState"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCH END"
+AnimationName = "crouch_end"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 10
+RecoveryFrames = 0
+BoxTimeline = [SubResource("CrouchEndHurtbox")]
+
+[sub_resource type="Resource" id="StandingHitstunToIdleHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-47, -106, 94, 106)
+Tag = "standing-hitstun-to-idle-hurtbox"
+
+[sub_resource type="Resource" id="StandingHitstunToIdleState"]
+script = ExtResource("1_move")
+AttackName = "STATE STANDING HITSTUN TO IDLE"
+AnimationName = "standing_hitstun_to_idle"
+StartupFrames = 0
+ActiveFrames = 24
+RecoveryFrames = 0
+BoxTimeline = [SubResource("StandingHitstunToIdleHurtbox")]
+
+[sub_resource type="Resource" id="StandingLightHitstunToIdleHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -106, 84, 106)
+Tag = "standing-light-hitstun-to-idle-hurtbox"
+
+[sub_resource type="Resource" id="StandingLightHitstunToIdleState"]
+script = ExtResource("1_move")
+AttackName = "STATE STANDING LIGHT HITSTUN TO IDLE"
+AnimationName = "standing_light_hitstun_to_idle"
+StartupFrames = 0
+ActiveFrames = 10
+RecoveryFrames = 0
+BoxTimeline = [SubResource("StandingLightHitstunToIdleHurtbox")]
+
+[sub_resource type="Resource" id="StandingMediumHitstunToIdleHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-47, -106, 94, 106)
+Tag = "standing-medium-hitstun-to-idle-hurtbox"
+
+[sub_resource type="Resource" id="StandingMediumHitstunToIdleState"]
+script = ExtResource("1_move")
+AttackName = "STATE STANDING MEDIUM HITSTUN TO IDLE"
+AnimationName = "standing_medium_hitstun_to_idle"
+StartupFrames = 0
+ActiveFrames = 17
+RecoveryFrames = 0
+BoxTimeline = [SubResource("StandingMediumHitstunToIdleHurtbox")]
+
+[sub_resource type="Resource" id="StandingBigHitstunToIdle2Hurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-47, -106, 94, 106)
+Tag = "standing-big-hitstun-to-idle-2-hurtbox"
+
+[sub_resource type="Resource" id="StandingBigHitstunToIdle2State"]
+script = ExtResource("1_move")
+AttackName = "STATE STANDING BIG HITSTUN TO IDLE 2"
+AnimationName = "standing_big_hitstun_to_idle_2"
+StartupFrames = 0
+ActiveFrames = 23
+RecoveryFrames = 0
+BoxTimeline = [SubResource("StandingBigHitstunToIdle2Hurtbox")]
+
+[sub_resource type="Resource" id="StandingBigHitstunToIdle3Hurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-47, -106, 94, 106)
+Tag = "standing-big-hitstun-to-idle-3-hurtbox"
+
+[sub_resource type="Resource" id="StandingBigHitstunToIdle3State"]
+script = ExtResource("1_move")
+AttackName = "STATE STANDING BIG HITSTUN TO IDLE 3"
+AnimationName = "standing_big_hitstun_to_idle_3"
+StartupFrames = 0
+ActiveFrames = 23
+RecoveryFrames = 0
+BoxTimeline = [SubResource("StandingBigHitstunToIdle3Hurtbox")]
+
+[sub_resource type="Resource" id="StandingMidHitstunToIdleHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-41, -107, 82, 107)
+Tag = "standing-mid-hitstun-to-idle-hurtbox"
+
+[sub_resource type="Resource" id="StandingMidHitstunToIdleState"]
+script = ExtResource("1_move")
+AttackName = "STATE STANDING MID HITSTUN TO IDLE"
+AnimationName = "standing_mid_hitstun_to_idle"
+StartupFrames = 0
+ActiveFrames = 24
+RecoveryFrames = 0
+BoxTimeline = [SubResource("StandingMidHitstunToIdleHurtbox")]
+
+[sub_resource type="Resource" id="StandingLightMidHitstunToIdleHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-41, -107, 82, 107)
+Tag = "standing-light-mid-hitstun-to-idle-hurtbox"
+
+[sub_resource type="Resource" id="StandingLightMidHitstunToIdleState"]
+script = ExtResource("1_move")
+AttackName = "STATE STANDING LIGHT MID HITSTUN TO IDLE"
+AnimationName = "standing_light_mid_hitstun_to_idle"
+StartupFrames = 0
+ActiveFrames = 10
+RecoveryFrames = 0
+BoxTimeline = [SubResource("StandingLightMidHitstunToIdleHurtbox")]
+
+[sub_resource type="Resource" id="StandingLightMidHitstunToIdle2Hurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-41, -107, 82, 107)
+Tag = "standing-light-mid-hitstun-to-idle-2-hurtbox"
+
+[sub_resource type="Resource" id="StandingLightMidHitstunToIdle2State"]
+script = ExtResource("1_move")
+AttackName = "STATE STANDING LIGHT MID HITSTUN TO IDLE 2"
+AnimationName = "standing_light_mid_hitstun_to_idle_2"
+StartupFrames = 0
+ActiveFrames = 17
+RecoveryFrames = 0
+BoxTimeline = [SubResource("StandingLightMidHitstunToIdle2Hurtbox")]
+
+[sub_resource type="Resource" id="StandingMidHitstunToIdle2Hurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-41, -107, 82, 107)
+Tag = "standing-mid-hitstun-to-idle-2-hurtbox"
+
+[sub_resource type="Resource" id="StandingMidHitstunToIdle2State"]
+script = ExtResource("1_move")
+AttackName = "STATE STANDING MID HITSTUN TO IDLE 2"
+AnimationName = "standing_mid_hitstun_to_idle_2"
+StartupFrames = 0
+ActiveFrames = 21
+RecoveryFrames = 0
+BoxTimeline = [SubResource("StandingMidHitstunToIdle2Hurtbox")]
+
+[sub_resource type="Resource" id="StandingMidHitstunToIdle3Hurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-41, -107, 82, 107)
+Tag = "standing-mid-hitstun-to-idle-3-hurtbox"
+
+[sub_resource type="Resource" id="StandingMidHitstunToIdle3State"]
+script = ExtResource("1_move")
+AttackName = "STATE STANDING MID HITSTUN TO IDLE 3"
+AnimationName = "standing_mid_hitstun_to_idle_3"
+StartupFrames = 0
+ActiveFrames = 23
+RecoveryFrames = 0
+BoxTimeline = [SubResource("StandingMidHitstunToIdle3Hurtbox")]
+
+[sub_resource type="Resource" id="CrouchHitstunHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-44, -61, 89, 61)
+Tag = "crouch-hitstun-hurtbox"
+
+[sub_resource type="Resource" id="CrouchHitstunState"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCH HITSTUN"
+AnimationName = "crouch_hit"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 5
+RecoveryFrames = 0
+BoxTimeline = [SubResource("CrouchHitstunHurtbox")]
+
+[sub_resource type="Resource" id="CrouchHitstun2Hurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-44, -61, 89, 61)
+Tag = "crouch-hitstun-2-hurtbox"
+
+[sub_resource type="Resource" id="CrouchHitstun2State"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCH HITSTUN 2"
+AnimationName = "crouch_hit_2"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 5
+RecoveryFrames = 0
+BoxTimeline = [SubResource("CrouchHitstun2Hurtbox")]
+
+[sub_resource type="Resource" id="CrouchingHeavyHitstunHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-44, -70, 89, 70)
+Tag = "crouching-heavy-hitstun-hurtbox"
+
+[sub_resource type="Resource" id="CrouchingHeavyHitstunState"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCHING HEAVY HITSTUN"
+AnimationName = "crouching_heavy_hitstun"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 24
+RecoveryFrames = 0
+BoxTimeline = [SubResource("CrouchingHeavyHitstunHurtbox")]
+
+[sub_resource type="Resource" id="CrouchingLightHitstunHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -69, 77, 69)
+Tag = "crouching-light-hitstun-hurtbox"
+
+[sub_resource type="Resource" id="CrouchingLightHitstunState"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCHING LIGHT HITSTUN"
+AnimationName = "crouching_light_hitstun"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 10
+RecoveryFrames = 0
+BoxTimeline = [SubResource("CrouchingLightHitstunHurtbox")]
+
+[sub_resource type="Resource" id="CrouchingMidHitstunHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-41, -70, 83, 70)
+Tag = "crouching-mid-hitstun-hurtbox"
+
+[sub_resource type="Resource" id="CrouchingMidHitstunState"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCHING MID HITSTUN"
+AnimationName = "crouching_mid_hitstun"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 17
+RecoveryFrames = 0
+BoxTimeline = [SubResource("CrouchingMidHitstunHurtbox")]
+
+[sub_resource type="Resource" id="CrouchingMidHitstun2Hurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-44, -70, 89, 70)
+Tag = "crouching-mid-hitstun-2-hurtbox"
+
+[sub_resource type="Resource" id="CrouchingMidHitstun2State"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCHING MID HITSTUN 2"
+AnimationName = "crouching_mid_hitstun_2"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 21
+RecoveryFrames = 0
+BoxTimeline = [SubResource("CrouchingMidHitstun2Hurtbox")]
+
+[sub_resource type="Resource" id="CrouchingMidHitstun3Hurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-44, -70, 89, 70)
+Tag = "crouching-mid-hitstun-3-hurtbox"
+
+[sub_resource type="Resource" id="CrouchingMidHitstun3State"]
+script = ExtResource("1_move")
+AttackName = "STATE CROUCHING MID HITSTUN 3"
+AnimationName = "crouching_mid_hitstun_3"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 23
+RecoveryFrames = 0
+BoxTimeline = [SubResource("CrouchingMidHitstun3Hurtbox")]
+
+[sub_resource type="Resource" id="FullCrouchHitstunHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -94, 77, 94)
+Tag = "full-crouch-hitstun-hurtbox"
+
+[sub_resource type="Resource" id="FullCrouchHitstunState"]
+script = ExtResource("1_move")
+AttackName = "STATE FULL CROUCH HITSTUN"
+AnimationName = "full_crouch_hitstun"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 46
+RecoveryFrames = 0
+BoxTimeline = [SubResource("FullCrouchHitstunHurtbox")]
+
+[sub_resource type="Resource" id="FullCrouchHitstun2Hurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -94, 77, 94)
+Tag = "full-crouch-hitstun-2-hurtbox"
+
+[sub_resource type="Resource" id="FullCrouchHitstun2State"]
+script = ExtResource("1_move")
+AttackName = "STATE FULL CROUCH HITSTUN 2"
+AnimationName = "full_crouch_hitstun_2"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 46
+RecoveryFrames = 0
+BoxTimeline = [SubResource("FullCrouchHitstun2Hurtbox")]
+
+[sub_resource type="Resource" id="WalkForwardHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-35, -116, 70, 116)
+Tag = "walk-forward-hurtbox"
+
+[sub_resource type="Resource" id="WalkForwardState"]
+script = ExtResource("1_move")
+AttackName = "STATE WALK FORWARD"
+AnimationName = "walk"
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("WalkForwardHurtbox")]
+
+[sub_resource type="Resource" id="WalkBackHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-35, -114, 70, 114)
+Tag = "walk-back-hurtbox"
+
+[sub_resource type="Resource" id="WalkBackState"]
+script = ExtResource("1_move")
+AttackName = "STATE WALK BACK"
+AnimationName = "walk_back"
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("WalkBackHurtbox")]
+
+[sub_resource type="Resource" id="JumpRiseHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-31, -138, 62, 138)
+Tag = "jump-rise-hurtbox"
+
+[sub_resource type="Resource" id="JumpRiseState"]
+script = ExtResource("1_move")
+AttackName = "STATE JUMP RISE"
+AnimationName = "neutral_jump"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("JumpRiseHurtbox")]
+
+[sub_resource type="Resource" id="ForwardJumpHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-40, -138, 80, 138)
+Tag = "forward-jump-hurtbox"
+
+[sub_resource type="Resource" id="ForwardJumpState"]
+script = ExtResource("1_move")
+AttackName = "STATE JUMP FORWARD"
+AnimationName = "forward_jump_loop"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("ForwardJumpHurtbox")]
+
+[sub_resource type="Resource" id="BackwardJumpHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-36, -138, 72, 138)
+Tag = "backward-jump-hurtbox"
+
+[sub_resource type="Resource" id="BackwardJumpState"]
+script = ExtResource("1_move")
+AttackName = "STATE JUMP BACK"
+AnimationName = "backward_jump"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BackwardJumpHurtbox")]
+
+[sub_resource type="Resource" id="FlyUpHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-37, -138, 75, 138)
+Tag = "fly-up-hurtbox"
+
+[sub_resource type="Resource" id="FlyUpState"]
+script = ExtResource("1_move")
+AttackName = "STATE FLY UP"
+AnimationName = "fly_up"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("FlyUpHurtbox")]
+
+[sub_resource type="Resource" id="BenchedFlyUpHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-30, -138, 61, 138)
+Tag = "super-jump-neutral-hurtbox"
+
+[sub_resource type="Resource" id="BenchedFlyUpState"]
+script = ExtResource("1_move")
+AttackName = "STATE SUPER JUMP NEUTRAL"
+AnimationName = "super_jump_neutral"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 34
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BenchedFlyUpHurtbox")]
+
+[sub_resource type="Resource" id="BenchedFlyUpForwardHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-40, -138, 80, 138)
+Tag = "super-jump-forward-hurtbox"
+
+[sub_resource type="Resource" id="BenchedFlyUpForwardState"]
+script = ExtResource("1_move")
+AttackName = "STATE SUPER JUMP FORWARD"
+AnimationName = "super_jump_forward"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 34
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BenchedFlyUpForwardHurtbox")]
+
+[sub_resource type="Resource" id="BenchedFlyBackHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-36, -138, 72, 138)
+Tag = "super-jump-backward-hurtbox"
+
+[sub_resource type="Resource" id="BenchedFlyBackState"]
+script = ExtResource("1_move")
+AttackName = "STATE SUPER JUMP BACKWARD"
+AnimationName = "super_jump_backward"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 40
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BenchedFlyBackHurtbox")]
+
+[sub_resource type="Resource" id="BoosterState"]
+script = ExtResource("1_move")
+AttackName = "STATE BOOSTER"
+AnimationName = "booster_loop"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("FlyUpHurtbox")]
+
+[sub_resource type="Resource" id="BoosterUpHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-30, -138, 60, 138)
+Tag = "booster-up-hurtbox"
+
+[sub_resource type="Resource" id="BoosterUpState"]
+script = ExtResource("1_move")
+AttackName = "STATE BOOSTER UP"
+AnimationName = "booster_up"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BoosterUpHurtbox")]
+
+[sub_resource type="Resource" id="BoosterUpForwardHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-40, -128, 80, 128)
+Tag = "booster-up-forward-hurtbox"
+
+[sub_resource type="Resource" id="BoosterUpForwardState"]
+script = ExtResource("1_move")
+AttackName = "STATE BOOSTER UP FORWARD"
+AnimationName = "booster_up_forward"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BoosterUpForwardHurtbox")]
+
+[sub_resource type="Resource" id="BoosterForwardHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-55, -92, 110, 92)
+Tag = "booster-forward-hurtbox"
+
+[sub_resource type="Resource" id="BoosterForwardState"]
+script = ExtResource("1_move")
+AttackName = "STATE BOOSTER FORWARD"
+AnimationName = "booster_forward"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BoosterForwardHurtbox")]
+
+[sub_resource type="Resource" id="BoosterDownForwardHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-60, -88, 120, 88)
+Tag = "booster-down-forward-hurtbox"
+
+[sub_resource type="Resource" id="BoosterDownForwardState"]
+script = ExtResource("1_move")
+AttackName = "STATE BOOSTER DOWN FORWARD"
+AnimationName = "booster_down_forward"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BoosterDownForwardHurtbox")]
+
+[sub_resource type="Resource" id="BoosterDownHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-30, -138, 60, 138)
+Tag = "booster-down-hurtbox"
+
+[sub_resource type="Resource" id="BoosterDownState"]
+script = ExtResource("1_move")
+AttackName = "STATE BOOSTER DOWN"
+AnimationName = "booster_down"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BoosterDownHurtbox")]
+
+[sub_resource type="Resource" id="BoosterDownBackHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-60, -88, 120, 88)
+Tag = "booster-down-back-hurtbox"
+
+[sub_resource type="Resource" id="BoosterDownBackState"]
+script = ExtResource("1_move")
+AttackName = "STATE BOOSTER DOWN BACK"
+AnimationName = "booster_down_back"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BoosterDownBackHurtbox")]
+
+[sub_resource type="Resource" id="BoosterBackHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-50, -100, 100, 100)
+Tag = "booster-back-hurtbox"
+
+[sub_resource type="Resource" id="BoosterBackState"]
+script = ExtResource("1_move")
+AttackName = "STATE BOOSTER BACK"
+AnimationName = "booster_back"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BoosterBackHurtbox")]
+
+[sub_resource type="Resource" id="BoosterUpBackHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-40, -128, 80, 128)
+Tag = "booster-up-back-hurtbox"
+
+[sub_resource type="Resource" id="BoosterUpBackState"]
+script = ExtResource("1_move")
+AttackName = "STATE BOOSTER UP BACK"
+AnimationName = "booster_up_back"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BoosterUpBackHurtbox")]
+
+[sub_resource type="Resource" id="FallHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-25, -138, 51, 138)
+Tag = "fall-hurtbox"
+
+[sub_resource type="Resource" id="FallState"]
+script = ExtResource("1_move")
+AttackName = "STATE FALL"
+AnimationName = "fall"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("FallHurtbox")]
+
+[sub_resource type="Resource" id="KnockedAwayHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -110, 84, 110)
+Tag = "knocked-away-hurtbox"
+
+[sub_resource type="Resource" id="KnockedAwayState"]
+script = ExtResource("1_move")
+AttackName = "STATE KNOCKED AWAY"
+AnimationName = "knocked_away"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("KnockedAwayHurtbox")]
+
+[sub_resource type="Resource" id="LaunchedHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "launched-hurtbox"
+
+[sub_resource type="Resource" id="LaunchedState"]
+script = ExtResource("1_move")
+AttackName = "STATE LAUNCHED"
+AnimationName = "launched"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 40
+RecoveryFrames = 0
+BoxTimeline = [SubResource("LaunchedHurtbox")]
+
+[sub_resource type="Resource" id="LaunchedHitstunHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "launched-hitstun-hurtbox"
+
+[sub_resource type="Resource" id="LaunchedHitstunState"]
+script = ExtResource("1_move")
+AttackName = "STATE LAUNCHED HITSTUN"
+AnimationName = "launched_hitstun"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1032
+RecoveryFrames = 0
+BoxTimeline = [SubResource("LaunchedHitstunHurtbox")]
+
+[sub_resource type="Resource" id="LaunchedFarHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "launched-far-hurtbox"
+
+[sub_resource type="Resource" id="LaunchedFarState"]
+script = ExtResource("1_move")
+AttackName = "STATE LAUNCHED FAR"
+AnimationName = "launched_far"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1032
+RecoveryFrames = 0
+BoxTimeline = [SubResource("LaunchedFarHurtbox")]
+
+[sub_resource type="Resource" id="ShortLaunchHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "short-launch-hurtbox"
+
+[sub_resource type="Resource" id="ShortLaunchState"]
+script = ExtResource("1_move")
+AttackName = "STATE SHORT LAUNCH"
+AnimationName = "short_launch"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1032
+RecoveryFrames = 0
+BoxTimeline = [SubResource("ShortLaunchHurtbox")]
+
+[sub_resource type="Resource" id="LightLaunchHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "light-launch-hurtbox"
+
+[sub_resource type="Resource" id="LightLaunchState"]
+script = ExtResource("1_move")
+AttackName = "STATE LIGHT LAUNCH"
+AnimationName = "light_launch"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1032
+RecoveryFrames = 0
+BoxTimeline = [SubResource("LightLaunchHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayHorizontalHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -54, 99, 54)
+Tag = "blow-away-horizontal-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayHorizontalState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_真横"
+AnimationName = "blow_away_horizontal"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1000
+RecoveryFrames = 0
+BlowAwayDirection = 1
+BlowAwayStrength = 2
+BoxTimeline = [SubResource("BlowAwayHorizontalHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayVerticalWeakHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "blow-away-vertical-weak-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayVerticalWeakState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_真上_弱"
+AnimationName = "blow_away_vertical_weak"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 26
+RecoveryFrames = 0
+BlowAwayDirection = 2
+BlowAwayStrength = 1
+BoxTimeline = [SubResource("BlowAwayVerticalWeakHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayVerticalMediumHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "blow-away-vertical-medium-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayVerticalMediumState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_真上_中"
+AnimationName = "blow_away_vertical_medium"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 26
+RecoveryFrames = 0
+BlowAwayDirection = 2
+BlowAwayStrength = 2
+BoxTimeline = [SubResource("BlowAwayVerticalMediumHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayVerticalStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "blow-away-vertical-strong-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayVerticalStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_真上_強"
+AnimationName = "blow_away_vertical_strong"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 26
+RecoveryFrames = 0
+BlowAwayDirection = 2
+BlowAwayStrength = 3
+BoxTimeline = [SubResource("BlowAwayVerticalStrongHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayDiagonalWeakHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "blow-away-diagonal-weak-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayDiagonalWeakState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_斜め_弱"
+AnimationName = "blow_away_diagonal_weak"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 26
+RecoveryFrames = 0
+BlowAwayDirection = 3
+BlowAwayStrength = 1
+BoxTimeline = [SubResource("BlowAwayDiagonalWeakHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayDiagonalMediumHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "blow-away-diagonal-medium-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayDiagonalMediumState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_斜め_中"
+AnimationName = "blow_away_diagonal_medium"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 26
+RecoveryFrames = 0
+BlowAwayDirection = 3
+BlowAwayStrength = 2
+BoxTimeline = [SubResource("BlowAwayDiagonalMediumHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayDiagonalStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "blow-away-diagonal-strong-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayDiagonalStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_斜め_強"
+AnimationName = "blow_away_diagonal_strong"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 26
+RecoveryFrames = 0
+BlowAwayDirection = 3
+BlowAwayStrength = 3
+BoxTimeline = [SubResource("BlowAwayDiagonalStrongHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayDownwardWeakHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-20, -132, 41, 132)
+Tag = "blow-away-downward-weak-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayDownwardWeakState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_真下_弱"
+AnimationName = "blow_away_downward_weak"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1000
+RecoveryFrames = 0
+BlowAwayDirection = 4
+BlowAwayStrength = 1
+BoxTimeline = [SubResource("BlowAwayDownwardWeakHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayDownwardMediumHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-20, -132, 41, 132)
+Tag = "blow-away-downward-medium-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayDownwardMediumState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_真下_中"
+AnimationName = "blow_away_downward_medium"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1000
+RecoveryFrames = 0
+BlowAwayDirection = 4
+BlowAwayStrength = 2
+BoxTimeline = [SubResource("BlowAwayDownwardMediumHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayDownwardStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-20, -132, 41, 132)
+Tag = "blow-away-downward-strong-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayDownwardStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_真下_強"
+AnimationName = "blow_away_downward_strong"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1000
+RecoveryFrames = 0
+BlowAwayDirection = 4
+BlowAwayStrength = 3
+BoxTimeline = [SubResource("BlowAwayDownwardStrongHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayDiagonalDownHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-20, -132, 41, 132)
+Tag = "blow-away-diagonal-down-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayDiagonalDownState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_斜め下"
+AnimationName = "blow_away_diagonal_down"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1000
+RecoveryFrames = 0
+BlowAwayDirection = 5
+BlowAwayStrength = 2
+BoxTimeline = [SubResource("BlowAwayDiagonalDownHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayDownwardNoBounceHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-20, -132, 41, 132)
+Tag = "blow-away-downward-no-bounce-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayDownwardNoBounceState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_真下_無バウンド"
+AnimationName = "blow_away_downward_no_bounce"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1000
+RecoveryFrames = 0
+BlowAwayDirection = 4
+BlowAwayStrength = 2
+BlowAwayNoBounce = true
+BoxTimeline = [SubResource("BlowAwayDownwardNoBounceHurtbox")]
+
+[sub_resource type="Resource" id="BlowAwayDiagonalDownNoBounceHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-20, -132, 41, 132)
+Tag = "blow-away-diagonal-down-no-bounce-hurtbox"
+
+[sub_resource type="Resource" id="BlowAwayDiagonalDownNoBounceState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]吹っ飛び_斜め下_無バウンド"
+AnimationName = "blow_away_diagonal_down_no_bounce"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1000
+RecoveryFrames = 0
+BlowAwayDirection = 5
+BlowAwayStrength = 2
+BlowAwayNoBounce = true
+BoxTimeline = [SubResource("BlowAwayDiagonalDownNoBounceHurtbox")]
+
+[sub_resource type="Resource" id="StumbleHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "hit-stumble-hurtbox"
+
+[sub_resource type="Resource" id="StumbleState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ヒット]躓き"
+AnimationName = "stumble"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1032
+RecoveryFrames = 0
+HitReaction = 6
+BoxTimeline = [SubResource("StumbleHurtbox")]
+
+[sub_resource type="Resource" id="WallBounceStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "wall-bounce-strong-hurtbox"
+
+[sub_resource type="Resource" id="WallBounceStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [やられ]壁バウンド_強"
+AnimationName = "wall_bounce_strong"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1032
+RecoveryFrames = 0
+HitReaction = 3
+KnockdownType = 5
+KnocksDown = true
+WallBounceStrength = 2
+BoxTimeline = [SubResource("WallBounceStrongHurtbox")]
+
+[sub_resource type="Resource" id="WallBounceWeakHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "wall-bounce-weak-hurtbox"
+
+[sub_resource type="Resource" id="WallBounceWeakState"]
+script = ExtResource("1_move")
+AttackName = "STATE [やられ]壁バウンド_弱"
+AnimationName = "wall_bounce_weak"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1032
+RecoveryFrames = 0
+HitReaction = 3
+KnockdownType = 5
+KnocksDown = true
+WallBounceStrength = 1
+BoxTimeline = [SubResource("WallBounceWeakHurtbox")]
+
+[sub_resource type="Resource" id="HitFallHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-20, -132, 41, 132)
+Tag = "hit-fall-hurtbox"
+
+[sub_resource type="Resource" id="HitFallState"]
+script = ExtResource("1_move")
+AttackName = "STATE [やられ]ヒット落下"
+AnimationName = "hit_fall"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1000
+RecoveryFrames = 0
+HitReaction = 7
+KnockdownType = 2
+KnocksDown = true
+BoxTimeline = [SubResource("HitFallHurtbox")]
+
+[sub_resource type="Resource" id="DownedHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-72, -48, 144, 48)
+Tag = "downed-knockdown-hurtbox"
+
+[sub_resource type="Resource" id="DownedState"]
+script = ExtResource("1_move")
+AttackName = "STATE [やられ]ダウン"
+AnimationName = "knockdown"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 20
+RecoveryFrames = 0
+HitReaction = 2
+KnocksDown = true
+BoxTimeline = [SubResource("DownedHurtbox")]
+
+[sub_resource type="Resource" id="WakeupHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -116, 76, 116)
+Tag = "wakeup-hurtbox"
+
+[sub_resource type="Resource" id="WakeupState"]
+script = ExtResource("1_move")
+AttackName = "STATE [やられ]起き上がり"
+AnimationName = "get_up"
+StartupFrames = 0
+ActiveFrames = 45
+RecoveryFrames = 0
+BoxTimeline = [SubResource("WakeupHurtbox")]
+
+[sub_resource type="Resource" id="GroundBounceWeakHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "ground-bounce-weak-hurtbox"
+
+[sub_resource type="Resource" id="GroundBounceWeakState"]
+script = ExtResource("1_move")
+AttackName = "STATE [やられ]垂直バウンド弱"
+AnimationName = "ground_bounce_weak"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1038
+RecoveryFrames = 0
+HitReaction = 4
+KnockdownType = 6
+KnocksDown = true
+GroundBounceStrength = 1
+BoxTimeline = [SubResource("GroundBounceWeakHurtbox")]
+
+[sub_resource type="Resource" id="GroundBounceMediumHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "ground-bounce-medium-hurtbox"
+
+[sub_resource type="Resource" id="GroundBounceMediumState"]
+script = ExtResource("1_move")
+AttackName = "STATE [やられ]垂直バウンド中"
+AnimationName = "ground_bounce_medium"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1038
+RecoveryFrames = 0
+HitReaction = 4
+KnockdownType = 6
+KnocksDown = true
+GroundBounceStrength = 2
+BoxTimeline = [SubResource("GroundBounceMediumHurtbox")]
+
+[sub_resource type="Resource" id="GroundBounceStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "ground-bounce-strong-hurtbox"
+
+[sub_resource type="Resource" id="GroundBounceStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [やられ]垂直バウンド強"
+AnimationName = "ground_bounce_strong"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1038
+RecoveryFrames = 0
+HitReaction = 4
+KnockdownType = 6
+KnocksDown = true
+GroundBounceStrength = 3
+BoxTimeline = [SubResource("GroundBounceStrongHurtbox")]
+
+[sub_resource type="Resource" id="StandBlockWeakHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -126, 76, 126)
+Tag = "stand-block-weak-hurtbox"
+
+[sub_resource type="Resource" id="StandBlockWeakState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]立ち_弱"
+AnimationName = "stand_block_weak"
+StartupFrames = 0
+ActiveFrames = 10
+RecoveryFrames = 0
+GuardReactionStrength = 1
+BoxTimeline = [SubResource("StandBlockWeakHurtbox")]
+
+[sub_resource type="Resource" id="StandBlockMediumHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -126, 76, 126)
+Tag = "stand-block-medium-hurtbox"
+
+[sub_resource type="Resource" id="StandBlockMediumState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]立ち_中"
+AnimationName = "stand_block_medium"
+StartupFrames = 0
+ActiveFrames = 17
+RecoveryFrames = 0
+GuardReactionStrength = 2
+BoxTimeline = [SubResource("StandBlockMediumHurtbox")]
+
+[sub_resource type="Resource" id="StandBlockStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -126, 76, 126)
+Tag = "stand-block-strong-hurtbox"
+
+[sub_resource type="Resource" id="StandBlockStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]立ち_強"
+AnimationName = "stand_block_strong"
+StartupFrames = 0
+ActiveFrames = 21
+RecoveryFrames = 0
+GuardReactionStrength = 3
+BoxTimeline = [SubResource("StandBlockStrongHurtbox")]
+
+[sub_resource type="Resource" id="StandBlockSpecialStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -126, 76, 126)
+Tag = "stand-block-special-strong-hurtbox"
+
+[sub_resource type="Resource" id="StandBlockSpecialStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]立ち_特強"
+AnimationName = "stand_block_special_strong"
+StartupFrames = 0
+ActiveFrames = 23
+RecoveryFrames = 0
+GuardReactionStrength = 4
+BoxTimeline = [SubResource("StandBlockSpecialStrongHurtbox")]
+
+[sub_resource type="Resource" id="CrouchBlockWeakHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -86, 84, 86)
+Tag = "crouch-block-weak-hurtbox"
+
+[sub_resource type="Resource" id="CrouchBlockWeakState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]屈_弱"
+AnimationName = "crouch_block_weak"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 10
+RecoveryFrames = 0
+GuardReactionStrength = 1
+BoxTimeline = [SubResource("CrouchBlockWeakHurtbox")]
+
+[sub_resource type="Resource" id="CrouchBlockMediumHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -86, 84, 86)
+Tag = "crouch-block-medium-hurtbox"
+
+[sub_resource type="Resource" id="CrouchBlockMediumState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]屈_中"
+AnimationName = "crouch_block_medium"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 17
+RecoveryFrames = 0
+GuardReactionStrength = 2
+BoxTimeline = [SubResource("CrouchBlockMediumHurtbox")]
+
+[sub_resource type="Resource" id="CrouchBlockStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -86, 84, 86)
+Tag = "crouch-block-strong-hurtbox"
+
+[sub_resource type="Resource" id="CrouchBlockStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]屈_強"
+AnimationName = "crouch_block_strong"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 21
+RecoveryFrames = 0
+GuardReactionStrength = 3
+BoxTimeline = [SubResource("CrouchBlockStrongHurtbox")]
+
+[sub_resource type="Resource" id="CrouchBlockSpecialStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -86, 84, 86)
+Tag = "crouch-block-special-strong-hurtbox"
+
+[sub_resource type="Resource" id="CrouchBlockSpecialStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]屈_特強"
+AnimationName = "crouch_block_special_strong"
+Stance = 2
+StartupFrames = 0
+ActiveFrames = 23
+RecoveryFrames = 0
+GuardReactionStrength = 4
+BoxTimeline = [SubResource("CrouchBlockSpecialStrongHurtbox")]
+
+[sub_resource type="Resource" id="AirBlockWeakHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -112, 76, 112)
+Tag = "air-block-weak-hurtbox"
+
+[sub_resource type="Resource" id="AirBlockWeakState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]空中_弱"
+AnimationName = "air_block_weak"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 7
+RecoveryFrames = 0
+GuardReactionStrength = 1
+BoxTimeline = [SubResource("AirBlockWeakHurtbox")]
+
+[sub_resource type="Resource" id="AirBlockMediumHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -112, 76, 112)
+Tag = "air-block-medium-hurtbox"
+
+[sub_resource type="Resource" id="AirBlockMediumState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]空中_中"
+AnimationName = "air_block_medium"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 13
+RecoveryFrames = 0
+GuardReactionStrength = 2
+BoxTimeline = [SubResource("AirBlockMediumHurtbox")]
+
+[sub_resource type="Resource" id="AirBlockStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -112, 76, 112)
+Tag = "air-block-strong-hurtbox"
+
+[sub_resource type="Resource" id="AirBlockStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]空中_強"
+AnimationName = "air_block_strong"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 15
+RecoveryFrames = 0
+GuardReactionStrength = 3
+BoxTimeline = [SubResource("AirBlockStrongHurtbox")]
+
+[sub_resource type="Resource" id="AirBlockSpecialStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -112, 76, 112)
+Tag = "air-block-special-strong-hurtbox"
+
+[sub_resource type="Resource" id="AirBlockSpecialStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [ガード]空中_特強"
+AnimationName = "air_block_special_strong"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 18
+RecoveryFrames = 0
+GuardReactionStrength = 4
+BoxTimeline = [SubResource("AirBlockSpecialStrongHurtbox")]
+
+[sub_resource type="Resource" id="SpecialStaggerHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -126, 84, 126)
+Tag = "special-stagger-hurtbox"
+
+[sub_resource type="Resource" id="SpecialStaggerState"]
+script = ExtResource("1_move")
+AttackName = "STATE [特殊やられ]よろめき"
+AnimationName = "special_stagger"
+Stance = 1
+StartupFrames = 0
+ActiveFrames = 30
+RecoveryFrames = 0
+SpecialReaction = 1
+BoxTimeline = [SubResource("SpecialStaggerHurtbox")]
+
+[sub_resource type="Resource" id="SlideDownHorizontalHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "slide-down-horizontal-hurtbox"
+
+[sub_resource type="Resource" id="SlideDownHorizontalState"]
+script = ExtResource("1_move")
+AttackName = "STATE [特殊やられ]スライドダウン_横"
+AnimationName = "slide_down_horizontal"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1032
+RecoveryFrames = 0
+HitReaction = 2
+KnockdownType = 4
+KnocksDown = true
+SpecialReaction = 2
+BoxTimeline = [SubResource("SlideDownHorizontalHurtbox")]
+
+[sub_resource type="Resource" id="SlideDownDiagonalHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "slide-down-diagonal-hurtbox"
+
+[sub_resource type="Resource" id="SlideDownDiagonalState"]
+script = ExtResource("1_move")
+AttackName = "STATE [特殊やられ]スライドダウン_斜め下"
+AnimationName = "slide_down_diagonal"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1000
+RecoveryFrames = 0
+HitReaction = 2
+KnockdownType = 4
+KnocksDown = true
+SpecialReaction = 3
+BoxTimeline = [SubResource("SlideDownDiagonalHurtbox")]
+
+[sub_resource type="Resource" id="SlideDownedHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-72, -48, 144, 48)
+Tag = "slide-downed-hurtbox"
+
+[sub_resource type="Resource" id="SlideDownedState"]
+script = ExtResource("1_move")
+AttackName = "STATE [特殊やられ]ダウン(スライド)"
+AnimationName = "slide_downed"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 70
+RecoveryFrames = 0
+HitReaction = 2
+KnockdownType = 4
+KnocksDown = true
+SpecialReaction = 4
+BoxTimeline = [SubResource("SlideDownedHurtbox")]
+
+[sub_resource type="Resource" id="DiagonalBounceHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "diagonal-bounce-hurtbox"
+
+[sub_resource type="Resource" id="DiagonalBounceState"]
+script = ExtResource("1_move")
+AttackName = "STATE [やられ]斜めバウンド"
+AnimationName = "diagonal_bounce"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1036
+RecoveryFrames = 0
+HitReaction = 4
+KnockdownType = 6
+KnocksDown = true
+SpecialReaction = 5
+GroundBounceStrength = 3
+BoxTimeline = [SubResource("DiagonalBounceHurtbox")]
+
+[sub_resource type="Resource" id="PullbackWeakHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -126, 84, 126)
+Tag = "pullback-weak-hurtbox"
+
+[sub_resource type="Resource" id="PullbackWeakState"]
+script = ExtResource("1_move")
+AttackName = "STATE [特殊やられ]引き戻し_弱"
+AnimationName = "pullback_weak"
+Stance = 1
+StartupFrames = 0
+ActiveFrames = 17
+RecoveryFrames = 0
+SpecialReaction = 6
+BoxTimeline = [SubResource("PullbackWeakHurtbox")]
+
+[sub_resource type="Resource" id="PullbackStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -126, 84, 126)
+Tag = "pullback-strong-hurtbox"
+
+[sub_resource type="Resource" id="PullbackStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [特殊やられ]引き戻し_強"
+AnimationName = "pullback_strong"
+Stance = 1
+StartupFrames = 0
+ActiveFrames = 30
+RecoveryFrames = 0
+SpecialReaction = 7
+BoxTimeline = [SubResource("PullbackStrongHurtbox")]
+
+[sub_resource type="Resource" id="GuardPullbackWeakHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -126, 76, 126)
+Tag = "guard-pullback-weak-hurtbox"
+
+[sub_resource type="Resource" id="GuardPullbackWeakState"]
+script = ExtResource("1_move")
+AttackName = "STATE [特殊ガード]引き戻し_弱"
+AnimationName = "guard_pullback_weak"
+Stance = 1
+StartupFrames = 0
+ActiveFrames = 17
+RecoveryFrames = 0
+GuardReactionStrength = 1
+SpecialReaction = 8
+BoxTimeline = [SubResource("GuardPullbackWeakHurtbox")]
+
+[sub_resource type="Resource" id="GuardPullbackStrongHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -126, 76, 126)
+Tag = "guard-pullback-strong-hurtbox"
+
+[sub_resource type="Resource" id="GuardPullbackStrongState"]
+script = ExtResource("1_move")
+AttackName = "STATE [特殊ガード]引き戻し_強"
+AnimationName = "guard_pullback_strong"
+Stance = 1
+StartupFrames = 0
+ActiveFrames = 24
+RecoveryFrames = 0
+GuardReactionStrength = 3
+SpecialReaction = 9
+BoxTimeline = [SubResource("GuardPullbackStrongHurtbox")]
+
+[sub_resource type="Resource" id="PullbackAirHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-49, -133, 99, 133)
+Tag = "pullback-air-hurtbox"
+
+[sub_resource type="Resource" id="PullbackAirState"]
+script = ExtResource("1_move")
+AttackName = "STATE [特殊やられ]引き戻し_空中"
+AnimationName = "pullback_air"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 1032
+RecoveryFrames = 0
+SpecialReaction = 10
+BoxTimeline = [SubResource("PullbackAirHurtbox")]
+
+[sub_resource type="Resource" id="GuardPullbackAirHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-38, -112, 76, 112)
+Tag = "guard-pullback-air-hurtbox"
+
+[sub_resource type="Resource" id="GuardPullbackAirState"]
+script = ExtResource("1_move")
+AttackName = "STATE [特殊ガード]引き戻し_空中"
+AnimationName = "guard_pullback_air"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 18
+RecoveryFrames = 0
+SpecialReaction = 11
+BoxTimeline = [SubResource("GuardPullbackAirHurtbox")]
+
+[sub_resource type="Resource" id="BackdashHopEscapeHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-46, -118, 92, 118)
+Tag = "jet-escape-left-hurtbox"
+
+[sub_resource type="Resource" id="BackdashHopEscapeState"]
+script = ExtResource("1_move")
+AttackName = "STATE ESCAPE LEFT / JET BACK DASH"
+AnimationName = "jet_escape_left"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("BackdashHopEscapeHurtbox")]
+
+[sub_resource type="Resource" id="JetEscapeRightHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-48, -112, 96, 112)
+Tag = "jet-escape-right-hurtbox"
+
+[sub_resource type="Resource" id="JetEscapeRightState"]
+script = ExtResource("1_move")
+AttackName = "STATE ESCAPE RIGHT / JET FORWARD DASH"
+AnimationName = "jet_escape_right"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 16
+RecoveryFrames = 0
+BoxTimeline = [SubResource("JetEscapeRightHurtbox")]
+
+[sub_resource type="Resource" id="EscapeLandingHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -114, 84, 114)
+Tag = "escape-landing-hurtbox"
+
+[sub_resource type="Resource" id="EscapeLandingState"]
+script = ExtResource("1_move")
+AttackName = "STATE ESCAPE LANDING"
+AnimationName = "escape_landing"
+StartupFrames = 0
+ActiveFrames = 10
+RecoveryFrames = 0
+BoxTimeline = [SubResource("EscapeLandingHurtbox")]
+
+[sub_resource type="Resource" id="AirAttackLandingHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -114, 84, 114)
+Tag = "provisional-air-attack-landing-hurtbox"
+
+[sub_resource type="Resource" id="AirAttackLandingState"]
+script = ExtResource("1_move")
+AttackName = "STATE AIR ATTACK LANDING"
+AnimationName = "air_attack_landing"
+Stance = 1
+StartupFrames = 0
+ActiveFrames = 10
+RecoveryFrames = 0
+BoxTimeline = [SubResource("AirAttackLandingHurtbox")]
+
+[sub_resource type="Resource" id="FlightLandingHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -114, 84, 114)
+Tag = "flight-landing-hurtbox"
+
+[sub_resource type="Resource" id="FlightLandingState"]
+script = ExtResource("1_move")
+AttackName = "STATE FLIGHT LANDING"
+AnimationName = "flight_landing"
+StartupFrames = 0
+ActiveFrames = 8
+RecoveryFrames = 0
+BoxTimeline = [SubResource("FlightLandingHurtbox")]
+
+[sub_resource type="Resource" id="LandingHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -114, 84, 114)
+Tag = "landing-hurtbox"
+
+[sub_resource type="Resource" id="LandingState"]
+script = ExtResource("1_move")
+AttackName = "STATE LANDING"
+AnimationName = "landing"
+StartupFrames = 0
+ActiveFrames = 11
+RecoveryFrames = 0
+BoxTimeline = [SubResource("LandingHurtbox")]
+
+[sub_resource type="Resource" id="FlightFallHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -110, 84, 110)
+Tag = "flight-fall-hurtbox"
+
+[sub_resource type="Resource" id="FlightFallState"]
+script = ExtResource("1_move")
+AttackName = "STATE FLIGHT FALL"
+AnimationName = "flight_fall"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("FlightFallHurtbox")]
+
+[sub_resource type="Resource" id="AirInterpolationFallHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-42, -110, 84, 110)
+Tag = "air-interpolation-fall-hurtbox"
+
+[sub_resource type="Resource" id="AirInterpolationFallState"]
+script = ExtResource("1_move")
+AttackName = "STATE AIR INTERPOLATION FALL"
+AnimationName = "air_interpolation_fall"
+Stance = 3
+StartupFrames = 0
+ActiveFrames = 60
+RecoveryFrames = 0
+BoxTimeline = [SubResource("AirInterpolationFallHurtbox")]
+
+[sub_resource type="Resource" id="WinTauntHurtbox"]
+script = ExtResource("3_box")
+LocalRect = Rect2(-36, -113, 72, 113)
+Tag = "win-taunt-hurtbox"
+
+[sub_resource type="Resource" id="WinTauntState"]
+script = ExtResource("1_move")
+AttackName = "STATE WIN TAUNT"
+AnimationName = "win"
+StartupFrames = 0
+ActiveFrames = 309
+RecoveryFrames = 0
+BoxTimeline = [SubResource("WinTauntHurtbox")]
+
+[resource]
+script = ExtResource("2_set")
+Rules = [SubResource("IdleState"), SubResource("CrouchStartState"), SubResource("CrouchState"), SubResource("FullCrouch2State"), SubResource("CrouchEndState"), SubResource("StandingHitstunToIdleState"), SubResource("StandingLightHitstunToIdleState"), SubResource("StandingMediumHitstunToIdleState"), SubResource("StandingBigHitstunToIdle2State"), SubResource("StandingBigHitstunToIdle3State"), SubResource("StandingMidHitstunToIdleState"), SubResource("StandingLightMidHitstunToIdleState"), SubResource("StandingLightMidHitstunToIdle2State"), SubResource("StandingMidHitstunToIdle2State"), SubResource("StandingMidHitstunToIdle3State"), SubResource("CrouchHitstunState"), SubResource("CrouchHitstun2State"), SubResource("CrouchingHeavyHitstunState"), SubResource("CrouchingLightHitstunState"), SubResource("CrouchingMidHitstunState"), SubResource("CrouchingMidHitstun2State"), SubResource("CrouchingMidHitstun3State"), SubResource("FullCrouchHitstunState"), SubResource("FullCrouchHitstun2State"), SubResource("WalkForwardState"), SubResource("WalkBackState"), SubResource("JumpRiseState"), SubResource("ForwardJumpState"), SubResource("BackwardJumpState"), SubResource("FlyUpState"), SubResource("BenchedFlyUpState"), SubResource("BenchedFlyUpForwardState"), SubResource("BenchedFlyBackState"), SubResource("BoosterState"), SubResource("BoosterUpState"), SubResource("BoosterUpForwardState"), SubResource("BoosterForwardState"), SubResource("BoosterDownForwardState"), SubResource("BoosterDownState"), SubResource("BoosterDownBackState"), SubResource("BoosterBackState"), SubResource("BoosterUpBackState"), SubResource("FallState"), SubResource("KnockedAwayState"), SubResource("LaunchedState"), SubResource("LaunchedHitstunState"), SubResource("LaunchedFarState"), SubResource("ShortLaunchState"), SubResource("LightLaunchState"), SubResource("BlowAwayHorizontalState"), SubResource("BlowAwayVerticalWeakState"), SubResource("BlowAwayVerticalMediumState"), SubResource("BlowAwayVerticalStrongState"), SubResource("BlowAwayDiagonalWeakState"), SubResource("BlowAwayDiagonalMediumState"), SubResource("BlowAwayDiagonalStrongState"), SubResource("BlowAwayDownwardWeakState"), SubResource("BlowAwayDownwardMediumState"), SubResource("BlowAwayDownwardStrongState"), SubResource("BlowAwayDiagonalDownState"), SubResource("BlowAwayDownwardNoBounceState"), SubResource("BlowAwayDiagonalDownNoBounceState"), SubResource("StumbleState"), SubResource("WallBounceStrongState"), SubResource("WallBounceWeakState"), SubResource("HitFallState"), SubResource("DownedState"), SubResource("WakeupState"), SubResource("GroundBounceWeakState"), SubResource("GroundBounceMediumState"), SubResource("GroundBounceStrongState"), SubResource("StandBlockWeakState"), SubResource("StandBlockMediumState"), SubResource("StandBlockStrongState"), SubResource("StandBlockSpecialStrongState"), SubResource("CrouchBlockWeakState"), SubResource("CrouchBlockMediumState"), SubResource("CrouchBlockStrongState"), SubResource("CrouchBlockSpecialStrongState"), SubResource("AirBlockWeakState"), SubResource("AirBlockMediumState"), SubResource("AirBlockStrongState"), SubResource("AirBlockSpecialStrongState"), SubResource("SpecialStaggerState"), SubResource("SlideDownHorizontalState"), SubResource("SlideDownDiagonalState"), SubResource("SlideDownedState"), SubResource("DiagonalBounceState"), SubResource("PullbackWeakState"), SubResource("PullbackStrongState"), SubResource("GuardPullbackWeakState"), SubResource("GuardPullbackStrongState"), SubResource("PullbackAirState"), SubResource("GuardPullbackAirState"), SubResource("BackdashHopEscapeState"), SubResource("JetEscapeRightState"), SubResource("EscapeLandingState"), SubResource("AirAttackLandingState"), SubResource("FlightLandingState"), SubResource("LandingState"), SubResource("FlightFallState"), SubResource("AirInterpolationFallState"), SubResource("WinTauntState")]

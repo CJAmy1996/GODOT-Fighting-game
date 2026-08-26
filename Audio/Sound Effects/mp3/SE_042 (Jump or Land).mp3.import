@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://btxb3injreo8p"
+path="res://.godot/imported/SE_042 (Jump or Land).mp3-e7f5a2faf04fa177d2b0f0d4f64c8318.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_042 (Jump or Land).mp3"
+dest_files=["res://.godot/imported/SE_042 (Jump or Land).mp3-e7f5a2faf04fa177d2b0f0d4f64c8318.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

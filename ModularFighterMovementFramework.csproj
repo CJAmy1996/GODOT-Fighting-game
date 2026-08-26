@@ -3,5 +3,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Modular Fighter Movement Framework</AssemblyName>
     <EnableDynamicLoading>true</EnableDynamicLoading>
+    <UseSystemDrawing>true</UseSystemDrawing>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="8.0.29" />
+    <EmbeddedResource Include="Assets\Backgrounds\ALidej.gif" LogicalName="ModularFighter.Assets.Backgrounds.ALidej.gif" />
+    <EmbeddedResource Include="Assets\Backgrounds\ALidej2.gif" LogicalName="ModularFighter.Assets.Backgrounds.ALidej2.gif" />
+  </ItemGroup>
 </Project>

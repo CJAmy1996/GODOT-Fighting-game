@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="DashAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/DashAbility.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Id = "backdash"
+Priority = 12
+GroundOnly = true
+DirectionRequirement = 2
+ActiveFrames = 12
+RecoveryFrames = 18
+Speed = 520.0
+VerticalSpeed = -360.0
+PreserveGravity = true
+CommittedUntilComplete = true
+SuspendsInputBufferWhileActive = true
+InvulnerabilityFrames = 3

@@ -5,12 +5,14 @@ namespace ModularFighter.Movement;
 
 public enum DashDirectionRequirement { Any, Forward, Backward }
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class DashAbility : MovementAbility
 {
 	[Export] public bool AirOnly { get; set; }
 	[Export] public bool GroundOnly { get; set; }
 	[Export] public DashDirectionRequirement DirectionRequirement { get; set; } = DashDirectionRequirement.Any;
+	[Export] public bool RequireDirectionalDoubleTap { get; set; }
+	[Export] public bool DisallowDownInput { get; set; }
 	[Export] public int MaxAirUses { get; set; } = 1;
 	[Export] public int ActiveFrames { get; set; } = 12;
 	[Export] public int RecoveryFrames { get; set; } = 0;
@@ -23,6 +25,9 @@ public partial class DashAbility : MovementAbility
 	[Export] public bool CommittedUntilComplete { get; set; }
 	[Export] public bool ConsumesAirAction { get; set; } = true;
 	[Export] public int LandingLagFrames { get; set; }
+	[Export] public int InvulnerabilityFrames { get; set; }
+	[Export] public float MinimumAirHeight { get; set; }
+	[Export] public bool UsesShortHopNormalRules { get; set; }
 	public override bool OwnsHorizontalVelocity => true;
 	public override bool OwnsGravity => !PreserveGravity;
 	public override bool CanBeInterruptedBy(MovementAbility incoming) => !CommittedUntilComplete && base.CanBeInterruptedBy(incoming);
@@ -35,9 +40,12 @@ public partial class DashAbility : MovementAbility
 			return false;
 		}
 		if (!fighter.ActionInput.DashPressed) return false;
+		if (RequireDirectionalDoubleTap && !fighter.HasBufferedDashCommand) return false;
+		if (DisallowDownInput && fighter.CurrentInput.Vertical > 0.5f) return false;
 		if (AirOnly && fighter.WasGrounded) return false;
 		if (GroundOnly && !fighter.WasGrounded) return false;
 		if (!fighter.WasGrounded && ConsumesAirAction && !fighter.CanUseAirDashAction()) return false;
+		if (AirOnly && fighter.AirHeightAboveGround < MinimumAirHeight) return false;
 		if (!MatchesDirection(fighter)) return false;
 		return fighter.WasGrounded || runtime.UsesThisAirTime < MaxAirUses;
 	}
@@ -45,6 +53,7 @@ public partial class DashAbility : MovementAbility
 	public override void Start(FighterController fighter, AbilityRuntime runtime)
 	{
 		base.Start(fighter, runtime);
+		if (UsesShortHopNormalRules) fighter.MarkShortHopRoute();
 		if (!fighter.WasGrounded)
 		{
 			runtime.UsesThisAirTime++;
@@ -52,6 +61,7 @@ public partial class DashAbility : MovementAbility
 			fighter.QueueLandingLag(LandingLagFrames);
 		}
 		runtime.FramesRemaining = ActiveFrames;
+		fighter.BeginMovementInvulnerability(InvulnerabilityFrames);
 		Vector2 direction = AimWithStick ? new Vector2(fighter.CurrentInput.Horizontal, fighter.CurrentInput.Vertical) : Vector2.Right * fighter.DashInputDirection;
 		if (direction == Vector2.Zero) direction = Vector2.Right * fighter.Facing;
 		direction = direction.Normalized();

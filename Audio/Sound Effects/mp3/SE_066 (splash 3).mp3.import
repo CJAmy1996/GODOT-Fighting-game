@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://c161hdfodu2g5"
+path="res://.godot/imported/SE_066 (splash 3).mp3-5183fa8f5bfe51b32df3c965269dbb4c.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_066 (splash 3).mp3"
+dest_files=["res://.godot/imported/SE_066 (splash 3).mp3-5183fa8f5bfe51b32df3c965269dbb4c.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

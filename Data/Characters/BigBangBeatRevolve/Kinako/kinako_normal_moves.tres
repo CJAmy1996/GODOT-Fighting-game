@@ -1,0 +1,83 @@
+[gd_resource type="Resource" script_class="NormalMoveSet" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/NormalMoveSet.cs" id="1_set"]
+[ext_resource type="Script" path="res://Scripts/Core/NormalMoveData.cs" id="2_move"]
+[ext_resource type="Script" path="res://Scripts/Core/FighterBoxFrame.cs" id="3_box"]
+
+[sub_resource type="Resource" id="KinakoCrouchingLightPunchBody"]
+script = ExtResource("3_box")
+EndFrame = 16
+LocalRect = Rect2(-25, -72, 50, 72)
+Tag = "kinako-crouching-light-punch-body"
+
+[sub_resource type="Resource" id="KinakoCrouchingLightPunchHit"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 5
+EndFrame = 10
+LocalRect = Rect2(14, -46, 108, 40)
+Tag = "kinako-pink-bear-low-punch"
+AttackLevel = 3
+Damage = 35
+
+[sub_resource type="Resource" id="KinakoCrouchingLightPunch"]
+script = ExtResource("2_move")
+AttackName = "LIGHT PUNCH"
+AnimationName = "crouching_light_punch"
+Stance = 2
+StartupFrames = 5
+ActiveFrames = 6
+RecoveryFrames = 6
+SuppressFallbackHitbox = true
+Damage = 35
+HitstunFrames = 12
+BlockstunFrames = 9
+HitstopFrames = 5
+Pushback = 55.0
+CanChainToLight = true
+CanChainToMedium = true
+CanChainToHeavy = true
+CanChainToSpecial = true
+BoxTimeline = [SubResource("KinakoCrouchingLightPunchBody"), SubResource("KinakoCrouchingLightPunchHit")]
+
+[sub_resource type="Resource" id="KinakoForwardHeavyPunch"]
+script = ExtResource("2_move")
+AttackName = "HEAVY PUNCH FORWARD"
+AnimationName = "forward_heavy_punch"
+Stance = 1
+StartupFrames = 8
+ActiveFrames = 4
+RecoveryFrames = 28
+Damage = 100
+
+[sub_resource type="Resource" id="KinakoForwardThrow"]
+script = ExtResource("2_move")
+AttackName = "THROW"
+AnimationName = "throw"
+AnimationTailName = "forward_throw"
+AnimationTailStartFrame = 10
+ConnectedThrowRecoveryFrames = 71
+Stance = 1
+StartupFrames = 10
+ActiveFrames = 1
+RecoveryFrames = 15
+KnocksDown = true
+KnockdownFrames = 42
+
+[sub_resource type="Resource" id="KinakoBackThrow"]
+script = ExtResource("2_move")
+AttackName = "BACK THROW"
+AnimationName = "back_throw_startup"
+AnimationTailName = "back_throw"
+AnimationTailStartFrame = 10
+ConnectedThrowRecoveryFrames = 71
+Stance = 1
+StartupFrames = 10
+ActiveFrames = 1
+RecoveryFrames = 15
+KnocksDown = true
+KnockdownFrames = 42
+
+[resource]
+script = ExtResource("1_set")
+Rules = [SubResource("KinakoCrouchingLightPunch"), SubResource("KinakoForwardHeavyPunch"), SubResource("KinakoForwardThrow"), SubResource("KinakoBackThrow")]

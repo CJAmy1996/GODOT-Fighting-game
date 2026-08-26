@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://pnsfrni8y2e1"
+path="res://.godot/imported/SE_130.mp3-1f9008cd40c3b1494d6a42c1b850e4d0.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_130.mp3"
+dest_files=["res://.godot/imported/SE_130.mp3-1f9008cd40c3b1494d6a42c1b850e4d0.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

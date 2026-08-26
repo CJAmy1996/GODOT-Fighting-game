@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://btcoccsm0eanu"
+path="res://.godot/imported/SE_073 (wall splat).mp3-a6b3e85fe3b1e774a1797f0962a864c8.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_073 (wall splat).mp3"
+dest_files=["res://.godot/imported/SE_073 (wall splat).mp3-a6b3e85fe3b1e774a1797f0962a864c8.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

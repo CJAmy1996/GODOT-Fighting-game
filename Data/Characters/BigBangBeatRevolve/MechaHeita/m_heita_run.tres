@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RunAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/RunAbility.cs" id="1_run"]
+
+[resource]
+script = ExtResource("1_run")
+Id = "mecha_forward_run"
+Priority = 10
+Speed = 620.0
+Acceleration = 3600.0
+StopFriction = 4800.0
+CrouchCancelFriction = 2400.0
+RequireDirectionalDoubleTap = true
+StopSlideFrames = 12

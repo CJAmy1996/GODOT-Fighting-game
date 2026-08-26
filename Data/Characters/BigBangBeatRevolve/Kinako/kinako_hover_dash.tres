@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DashAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Movement/DashAbility.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Id = "kinako_hover_dash"
+Priority = 16
+GroundOnly = true
+DirectionRequirement = 1
+ActiveFrames = 18
+RecoveryFrames = 3
+Speed = 720.0
+VerticalSpeed = -360.0
+PreserveGravity = true
+CommittedUntilComplete = false
+ConsumesAirAction = false
+LandingLagFrames = 3
+UsesShortHopNormalRules = true

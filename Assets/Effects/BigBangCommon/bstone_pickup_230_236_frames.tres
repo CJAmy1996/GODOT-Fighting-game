@@ -1,0 +1,17 @@
+[gd_resource type="SpriteFrames" load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/230.png" id="1_230"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/231.png" id="2_231"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/232.png" id="3_232"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/233.png" id="4_233"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/234.png" id="5_234"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/235.png" id="6_235"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/236.png" id="7_236"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 1.0, "texture": ExtResource("1_230")}, {"duration": 1.0, "texture": ExtResource("2_231")}, {"duration": 1.0, "texture": ExtResource("3_232")}, {"duration": 1.0, "texture": ExtResource("4_233")}, {"duration": 1.0, "texture": ExtResource("5_234")}, {"duration": 1.0, "texture": ExtResource("6_235")}, {"duration": 1.0, "texture": ExtResource("7_236")}],
+"loop": false,
+"name": &"bstone_pickup_230_236",
+"speed": 60.0
+}]

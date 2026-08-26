@@ -5,7 +5,7 @@ namespace ModularFighter.Movement;
 
 public enum JumpDirection { Neutral, Forward, Backward }
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class JumpAbility : MovementAbility
 {
 	public override bool SuppressesGroundedPushWhileAirborne => true;
@@ -69,12 +69,16 @@ public partial class JumpAbility : MovementAbility
 		if (runtime.FramesRemaining-- <= 0) return false;
 		if (!fighter.CurrentInput.JumpHeld)
 		{
+			// Down-to-up is a committed super-jump command, never a variable-height
+			// normal jump. A one-frame Up+Jump press must retain the full launch.
+			if (fighter.IsInSuperJumpRoute) return false;
 			bool shortHopAllowed = runtime.BoolValue ||
 				(AllowAirShortHop && fighter.Definition.Tuning.AllowAirShortHops);
 			// Releasing jump early cuts upward momentum: a tap produces a true short hop.
 			// By default this is only legal from a grounded jump, not from an air jump.
 			if (shortHopAllowed && fighter.Velocity.Y < 0)
 			{
+				fighter.MarkShortHopRoute();
 				fighter.Velocity = new Vector2(fighter.Velocity.X, fighter.Velocity.Y * ReleaseVelocityMultiplier);
 				if (runtime.BoolValue && !ShortHopAllowsAirJumps) fighter.DisableAirJumpsThisJump();
 				if (runtime.BoolValue)
@@ -91,6 +95,7 @@ public partial class JumpAbility : MovementAbility
 	private void Launch(FighterController fighter, AbilityRuntime runtime)
 	{
 		runtime.IntValue = -1;
+		if (runtime.BoolValue) fighter.QueueGroundJumpStartEffect();
 		float launchSpeed = runtime.BoolValue || AirJumpInitialSpeed <= 0f
 			? InitialSpeed
 			: AirJumpInitialSpeed;

@@ -7,13 +7,16 @@ namespace ModularFighter.Movement;
 /// A stateless, shareable ability definition. Make a new subclass for a new archetype;
 /// do not add archetype checks to FighterController.
 /// </summary>
-[GlobalClass]
+[Tool, GlobalClass]
 public abstract partial class MovementAbility : Resource
 {
 	[Export] public string Id { get; set; } = "ability_id";
 	[Export] public int Priority { get; set; }
 	public virtual bool OwnsHorizontalVelocity => false;
 	public virtual bool OwnsGravity => false;
+	public virtual bool PreventsBlocking => false;
+	public virtual bool TicksDuringAttack => false;
+	public virtual bool PersistsThroughNormalAttack => false;
 	/// <summary>Prevents this airborne movement from pushing a grounded opponent.</summary>
 	public virtual bool SuppressesGroundedPushWhileAirborne => false;
 	/// <summary>Lets this movement retain horizontal steering for its full airborne lifetime.</summary>
@@ -24,6 +27,10 @@ public abstract partial class MovementAbility : Resource
 	[Export] public bool SuspendsInputBufferWhileActive { get; set; }
 
 	public abstract bool CanStart(FighterController fighter, AbilityRuntime runtime);
+	/// <summary>Optional character-authored movement cancel checked while an attack is still running.</summary>
+	public virtual bool CanStartFromAttack(FighterController fighter, AbilityRuntime runtime) => false;
+	/// <summary>Whether a basic attack may interrupt this active movement state.</summary>
+	public virtual bool CanStartAttack(FighterController fighter, AbilityRuntime runtime) => false;
 	public virtual void Start(FighterController fighter, AbilityRuntime runtime) => runtime.Active = true;
 	/// <returns>True while the ability remains active.</returns>
 	public virtual bool Tick(FighterController fighter, AbilityRuntime runtime, float delta) => false;

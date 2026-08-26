@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ch1l2ninupfe8"
+path="res://.godot/imported/SE_097 (tick tock).mp3-9dcdcbde6f89c07ae986ff227775ffd1.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_097 (tick tock).mp3"
+dest_files=["res://.godot/imported/SE_097 (tick tock).mp3-9dcdcbde6f89c07ae986ff227775ffd1.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

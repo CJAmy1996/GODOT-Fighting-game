@@ -1,0 +1,16 @@
+[gd_resource type="SpriteFrames" load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/181.png" id="1_181"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/182.png" id="2_182"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/183.png" id="3_183"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/184.png" id="4_184"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/185.png" id="5_185"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/186.png" id="6_186"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 2.0, "texture": ExtResource("1_181")}, {"duration": 2.0, "texture": ExtResource("2_182")}, {"duration": 2.0, "texture": ExtResource("3_183")}, {"duration": 2.0, "texture": ExtResource("4_184")}, {"duration": 2.0, "texture": ExtResource("5_185")}, {"duration": 2.0, "texture": ExtResource("6_186")}],
+"loop": true,
+"name": &"additive_impact_181_186",
+"speed": 60.0
+}]

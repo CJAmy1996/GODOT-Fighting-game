@@ -1,0 +1,82 @@
+[gd_resource type="Resource" script_class="FighterDefinition" load_steps=25 format=3 uid="uid://dsetnqhur88du"]
+
+[ext_resource type="Script" uid="uid://p3g6dew2wiky" path="res://Scripts/Core/FighterDefinition.cs" id="1_def"]
+[ext_resource type="Script" uid="uid://s1q2kuukuw7h" path="res://Scripts/Core/MovementTuning.cs" id="2_tuning"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/neutral_jump.tres" id="3_neutral_jump"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/forward_jump.tres" id="4_forward_jump"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/backward_jump.tres" id="5_backward_jump"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_super_jump.tres" id="10_super_jump"]
+[ext_resource type="Resource" uid="uid://c0l6icodj88b5" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_normal_moves.tres" id="11_normals"]
+[ext_resource type="Resource" uid="uid://cdf5b0vbftpog" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_special_moves.tres" id="12_specials"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_gauges.tres" id="13_gauges"]
+[ext_resource type="Resource" uid="uid://c13bhhkg52jko" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_state_boxes.tres" id="14_states"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_booster.tres" id="15_booster"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_jet_escape_right.tres" id="16_escape_right"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_jet_escape_left.tres" id="17_escape_left"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_run.tres" id="18_run"]
+[ext_resource type="Resource" uid="uid://b5uuxymmwh8hh" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_full_fire.tres" id="19_full_fire"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/MechaHeita/m_heita_shinryuken_super.tres" id="22_shinryuken"]
+[ext_resource type="Texture2D" uid="uid://cn0hfwwpnj0hj" path="res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/super_portrait.png" id="20_portrait"]
+[ext_resource type="Script" uid="uid://ccpi48jqc0xq" path="res://Scripts/Core/CancelRule.cs" id="21_cancel_rule"]
+
+[sub_resource type="Resource" id="CancelRule_mecha_light_kick_jump"]
+script = ExtResource("21_cancel_rule")
+FromMove = "LIGHT KICK"
+Kind = 2
+AllowedTargets = PackedStringArray("JUMP")
+
+[sub_resource type="Resource" id="CancelRule_mecha_ground_medium_kick_jump"]
+script = ExtResource("21_cancel_rule")
+FromMove = "CROUCHING MEDIUM KICK"
+Kind = 2
+AllowedTargets = PackedStringArray("JUMP")
+
+[sub_resource type="Resource" id="CancelRule_mecha_air_medium_kick_jump"]
+script = ExtResource("21_cancel_rule")
+FromMove = "MEDIUM KICK AIR BACK"
+Kind = 2
+AllowedTargets = PackedStringArray("JUMP")
+
+[sub_resource type="Resource" id="CancelRule_mecha_ground_medium_punch_jump"]
+script = ExtResource("21_cancel_rule")
+FromMove = "MEDIUM PUNCH BACK"
+Kind = 2
+AllowedTargets = PackedStringArray("JUMP")
+
+[sub_resource type="Resource" id="CancelRule_mecha_air_medium_punch_jump"]
+script = ExtResource("21_cancel_rule")
+FromMove = "MEDIUM PUNCH AIR BACK"
+Kind = 2
+AllowedTargets = PackedStringArray("JUMP")
+
+[sub_resource type="Resource" id="CancelRule_mecha_normal_to_special"]
+script = ExtResource("21_cancel_rule")
+
+[sub_resource type="Resource" id="MovementTuning_imported"]
+script = ExtResource("2_tuning")
+GroundAcceleration = 4200.0
+GroundDeceleration = 5000.0
+GroundFriction = 5800.0
+Gravity = 2400.0
+TerminalFallSpeed = 1900.0
+AirSpeed = 340.0
+AirAcceleration = 2200.0
+AirDeceleration = 1500.0
+AllowAirControl = false
+NonFlightLandingLagMultiplier = 0.5
+InputBufferFrames = 8
+SpecialCancelBufferFrames = 10
+
+[resource]
+script = ExtResource("1_def")
+FighterName = "Mecha Heita"
+AllowLegacyFallbackMoves = false
+SuperPortrait = ExtResource("20_portrait")
+Gauges = ExtResource("13_gauges")
+Tuning = SubResource("MovementTuning_imported")
+Abilities = [ExtResource("16_escape_right"), ExtResource("17_escape_left"), ExtResource("15_booster"), ExtResource("18_run"), ExtResource("10_super_jump"), ExtResource("3_neutral_jump"), ExtResource("4_forward_jump"), ExtResource("5_backward_jump")]
+NormalMoves = ExtResource("11_normals")
+StateBoxes = ExtResource("14_states")
+SpecialMoves = ExtResource("12_specials")
+SuperMoves = [ExtResource("19_full_fire"), ExtResource("22_shinryuken")]
+CancelRules = [SubResource("CancelRule_mecha_light_kick_jump"), SubResource("CancelRule_mecha_ground_medium_kick_jump"), SubResource("CancelRule_mecha_air_medium_kick_jump"), SubResource("CancelRule_mecha_ground_medium_punch_jump"), SubResource("CancelRule_mecha_air_medium_punch_jump"), SubResource("CancelRule_mecha_normal_to_special")]

@@ -1,0 +1,21 @@
+[gd_resource type="SpriteFrames" load_steps=12 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/260.png" id="1_260"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/261.png" id="2_261"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/262.png" id="3_262"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/263.png" id="4_263"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/264.png" id="5_264"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/265.png" id="6_265"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/266.png" id="7_266"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/267.png" id="8_267"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/268.png" id="9_268"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/269.png" id="10_269"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/270.png" id="11_270"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 3.0, "texture": ExtResource("1_260")}, {"duration": 2.0, "texture": ExtResource("2_261")}, {"duration": 3.0, "texture": ExtResource("3_262")}, {"duration": 4.0, "texture": ExtResource("4_263")}, {"duration": 3.0, "texture": ExtResource("5_264")}, {"duration": 3.0, "texture": ExtResource("6_265")}, {"duration": 3.0, "texture": ExtResource("7_266")}, {"duration": 3.0, "texture": ExtResource("8_267")}, {"duration": 3.0, "texture": ExtResource("9_268")}, {"duration": 3.0, "texture": ExtResource("10_269")}, {"duration": 3.0, "texture": ExtResource("11_270")}],
+"loop": false,
+"name": &"blood_260_270",
+"speed": 60.0
+}]

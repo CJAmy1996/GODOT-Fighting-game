@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://kfqidog6ybjj"
+path="res://.godot/imported/SE_110 (waterfall).mp3-2d530975cfa44962c64541b1a13615e6.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_110 (waterfall).mp3"
+dest_files=["res://.godot/imported/SE_110 (waterfall).mp3-2d530975cfa44962c64541b1a13615e6.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

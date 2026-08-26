@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cbh7x88xlu2fe"
+path="res://.godot/imported/SE_018 (Kick whiff).mp3-5e3d0188a79bf1941f31e8dba3d0a5d5.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_018 (Kick whiff).mp3"
+dest_files=["res://.godot/imported/SE_018 (Kick whiff).mp3-5e3d0188a79bf1941f31e8dba3d0a5d5.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,234 @@
+[gd_resource type="Resource" script_class="SpecialMoveSet" load_steps=22 format=3 uid="uid://cm04ot2ir63p"]
+
+[ext_resource type="Script" uid="uid://b0wbufr78dysp" path="res://Scripts/Core/SpecialMoveSet.cs" id="1_set"]
+[ext_resource type="Script" uid="uid://cvrl3b6rdaomb" path="res://Scripts/Core/SpecialMoveData.cs" id="2_move"]
+[ext_resource type="Script" uid="uid://n3y3qgmoj53v" path="res://Scripts/Core/FighterBoxFrame.cs" id="3_box"]
+[ext_resource type="Script" uid="uid://b60x15w1xhb6k" path="res://Scripts/Core/MotionInputBinding.cs" id="4_binding"]
+[ext_resource type="Resource" path="res://Data/Motions/quarter_circle_forward.tres" id="5_qcf"]
+[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/Kamui/kamui_sprite_frames.tres" id="6_frames"]
+[ext_resource type="SpriteFrames" path="res://Assets/TestFighter/BigBangBeatRevolve/Kamui/Effects/RockBreak/rock_break_sprite_frames.tres" id="7_rocks"]
+
+[sub_resource type="Resource" id="KamuiGuardCancelHurtbox"]
+script = ExtResource("3_box")
+EndFrame = 57
+LocalRect = Rect2(-38, -124, 76, 124)
+Tag = "kamui-guard-cancel-body"
+
+[sub_resource type="Resource" id="KamuiGuardCancelHitbox"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 36
+EndFrame = 43
+LocalRect = Rect2(4, -110, 116, 82)
+Tag = "kamui-guard-cancel-hit"
+HitGroup = 1
+Priority = 3
+
+[sub_resource type="Resource" id="KamuiGuardCancelMove"]
+script = ExtResource("2_move")
+GuardCancel = true
+CanStartDuringBlockstun = true
+AttackName = "ALPHA COUNTER"
+AnimationName = "guard_cancel_burst"
+Stance = 1
+StartupFrames = 36
+ActiveFrames = 8
+RecoveryFrames = 23
+SuppressFallbackHitbox = true
+Damage = 110
+HitstunFrames = 24
+BlockstunFrames = 16
+HitstopFrames = 12
+Pushback = 220.0
+ShakeStrength = 6.0
+GuardReactionStrength = 3
+BoxTimeline = [SubResource("KamuiGuardCancelHurtbox"), SubResource("KamuiGuardCancelHitbox")]
+
+[sub_resource type="Resource" id="IkazuchiBody"]
+script = ExtResource("3_box")
+EndFrame = 50
+LocalRect = Rect2(-42, -138, 84, 138)
+
+[sub_resource type="Resource" id="IkazuchiLightBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("5_qcf")
+Priority = 30
+
+[sub_resource type="Resource" id="IkazuchiLight"]
+script = ExtResource("2_move")
+CommandInput = SubResource("IkazuchiLightBinding")
+CanCancelIntoFromNormals = true
+RequiresSwordInHand = true
+Projectile = true
+ProjectileSpeed = 0.0
+ProjectileSpawnOffset = Vector2(112, -360)
+ProjectileHitboxLocal = Rect2(-25, -360, 50, 720)
+ProjectileSpriteFrames = ExtResource("6_frames")
+ProjectileAnimationName = "ikazuchi_active"
+ProjectileVisualScale = Vector2(1, 6)
+ProjectileVisualStartScale = Vector2(2, 6)
+ProjectileVisualScaleStartFrame = 0
+ProjectileVisualScaleEndFrame = 2
+ProjectileVisualAdditiveBlend = true
+ProjectileVisualBlackKey = true
+ProjectilePersistsVisuallyAfterFinalHit = true
+ProjectileLifetimeFrames = 52
+ProjectileVisualOpacityFrames = PackedInt32Array(0, 2)
+ProjectileVisualOpacityValues = PackedFloat32Array(255, 155)
+ProjectileVisualOpacityLossPerFrame = PackedFloat32Array(0, 5)
+AttackName = "IKAZUCHI LIGHT"
+AnimationName = "anim_130"
+Stance = 1
+StartupFrames = 22
+ActiveFrames = 3
+RecoveryFrames = 24
+SuppressFallbackHitbox = true
+Damage = 82
+HitstunFrames = 20
+BlockstunFrames = 12
+HitstopFrames = 7
+Pushback = 115.0
+ShakeStrength = 4.0
+BoxTimeline = [SubResource("IkazuchiBody")]
+Launches = true
+LaunchGroundedOnly = true
+LaunchSpeed = 1265.0
+LaunchPushback = 55.0
+LaunchHitstunFrames = 38
+
+[sub_resource type="Resource" id="IkazuchiHeavyBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("5_qcf")
+Buttons = 2
+Priority = 31
+
+[sub_resource type="Resource" id="IkazuchiHeavy"]
+script = ExtResource("2_move")
+CommandInput = SubResource("IkazuchiHeavyBinding")
+CanCancelIntoFromNormals = true
+RequiresSwordInHand = true
+Projectile = true
+HeavyProjectile = true
+ProjectileSpeed = 0.0
+ProjectileSpawnOffset = Vector2(420, -360)
+ProjectileHitboxLocal = Rect2(-25, -360, 50, 720)
+ProjectileSpriteFrames = ExtResource("6_frames")
+ProjectileAnimationName = "ikazuchi_active"
+ProjectileVisualScale = Vector2(1, 6)
+ProjectileVisualStartScale = Vector2(2, 6)
+ProjectileVisualScaleStartFrame = 0
+ProjectileVisualScaleEndFrame = 2
+ProjectileVisualAdditiveBlend = true
+ProjectileVisualBlackKey = true
+ProjectilePersistsVisuallyAfterFinalHit = true
+ProjectileLifetimeFrames = 52
+ProjectileVisualOpacityFrames = PackedInt32Array(0, 2)
+ProjectileVisualOpacityValues = PackedFloat32Array(255, 155)
+ProjectileVisualOpacityLossPerFrame = PackedFloat32Array(0, 5)
+AttackName = "IKAZUCHI HEAVY"
+AnimationName = "anim_132"
+Stance = 1
+StartupFrames = 22
+ActiveFrames = 3
+RecoveryFrames = 26
+SuppressFallbackHitbox = true
+Damage = 92
+HitstunFrames = 22
+BlockstunFrames = 13
+HitstopFrames = 8
+Pushback = 130.0
+ShakeStrength = 5.0
+BoxTimeline = [SubResource("IkazuchiBody")]
+Launches = true
+LaunchGroundedOnly = true
+LaunchSpeed = 1265.0
+LaunchPushback = 55.0
+LaunchHitstunFrames = 38
+
+[sub_resource type="Resource" id="RingFireballBody"]
+script = ExtResource("3_box")
+EndFrame = 57
+LocalRect = Rect2(-42, -138, 84, 138)
+
+[sub_resource type="Resource" id="RingFireballBinding"]
+script = ExtResource("4_binding")
+Motion = ExtResource("5_qcf")
+Buttons = 12
+Priority = 29
+
+[sub_resource type="Resource" id="RingFireball"]
+script = ExtResource("2_move")
+CommandInput = SubResource("RingFireballBinding")
+CanCancelIntoFromNormals = true
+Projectile = true
+ProjectileSpeed = 620.0
+ProjectileSpawnOffset = Vector2(136, -114)
+ProjectileHitboxLocal = Rect2(-28, -28, 56, 56)
+ProjectileSpriteFrames = ExtResource("6_frames")
+ProjectileAnimationName = "kamui_fireball_core"
+ProjectileVisualAdditiveBlend = true
+ProjectileVisualBlackKey = true
+ProjectileTrailAnimationName = "kamui_fireball_ring"
+ProjectileTrailCount = 6
+ProjectileTrailOpacity = 1.0
+ProjectileTrailScaleStep = 0.05
+ProjectileTrailOpacityLossPerFrame = 10.0
+ProjectileHitCount = 10
+ProjectileLifetimeFrames = 84
+AttackName = "KAMUI RING FIREBALL"
+AnimationName = "fireball_cast"
+Stance = 1
+StartupFrames = 10
+ActiveFrames = 1
+RecoveryFrames = 47
+SuppressFallbackHitbox = true
+Damage = 14
+HitstunFrames = 9
+BlockstunFrames = 6
+HitstopFrames = 2
+Pushback = 35.0
+ShakeStrength = 1.5
+BoxTimeline = [SubResource("RingFireballBody")]
+
+[sub_resource type="Resource" id="SpecialTraitCounterBody"]
+script = ExtResource("3_box")
+EndFrame = 48
+LocalRect = Rect2(-40, -136, 80, 136)
+
+[sub_resource type="Resource" id="SpecialTraitRockHit"]
+script = ExtResource("3_box")
+Kind = 1
+StartFrame = 7
+EndFrame = 30
+LocalRect = Rect2(20, -178, 145, 176)
+Damage = 120
+HitstunFrames = 24
+BlockstunFrames = 15
+HitstopFrames = 9
+Pushback = 180.0
+ShakeStrength = 7.0
+
+[sub_resource type="Resource" id="SpecialTraitCounter"]
+script = ExtResource("2_move")
+AttackName = "KAMUI S2 ROCK ATTACK"
+AnimationName = "trait_2"
+Stance = 1
+StartupFrames = 7
+ActiveFrames = 30
+RecoveryFrames = 12
+SuppressFallbackHitbox = true
+EffectSpriteFrames = ExtResource("7_rocks")
+EffectAnimationName = "rock_break"
+EffectSpawnFrame = 7
+EffectSpawnOffset = Vector2(92, -92)
+Damage = 120
+HitstunFrames = 24
+BlockstunFrames = 15
+HitstopFrames = 9
+Pushback = 180.0
+ShakeStrength = 7.0
+BoxTimeline = [SubResource("SpecialTraitCounterBody"), SubResource("SpecialTraitRockHit")]
+
+[resource]
+script = ExtResource("1_set")
+Moves = [SubResource("KamuiGuardCancelMove"), SubResource("IkazuchiLight"), SubResource("IkazuchiHeavy"), SubResource("RingFireball"), SubResource("SpecialTraitCounter")]

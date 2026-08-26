@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="FighterDefinition" load_steps=19 format=3 uid="uid://bsia1qvkdppur"]
+
+[ext_resource type="Script" uid="uid://p3g6dew2wiky" path="res://Scripts/Core/FighterDefinition.cs" id="1_def"]
+[ext_resource type="Script" uid="uid://s1q2kuukuw7h" path="res://Scripts/Core/MovementTuning.cs" id="2_tuning"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/neutral_jump.tres" id="3"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/forward_jump.tres" id="4"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/backward_jump.tres" id="5"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/forward_run.tres" id="6"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/backdash.tres" id="7"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/air_dash.tres" id="8"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/backward_air_dash.tres" id="9"]
+[ext_resource type="Resource" path="res://Data/Characters/Common/super_jump.tres" id="10"]
+[ext_resource type="Resource" uid="uid://c32qbocpsvmo4" path="res://Data/Characters/KungFuMan/kung_fu_man_normal_moves.tres" id="11_normals"]
+[ext_resource type="Resource" uid="uid://ds7etjdao7hoc" path="res://Data/Characters/KungFuMan/kung_fu_man_special_moves.tres" id="12_specials"]
+[ext_resource type="Resource" path="res://Data/Characters/KungFuMan/super_rush.tres" id="13_super_rush"]
+[ext_resource type="Resource" path="res://Data/Characters/KungFuMan/super_fireball.tres" id="14_super_fireball"]
+[ext_resource type="Script" uid="uid://ccpi48jqc0xq" path="res://Scripts/Core/CancelRule.cs" id="15_cancel_rule"]
+[ext_resource type="Resource" path="res://Data/Characters/KungFuMan/kung_fu_man_gauges.tres" id="16_gauges"]
+
+[sub_resource type="Resource" id="CancelRule_normal_to_special_on_contact"]
+script = ExtResource("15_cancel_rule")
+AllowedTargets = PackedStringArray("LIGHT PROJECTILE", "HEAVY PROJECTILE", "SUPER RUSH", "SUPER FIREBALL")
+
+[sub_resource type="Resource" id="MovementTuning_kfm"]
+script = ExtResource("2_tuning")
+WalkSpeed = 360.0
+GroundAcceleration = 4400.0
+GroundDeceleration = 5200.0
+GroundFriction = 6000.0
+Gravity = 2780.0
+TerminalFallSpeed = 2400.0
+AirSpeed = 420.0
+AirAcceleration = 2600.0
+AirDeceleration = 1700.0
+AllowAirControl = false
+InputBufferFrames = 4
+
+[resource]
+script = ExtResource("1_def")
+FighterName = "Kung Fu Man (Sprite Test)"
+Gauges = ExtResource("16_gauges")
+Tuning = SubResource("MovementTuning_kfm")
+Abilities = [ExtResource("10"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("9"), ExtResource("8")]
+NormalMoves = ExtResource("11_normals")
+SpecialMoves = ExtResource("12_specials")
+SuperMoves = [ExtResource("13_super_rush"), ExtResource("14_super_fireball")]
+CancelRules = [SubResource("CancelRule_normal_to_special_on_contact")]

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cbt1phjc5kim6"
+path="res://.godot/imported/SE_023 (thrown).mp3-d3e5e68bc3c6634bb41ce639528974ec.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_023 (thrown).mp3"
+dest_files=["res://.godot/imported/SE_023 (thrown).mp3-d3e5e68bc3c6634bb41ce639528974ec.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

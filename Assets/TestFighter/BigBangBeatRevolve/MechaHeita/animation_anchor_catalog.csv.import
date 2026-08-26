@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dkxqfdujr70h2"
+
+[deps]
+
+files=["res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.script.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.script.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation"]
+
+source_file="res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.csv"
+dest_files=["res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.script.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.script.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation", "res://Assets/TestFighter/BigBangBeatRevolve/MechaHeita/animation_anchor_catalog.godot.translation"]
+
+[params]
+
+compress=true
+delimiter=0

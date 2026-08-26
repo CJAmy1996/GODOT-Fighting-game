@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bo5yfy3mlh4my"
+
+[deps]
+
+files=["res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.category.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.assignment.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.drawing.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.timeline.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.resolved.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.hold.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.offset.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.offset.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.missing.translation"]
+
+source_file="res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.csv"
+dest_files=["res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.category.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.assignment.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.drawing.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.timeline.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.source.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.resolved.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.hold.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.offset.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.offset.translation", "res://Assets/TestFighter/BigBangBeatRevolve/Kunagi/animation_catalog.missing.translation"]
+
+[params]
+
+compress=true
+delimiter=0

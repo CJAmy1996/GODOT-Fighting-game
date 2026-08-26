@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://0wt5gms12rbl"
+path="res://.godot/imported/SE_035 (box break).mp3-0d47136ad666767a9efe11da5aeb2852.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_035 (box break).mp3"
+dest_files=["res://.godot/imported/SE_035 (box break).mp3-0d47136ad666767a9efe11da5aeb2852.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

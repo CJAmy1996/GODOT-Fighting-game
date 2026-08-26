@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MotionInputDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/MotionInputDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+MotionName = "Shoryuken / Forward DP"
+DirectionSequences = PackedStringArray("F,D,DF", "F,D,F")
+MotionWindowFrames = 16
+ButtonLeniencyFrames = 5
+MaxSkippedDirections = 1

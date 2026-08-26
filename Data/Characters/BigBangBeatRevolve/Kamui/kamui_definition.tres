@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="FighterDefinition" load_steps=21 format=3 uid="uid://cgqniue2p5wyh"]
+
+[ext_resource type="Script" uid="uid://p3g6dew2wiky" path="res://Scripts/Core/FighterDefinition.cs" id="1_def"]
+[ext_resource type="Script" uid="uid://s1q2kuukuw7h" path="res://Scripts/Core/MovementTuning.cs" id="2_tuning"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_neutral_jump.tres" id="3_neutral_jump"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_forward_jump.tres" id="4_forward_jump"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_backward_jump.tres" id="5_backward_jump"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_forward_run.tres" id="6_run"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_ground_backdash.tres" id="7_backdash"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_super_jump.tres" id="10_super_jump"]
+[ext_resource type="Resource" uid="uid://bvl8mmy3vtqs0" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_normal_moves.tres" id="11_normals"]
+[ext_resource type="Resource" uid="uid://cm04ot2ir63p" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_special_moves.tres" id="12_specials"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_gauges.tres" id="13_gauges"]
+[ext_resource type="Resource" uid="uid://b3qjkhhlk7kp7" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_state_boxes.tres" id="14_states"]
+[ext_resource type="Texture2D" uid="uid://c0kto7blj17e" path="res://Assets/TestFighter/BigBangBeatRevolve/Kamui/super_portrait.png" id="20_portrait"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_air_walk.tres" id="21_air_walk"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_teleport_dash.tres" id="22_teleport_dash"]
+[ext_resource type="Resource" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_teleport_backdash.tres" id="23_teleport_backdash"]
+[ext_resource type="Resource" uid="uid://cry0lbvlq4jgp" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_super_electrocution.tres" id="24_electrocution"]
+[ext_resource type="Resource" uid="uid://5c3nptig03fq" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_super_lightning_forward.tres" id="25_lightning_forward"]
+[ext_resource type="Resource" uid="uid://bg7x0hc4bt6jj" path="res://Data/Characters/BigBangBeatRevolve/Kamui/kamui_super_lightning_back.tres" id="26_lightning_back"]
+
+[sub_resource type="Resource" id="MovementTuning_imported"]
+script = ExtResource("2_tuning")
+WalkSpeed = 186.0
+GroundAcceleration = 4200.0
+GroundDeceleration = 5000.0
+GroundFriction = 5800.0
+Gravity = 3000.0
+TerminalFallSpeed = 1900.0
+AirSpeed = 210.8
+AirAcceleration = 1364.0
+AirDeceleration = 930.0
+AllowAirControl = false
+InputBufferFrames = 4
+
+[resource]
+script = ExtResource("1_def")
+FighterName = "Kamui"
+AllowLegacyFallbackMoves = false
+SuperPortrait = ExtResource("20_portrait")
+Gauges = ExtResource("13_gauges")
+Tuning = SubResource("MovementTuning_imported")
+Abilities = [ExtResource("21_air_walk"), ExtResource("22_teleport_dash"), ExtResource("23_teleport_backdash"), ExtResource("10_super_jump"), ExtResource("3_neutral_jump"), ExtResource("4_forward_jump"), ExtResource("5_backward_jump"), ExtResource("6_run"), ExtResource("7_backdash")]
+NormalMoves = ExtResource("11_normals")
+StateBoxes = ExtResource("14_states")
+SpecialMoves = ExtResource("12_specials")
+SuperMoves = [ExtResource("24_electrocution"), ExtResource("25_lightning_forward"), ExtResource("26_lightning_back")]

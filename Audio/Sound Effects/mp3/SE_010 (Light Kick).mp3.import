@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://doxp80q6yqa72"
+path="res://.godot/imported/SE_010 (Light Kick).mp3-645bb054df6b71e9c5ee10d202fc1860.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_010 (Light Kick).mp3"
+dest_files=["res://.godot/imported/SE_010 (Light Kick).mp3-645bb054df6b71e9c5ee10d202fc1860.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

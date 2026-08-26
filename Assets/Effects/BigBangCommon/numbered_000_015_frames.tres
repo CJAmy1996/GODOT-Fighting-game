@@ -1,0 +1,26 @@
+[gd_resource type="SpriteFrames" load_steps=17 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/000.png" id="1_000"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/001.png" id="2_001"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/002.png" id="3_002"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/003.png" id="4_003"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/004.png" id="5_004"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/005.png" id="6_005"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/006.png" id="7_006"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/007.png" id="8_007"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/008.png" id="9_008"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/009.png" id="10_009"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/010.png" id="11_010"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/011.png" id="12_011"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/012.png" id="13_012"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/013.png" id="14_013"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/014.png" id="15_014"]
+[ext_resource type="Texture2D" path="res://Assets/Effects/BigBangCommon/015.png" id="16_015"]
+
+[resource]
+animations = [{
+"frames": [{"duration": 2.0, "texture": ExtResource("1_000")}, {"duration": 2.0, "texture": ExtResource("2_001")}, {"duration": 2.0, "texture": ExtResource("3_002")}, {"duration": 2.0, "texture": ExtResource("4_003")}, {"duration": 2.0, "texture": ExtResource("5_004")}, {"duration": 2.0, "texture": ExtResource("6_005")}, {"duration": 2.0, "texture": ExtResource("7_006")}, {"duration": 2.0, "texture": ExtResource("8_007")}, {"duration": 2.0, "texture": ExtResource("9_008")}, {"duration": 2.0, "texture": ExtResource("10_009")}, {"duration": 2.0, "texture": ExtResource("11_010")}, {"duration": 2.0, "texture": ExtResource("12_011")}, {"duration": 2.0, "texture": ExtResource("13_012")}, {"duration": 2.0, "texture": ExtResource("14_013")}, {"duration": 2.0, "texture": ExtResource("15_014")}, {"duration": 2.0, "texture": ExtResource("16_015")}],
+"loop": true,
+"name": &"numbered_000_015",
+"speed": 60.0
+}]

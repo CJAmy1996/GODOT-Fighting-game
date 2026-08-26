@@ -4,7 +4,7 @@ using ModularFighter.Core;
 namespace ModularFighter.Movement;
 
 /// <summary>Marvel-style down-to-up super jump: fixed high launch with air steering.</summary>
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class SuperJumpAbility : MovementAbility
 {
 	[Export] public int CommandWindowFrames { get; set; } = 4;
@@ -23,8 +23,14 @@ public partial class SuperJumpAbility : MovementAbility
 	{
 		base.Start(fighter, runtime);
 		fighter.RefreshAirJumpResourcesForSuperJump();
+		fighter.SetSuperJumpPresentationDirection(fighter.CurrentInput.Horizontal);
 		fighter.ConsumeDownThenUpCommand();
 		fighter.ConsumeJumpBuffer();
+		fighter.QueueGroundJumpStartEffect(isSuperJump: true);
 		fighter.Velocity = new Vector2(fighter.CurrentInput.Horizontal * ForwardSpeed, -InitialSpeed);
 	}
+
+	// Super jumps are command launches, not held-button variable-height jumps.
+	// The launch speed is committed in Start even if Jump is released next frame.
+	public override bool Tick(FighterController fighter, AbilityRuntime runtime, float delta) => false;
 }

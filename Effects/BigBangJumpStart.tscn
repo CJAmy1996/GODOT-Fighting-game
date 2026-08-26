@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Demo/BigBangCommonEffect.cs" id="1_effect"]
+
+[node name="BigBangJumpStart" type="Node2D"]
+script = ExtResource("1_effect")
+EffectKind = 5

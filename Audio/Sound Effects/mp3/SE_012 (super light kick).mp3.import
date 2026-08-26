@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://blve866s3xdvk"
+path="res://.godot/imported/SE_012 (super light kick).mp3-fc49982c34f68786ced649105d1da8ea.mp3str"
+
+[deps]
+
+source_file="res://Audio/Sound Effects/mp3/SE_012 (super light kick).mp3"
+dest_files=["res://.godot/imported/SE_012 (super light kick).mp3-fc49982c34f68786ced649105d1da8ea.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,91 @@
+[gd_resource type="SpriteFrames" load_steps=5 format=3 uid="uid://ktjtoushsi3r"]
+
+[ext_resource type="Texture2D" uid="uid://bnso7s04whlex" path="res://Assets/TestFighter/BigBangBeatRevolve/Kinako/Frames/frame_0384.png" id="1_beam_a"]
+[ext_resource type="Texture2D" uid="uid://cw0olw1vkwx3p" path="res://Assets/TestFighter/BigBangBeatRevolve/Kinako/Frames/frame_0386.png" id="2_beam_b"]
+
+[sub_resource type="AtlasTexture" id="AtlasBeamA"]
+atlas = ExtResource("1_beam_a")
+region = Rect2(155, 237, 10, 13)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasBeamB"]
+atlas = ExtResource("2_beam_b")
+region = Rect2(157, 242, 7, 8)
+filter_clip = true
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 10.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 4.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamB")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamB")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamB")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamB")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamB")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamB")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamB")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamB")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamB")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamA")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasBeamB")
+}, {
+"duration": 30.0,
+"texture": SubResource("AtlasBeamA")
+}],
+"loop": false,
+"name": &"source_beam",
+"speed": 60.0
+}]
